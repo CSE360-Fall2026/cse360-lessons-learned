@@ -31,7 +31,6 @@ out/
 
 # Eclipse workspace metadata & local user settings
 .metadata/
-.settings/
 *.tmp
 *.bak
 *.swp
