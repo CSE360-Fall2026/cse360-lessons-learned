@@ -43,3 +43,17 @@ local.properties
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Generated Javadoc documentation
+/doc/
+/docs/
+/javadoc/
+
+# Local H2 database files
+*.mv.db
+*.trace.db
+*.lock.db
+
+# macOS metadata
+.AppleDouble
+._*
