@@ -6,7 +6,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import entityClasses.ExperienceEntry;
@@ -36,6 +39,9 @@ import entityClasses.User;
  * @version 2.03		2026-10-14 TP2: in-place migration of lessonsLearnedDB for the Phase Three
  * 							attributes; experienceMemberEffortDB table; all-lessons query;
  * 							Curator-field update; transactional experience insert
+ * @version 2.04		2026-11-01 HW3 Task 5: setLessonLocks() saves several lock flags in one
+ * 							UPDATE for the Curator lock prototype; lockColumn() shared with
+ * 							setLessonLock()
  */
 
 /*
@@ -1393,17 +1399,12 @@ public class Database {
 	 * @return true if a row was updated, false otherwise (including an unknown field name)
 	 */
 	public boolean setLessonLock(int lessonId, String field, boolean locked) {
-		String column;
-		switch (field) {
-			case "title": column = "lockedTitle"; break;
-			case "description": column = "lockedDescription"; break;
-			case "tags": column = "lockedTags"; break;
-			case "category": column = "lockedCategory"; break;
-			case "entire": column = "lockedEntire"; break;
-			default: return false;
-		}
+		// HW3 Task 5 refactor: the name-to-column switch moved to lockColumn() so this method and
+		// setLessonLocks() share one fixed list of lock columns and can never disagree
+		String column = lockColumn(field);
+		if (column == null) return false;
 		// JDBC can only parameterize values, not column names, so the column name is placed in
-		// the query text.  That is safe here because it only ever comes from the switch above.
+		// the query text.  That is safe here because it only ever comes from lockColumn().
 		String query = "UPDATE lessonsLearnedDB SET " + column + " = ? WHERE id = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setBoolean(1, locked);
@@ -1412,6 +1413,85 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	/*******
+	 * <p> Method: boolean setLessonLocks(int lessonId, Collection&lt;String&gt; fields,
+	 * 		boolean locked) </p>
+	 *
+	 * <p> Description: HW3 Task 5 prototype for TP3 Aspect 2 (Epic E6).  Sets or clears several
+	 * lock flags of one lesson in ONE UPDATE statement, so the flags a Curator chose are saved
+	 * together or not at all (Epic E6, action 4: "System saves all lock flags in one write";
+	 * ConOps objective OB-7).  setLessonLock() above changes one flag per call, so a request for
+	 * several flags could be left half-saved if a later call failed; ModelCuratorLock uses this
+	 * method instead.</p>
+	 *
+	 * <p> Every name is checked against the five known field names BEFORE the statement is built.
+	 * An unknown name, an empty or null list, or a lesson that does not exist changes nothing
+	 * and returns false (requirement TR-7).  A repeated name is used once.</p>
+	 *
+	 * @param lessonId the lesson to change
+	 *
+	 * @param fields any of "title", "description", "tags", "category", and "entire" (the
+	 * 		LessonsLearned FIELD_ and LOCK_ENTIRE constants)
+	 *
+	 * @param locked true to lock, false to unlock
+	 *
+	 * @return true if the lesson's row was updated; false if nothing was changed
+	 */
+	public boolean setLessonLocks(int lessonId, Collection<String> fields, boolean locked) {
+		if (fields == null || fields.isEmpty()) return false;
+
+		// Turn every name into its column before building anything.  One unknown name stops
+		// the whole request, so a valid name in the same list is never saved on its own.
+		// A LinkedHashSet drops repeated names, because H2 rejects a column listed twice in SET.
+		Set<String> columns = new LinkedHashSet<String>();
+		for (String field : fields) {
+			String column = lockColumn(field);
+			if (column == null) return false;
+			columns.add(column);
+		}
+
+		// JDBC can only parameterize values, not column names, so the column names are placed
+		// in the query text.  That is safe because every one came from lockColumn()'s fixed
+		// list, never from the caller's text (Top Defects R2, CWE-89).
+		StringBuilder query = new StringBuilder("UPDATE lessonsLearnedDB SET ");
+		query.append(String.join(" = ?, ", columns)).append(" = ? WHERE id = ?");
+		try (PreparedStatement pstmt = connection.prepareStatement(query.toString())) {
+			int index = 1;
+			for (int i = 0; i < columns.size(); i++) pstmt.setBoolean(index++, locked);
+			pstmt.setInt(index, lessonId);
+			// No matching row (for example, a deleted lesson) means nothing was saved
+			return pstmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	/*******
+	 * <p> Method: String lockColumn(String field) </p>
+	 *
+	 * <p> Description: Returns the lessonsLearnedDB column that holds the lock flag for a field
+	 * name, or null if the name is not one of the five lockable names.  This fixed list is the
+	 * only source of column names in the lock UPDATE statements. </p>
+	 *
+	 * @param field "title", "description", "tags", "category", or "entire"
+	 *
+	 * @return the column name, or null for any other value, including null
+	 */
+	private static String lockColumn(String field) {
+		// A switch on a null String throws an exception, so null is handled first
+		if (field == null) return null;
+		switch (field) {
+			case "title": return "lockedTitle";
+			case "description": return "lockedDescription";
+			case "tags": return "lockedTags";
+			case "category": return "lockedCategory";
+			case "entire": return "lockedEntire";
+			default: return null;
 		}
 	}
 
