@@ -1,8 +1,10 @@
 package database;
 
-import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -54,7 +56,7 @@ public class Database {
 	/** JDBC driver name. */
 	static final String JDBC_DRIVER = "org.h2.Driver";
 	/** Database URL: an H2 file named FoundationDatabase in the user's home folder. */
-	static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
+    static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
 
 	/** Database user name (H2 default). */
 	static final String USER = "sa";
@@ -152,8 +154,11 @@ public class Database {
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 	            + "code VARCHAR(10) PRIMARY KEY, "
 	    		+ "emailAddress VARCHAR(255), "
-	            + "role VARCHAR(10))";
+                + "role VARCHAR(15))";
 	    statement.execute(invitationCodesTable);
+
+        // Update the role column for databases that already exist.
+        statement.execute("ALTER TABLE InvitationCodes ALTER COLUMN role VARCHAR(15)");
 
 	    // Create the one-time passwords table
  		String otpTable = "CREATE TABLE IF NOT EXISTS OneTimePasswords ("
