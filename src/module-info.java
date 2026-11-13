@@ -7,4 +7,5 @@ module FoundationsF26 {
 	opens hw3Tests to org.junit.platform.commons;
 	opens curatorLockTests to org.junit.platform.commons;
 	opens curatorHomeTests to org.junit.platform.commons;
+	opens curatorRefinementTests to org.junit.platform.commons;
 }

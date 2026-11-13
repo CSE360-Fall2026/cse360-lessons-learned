@@ -18,6 +18,7 @@ import entityClasses.ExperienceEntry;
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
 import entityClasses.MemberEffort;
+import entityClasses.RefinementDraft;
 import entityClasses.User;
 
 /*******
@@ -1396,6 +1397,69 @@ public class Database {
 			return pstmt.executeUpdate() > 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	/**
+	 * Reads the current stored Curator role without changing current-user attributes.
+	 * E3 checks this before an AI request/save, including after role revocation.
+	 * Tested by CuratorRefinementTests RF-02, RF-28/29, and RF-34.
+	 * @param username authenticated session username
+	 * @return true only for an existing account with the Curator flag
+	 */
+	public boolean hasCuratorRole(String username) {
+		if (username == null || username.isBlank()) return false;
+		try (PreparedStatement pstmt = connection.prepareStatement(
+				"SELECT newRole2 FROM userDB WHERE userName = ?")) {
+			pstmt.setString(1, username);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				return rs.next() && rs.getBoolean(1);
+			}
+		} catch (SQLException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Atomically stores E3 text, first originals, attribution, and the updated timestamp.
+	 * The Model validates text first. One prepared UPDATE rechecks the stored Curator
+	 * role and the review's revision, closing the read/check/write gap. It updates no
+	 * locks, ownership, E2 search terms, E4/E5 summaries, or Contributor coaching fields.
+	 * Tested by CuratorRefinementTests RF-09/10/13/14/16/17/28/30/31/32/33/36/38.
+	 * @param expected review snapshot
+	 * @param curator authenticated Curator username
+	 * @param title validated final title
+	 * @param description validated final description
+	 * @param when positive epoch-millisecond save time
+	 * @return true for exactly one saved lesson; false on stale review, role loss, or SQL failure
+	 */
+	public boolean saveCuratorRefinement(RefinementDraft expected, String curator,
+			String title, String description, long when) {
+		if (expected == null || curator == null || when <= 0) return false;
+		String query = "UPDATE lessonsLearnedDB SET "
+				+ "originalTitle = CASE WHEN originalTitle = '' THEN title ELSE originalTitle END, "
+				+ "originalDescription = CASE WHEN originalDescription = '' THEN description ELSE originalDescription END, "
+				+ "title = ?, description = ?, curatedBy = ?, curatedAt = ?, updatedAt = ? "
+				+ "WHERE id = ? AND title = ? AND description = ? AND updatedAt = ? "
+				+ "AND curatedAt = ? AND curatedBy = ? "
+				+ "AND EXISTS (SELECT 1 FROM userDB WHERE userName = ? AND newRole2 = TRUE)";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, title);
+			pstmt.setString(2, description);
+			pstmt.setString(3, curator);
+			pstmt.setLong(4, when);
+			pstmt.setLong(5, when);
+			pstmt.setInt(6, expected.lessonId());
+			pstmt.setString(7, expected.title());
+			pstmt.setString(8, expected.description());
+			pstmt.setLong(9, expected.updatedAt());
+			pstmt.setLong(10, expected.curatedAt());
+			pstmt.setString(11, expected.curatedBy());
+			pstmt.setString(12, curator);
+			return pstmt.executeUpdate() == 1;
+		} catch (SQLException e) {
 			return false;
 		}
 	}
