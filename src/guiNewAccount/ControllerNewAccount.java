@@ -29,6 +29,7 @@ import inputValidation.PasswordRecognizer;
  * 
  * @version 1.00		2025-08-17 Initial version
  * @version 2.00		2026-09-16 Updated to implement username and password validation with dynamic updates
+ * @version 2.01		2026-11-10 TP3 Aspect 1: a Role2 invitation creates a Curator account
  *  
  */
 
@@ -156,7 +157,9 @@ public class ControllerNewAccount {
 			} else if (ViewNewAccount.theRole.compareTo("Role1") == 0 || ViewNewAccount.theRole.compareTo("Contributor") == 0) {
 				roleCode = 2;
 				user = new User(username, password, "", "", "", "", "", false, true, false);
-			} else if (ViewNewAccount.theRole.compareTo("Role2") == 0) {
+			} else if (ViewNewAccount.theRole.compareTo("Role2") == 0 || ViewNewAccount.theRole.compareTo("Curator") == 0) {
+				// TP3 Aspect 1: Role2 is the Curator role.  Invitations store "Role2"; "Curator"
+				// is accepted as well, the same way "Contributor" is accepted for Role1 above.
 				roleCode = 3;
 				user = new User(username, password, "", "", "", "", "", false, false, true);
 			} else {

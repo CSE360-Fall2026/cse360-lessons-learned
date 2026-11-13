@@ -44,6 +44,8 @@ import entityClasses.User;
  * @version 2.04		2026-11-01 HW3 Task 5: setLessonLocks() saves several lock flags in one
  * 							UPDATE for the Curator lock prototype; lockColumn() shared with
  * 							setLessonLock()
+ * @version 2.05		2026-11-10 TP3 Aspect 1: updateUserRole() also accepts "Curator" for the
+ * 							Role2 flag
  */
 
 /*
@@ -88,7 +90,7 @@ public class Database {
 	private boolean currentAdminRole;
 	/** Whether the current user has Role1 (shown as Contributor). */
 	private boolean currentNewRole1;
-	/** Whether the current user has Role2. */
+	/** Whether the current user has Role2 (shown as Curator since TP3 Aspect 1). */
 	private boolean currentNewRole2;
 
 	/*******
@@ -433,12 +435,17 @@ public class Database {
 	 * <p> Description: Check to see that a user with the specified username, password, and role
 	 * 		is the same as a row in the table for the username, password, and role. </p>
 	 *
-	 * @param user specifies the specific user that should be logged in playing the Reviewer role.
+	 * <p> Since TP3 Aspect 1 the Role2 flag is the Curator role, so this is the Curator login
+	 * 		check (US-CR2).  Because it reads the stored flag, a user whose Curator role was
+	 * 		removed by an Admin is refused at the next login.
+	 * 		Tested by curatorHomeTests.CuratorHomeTests CH-12 to CH-15 (JUnit). </p>
 	 *
-	 * @return true if the specified user has been logged in as an Student else false.
+	 * @param user specifies the specific user that should be logged in playing the Curator role.
+	 *
+	 * @return true if the specified user has been logged in as a Curator else false.
 	 *
 	 */
-	// Validates a reviewer user's login credentials.
+	// Validates a Curator's login credentials.
 	public boolean loginRole2(User user) {
 		String query = "SELECT * FROM userDB WHERE userName = ? AND password = ? AND "
 				+ "newRole2 = TRUE";
@@ -1056,11 +1063,17 @@ public class Database {
 	 * <p> Method: boolean updateUserRole(String username, String role, String value) </p>
 	 *
 	 * <p> Description: Update a specified role for a specified user's and set and update all the
-	 * 		current user attributes.</p>
+	 * 		current user attributes.  This is how an Admin gives or removes the Contributor role
+	 * 		("Role1" or "Contributor") and, in TP3, the Curator role ("Role2" or "Curator";
+	 * 		US-CR1).  A role name the system does not have changes nothing.</p>
+	 *
+	 * <p> For the Curator role, tested by curatorHomeTests.CuratorHomeTests CH-08 to CH-11 and
+	 * 		CH-15 (JUnit). </p>
 	 *
 	 * @param username is the username of the user
 	 *
-	 * @param role is string that specifies the role to update
+	 * @param role is string that specifies the role to update: "Admin", "Role1" or
+	 * 		"Contributor", "Role2" or "Curator"
 	 *
 	 * @param value is the string that specified TRUE or FALSE for the role
 	 *
@@ -1099,7 +1112,9 @@ public class Database {
 				return false;
 			}
 		}
-		if (role.compareTo("Role2") == 0) {
+		// TP3 Aspect 1: Role2 is the Curator role.  The pages pass the stored name "Role2";
+		// "Curator" is accepted as well, the same way "Contributor" is accepted for Role1 above.
+		if (role.compareTo("Role2") == 0 || role.compareTo("Curator") == 0) {
 			String query = "UPDATE userDB SET newRole2 = ? WHERE username = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 				pstmt.setString(1, value);

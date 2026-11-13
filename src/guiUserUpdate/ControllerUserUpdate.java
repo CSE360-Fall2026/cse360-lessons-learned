@@ -10,6 +10,7 @@ import javafx.stage.Stage;
  * class.</p>
  *
  * @version 1.01		2026-10-14 TP2: home page 2 is now the Contributor Home Page
+ * @version 1.02		2026-11-10 TP3 Aspect 1: home page 3 is now the Curator Home Page
  */
 public class ControllerUserUpdate {
 
@@ -31,6 +32,7 @@ public class ControllerUserUpdate {
 	 * class. In this case, there is just one method, no constructors, and no attributes.</p>
 	 *
 	 * @version 1.01		2026-10-14 TP2: home page 2 is now the Contributor Home Page
+	 * @version 1.02		2026-11-10 TP3 Aspect 1: home page 3 is now the Curator Home Page
 	 */
 
 	/*-********************************************************************************************
@@ -65,7 +67,8 @@ public class ControllerUserUpdate {
 			guiContributorHome.ViewContributorHome.displayContributorHome(theStage, theUser);
 			break;
 		case 3:
-			guiRole2.ViewRole2Home.displayRole2Home(theStage, theUser);
+			// TP3: home page 3 (the Role2 flag) is the Curator Home Page
+			guiCuratorHome.ViewCuratorHome.displayCuratorHome(theStage, theUser);
 			break;
 		default:
 			System.out.println("*** ERROR *** UserUpdate goToUserHome has an invalid role: " +

@@ -29,6 +29,8 @@ import javafx.scene.control.ComboBox;
  * @version 1.02		2026-10-16 TP2: Role1 is shown as "Contributor" in the current-roles line
  * 							and both role lists, and changed in the database as "Role1" (design
  * 							decision D12; see guiTools.RoleLabels)
+ * @version 1.03		2026-11-10 TP3 Aspect 1: Role2 is shown as "Curator" in the same places
+ * 							and changed in the database as "Role2"
  */
 
 public class ControllerAddRemoveRoles {
@@ -123,7 +125,8 @@ public class ControllerAddRemoveRoles {
 	 *
 	 * <p> Description: This method fetches the current values for the widgets whose values change
 	 * based on which user has been selected and any actions that the admin takes.  In TP2 the
-	 * Role1 flag is listed as "Contributor" (D12). </p>
+	 * Role1 flag is listed as "Contributor" (D12); in TP3 the Role2 flag is listed as "Curator"
+	 * (Aspect 1, US-CR1). </p>
 	 *
 	 */
 	private static void setupSelectedUser() {
@@ -138,7 +141,7 @@ public class ControllerAddRemoveRoles {
 		if (!theDatabase.getCurrentNewRole1())
 			ViewAddRemoveRoles.addList.add(RoleLabels.ROLE1_LABEL);		// TP2: was "Role1"
 		if (!theDatabase.getCurrentNewRole2())
-			ViewAddRemoveRoles.addList.add("Role2");
+			ViewAddRemoveRoles.addList.add(RoleLabels.ROLE2_LABEL);		// TP3: was "Role2"
 
 		// Create the list of roles that could be removed for the currently selected user (e.g., Do
 		// not show a role to remove that the user does not have!)
@@ -154,7 +157,7 @@ public class ControllerAddRemoveRoles {
 		if (theDatabase.getCurrentNewRole1())
 			ViewAddRemoveRoles.removeList.add(RoleLabels.ROLE1_LABEL);	// TP2: was "Role1"
 		if (theDatabase.getCurrentNewRole2())
-			ViewAddRemoveRoles.removeList.add("Role2");
+			ViewAddRemoveRoles.removeList.add(RoleLabels.ROLE2_LABEL);	// TP3: was "Role2"
 
 		// Create the list or roles that the user currently has with proper use of a comma between
 		// items
@@ -178,12 +181,13 @@ public class ControllerAddRemoveRoles {
 			}
 		}
 
-		// Roles 2 - It could be at the head of the list or later in the list
+		// Roles 2 - It could be at the head of the list or later in the list (TP3: shown as
+		// Curator)
 		if (theDatabase.getCurrentNewRole2()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role2";
+				theCurrentRoles += ", " + RoleLabels.ROLE2_LABEL;
 			else {
-				theCurrentRoles += "Role2";
+				theCurrentRoles += RoleLabels.ROLE2_LABEL;
 				notTheFirst = true;
 			}
 		}
@@ -215,7 +219,8 @@ public class ControllerAddRemoveRoles {
 	 *
 	 * <p> Description: This method adds a new role to the list of role in the ComboBox select
 	 * list.  The chosen label is turned back into the stored role name ("Contributor" becomes
-	 * "Role1") before the database is updated (D12). </p>
+	 * "Role1" and "Curator" becomes "Role2") before the database is updated (D12; TP3 Aspect 1,
+	 * US-CR1; tested by CuratorHomeTests CH-08 and CH-10). </p>
 	 *
 	 */
 	protected static void performAddRole() {
@@ -245,7 +250,8 @@ public class ControllerAddRemoveRoles {
 	 *
 	 * <p> Description: This method removes an existing role to the list of role in the ComboBox
 	 * select list.  The chosen label is turned back into the stored role name ("Contributor"
-	 * becomes "Role1") before the database is updated (D12). </p>
+	 * becomes "Role1" and "Curator" becomes "Role2") before the database is updated (D12; TP3
+	 * Aspect 1, US-CR1; tested by CuratorHomeTests CH-09). </p>
 	 *
 	 */
 	protected static void performRemoveRole() {

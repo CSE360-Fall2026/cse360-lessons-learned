@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import database.Database;
 import entityClasses.User;
+import guiTools.RoleLabels;
 
 /*******
  * <p> Title: ViewMultipleRoleDispatch Class. </p>
@@ -26,6 +27,7 @@ import entityClasses.User;
  *
  * @version 1.00		2025-08-20 Initial version
  * @version 1.01		2026-10-14 TP2: the Role1 choice is shown as "Contributor"
+ * @version 1.02		2026-11-10 TP3 Aspect 1: the Role2 choice is shown as "Curator"
  *
  */
 
@@ -142,7 +144,8 @@ public class ViewMultipleRoleDispatch {
 		// TP2: the Role1 flag is the Contributor role (design decision D12), so it is shown by
 		// that name; ControllerMultipleRoleDispatch.performRole() matches the same word
 		if (theDatabase.getCurrentNewRole1()) list.add("Contributor");
-		if (theDatabase.getCurrentNewRole2()) list.add("Role2");
+		// TP3: the Role2 flag is the Curator role (Aspect 1), shown by that name in the same way
+		if (theDatabase.getCurrentNewRole2()) list.add(RoleLabels.ROLE2_LABEL);
 		combobox_SelectRole.setItems(FXCollections.observableArrayList(list));
 
 		// Populate the dynamic aspects of the GUI with the data from the user and the current

@@ -6,4 +6,5 @@ module FoundationsF26 {
 	opens applicationMain to javafx.graphics, javafx.fxml;
 	opens hw3Tests to org.junit.platform.commons;
 	opens curatorLockTests to org.junit.platform.commons;
+	opens curatorHomeTests to org.junit.platform.commons;
 }

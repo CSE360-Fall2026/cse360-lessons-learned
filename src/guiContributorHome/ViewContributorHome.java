@@ -147,7 +147,7 @@ public class ViewContributorHome {
 	/** The shared Scene each invocation populates. */
 	private static Scene theContributorHomeScene;
 	/** This page's home-page number, used by the account update page to return here.  The
-	 * numbering is the Foundations one: Admin 1, Role1 (Contributor) 2, Role2 3. */
+	 * numbering is the Foundations one: Admin 1, Role1 (Contributor) 2, Role2 (Curator) 3. */
 	protected static final int theRole = 2;
 
 

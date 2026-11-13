@@ -36,7 +36,8 @@ public class User {
     private boolean adminRole;
     /** Whether the user has Role1, which TP2 shows as the Contributor role (design decision D12). */
     private boolean role1;
-    /** Whether the user has Role2. */
+    /** Whether the user has Role2, which TP3 shows as the Curator role (TP3 Aspect 1; the rule
+     * that reads it is guiTools.CuratorAccess). */
     private boolean role2;
     
     
@@ -74,7 +75,7 @@ public class User {
      * 
      * @param r2 specifies the the Role1 attribute, the Contributor role in TP2 (TRUE or FALSE)
      * 
-     * @param r3 specifies the the Role2 attribute (TRUE or FALSE) for this user
+     * @param r3 specifies the the Role2 attribute, the Curator role in TP3 (TRUE or FALSE)
      * 
      */
     // Constructor to initialize a new User object with userName, password, and role.

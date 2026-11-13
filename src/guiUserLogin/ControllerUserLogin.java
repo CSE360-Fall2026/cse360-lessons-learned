@@ -42,6 +42,7 @@ import inputValidation.PasswordRecognizer;
  * @version 1.01		2025-09-16 Update Javadoc documentation *
  * @version 2.00		2026-09-18 Add one-time password check with a required password reset before log in
  * @version 2.01		2026-10-14 TP2: a Role1 user is taken to the Contributor Home Page
+ * @version 2.02		2026-11-10 TP3 Aspect 1: a Role2 user is taken to the Curator Home Page
  */
 
 public class ControllerUserLogin {
@@ -221,7 +222,8 @@ public class ControllerUserLogin {
 			} else if (user.getNewRole2()) {
 				loginResult = theDatabase.loginRole2(user);
 				if (loginResult) {
-					guiRole2.ViewRole2Home.displayRole2Home(theStage, user);
+					// TP3: the Role2 flag is the Curator role (Aspect 1; ConOps assumption A1)
+					guiCuratorHome.ViewCuratorHome.displayCuratorHome(theStage, user);
 				}
 				// Other roles
 			} else {

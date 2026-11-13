@@ -89,7 +89,8 @@ public class FoundationsMain extends Application {
     /** Shown if the database is already in use by another copy of the application. */
     private Alert databaseInUse = new Alert(AlertType.INFORMATION);
 
-	/** Which role's home page is currently active (1 Admin, 2 Role1/Contributor, 3 Role2). */
+	/** Which role's home page is currently active (1 Admin, 2 Role1/Contributor,
+	 * 3 Role2/Curator). */
 	public static int activeHomePage = 0;		// Which role's home page is currently active?
 												// Role 0 is the admin role number
 	@Override

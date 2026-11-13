@@ -75,7 +75,7 @@ public class ViewFirstAdmin {
 	protected static Stage theStage;	
 	private static Pane theRootPane;
 	private static Scene theFirstAdminScene = null;
-	private static final int theRole = 1;		// Admin: 1; Contributor: 2; Role2: 3
+	private static final int theRole = 1;		// Admin: 1; Contributor: 2; Curator: 3
 	
 	// Password checklist
 	static protected Label validPassword = new Label();		// This only appears with a valid password

@@ -22,6 +22,7 @@ import entityClasses.User;
  *
  * @version 1.00		2025-04-20 Initial version
  * @version 1.01		2026-10-14 TP2: Role1 users go to the Contributor Home Page
+ * @version 1.02		2026-11-10 TP3 Aspect 1: Role2 users go to the Curator Home Page
  *
  */
 
@@ -79,7 +80,8 @@ public class GUISingleRoleDispatch {
 			// TP2: the Role1 flag is the Contributor role (design decision D12)
 			guiContributorHome.ViewContributorHome.displayContributorHome(ps, user);
 		} else if (user.getNewRole2()) {
-			guiRole2.ViewRole2Home.displayRole2Home(ps, user);
+			// TP3: the Role2 flag is the Curator role (Aspect 1; ConOps assumption A1)
+			guiCuratorHome.ViewCuratorHome.displayCuratorHome(ps, user);
 		} else {
 			// Invalid role
 			System.out.println("*** ERROR *** GUISingleRoleDispatch was asked to dispatch to " +

@@ -65,9 +65,10 @@ public class ControllerAdminHome {
 	 * Title: performInvitation () Method. </p>
 	 *
 	 * <p> Description: Protected method to send an email inviting a potential user to establish
-	 * an account and a specific role.  The role list shows "Contributor" for Role1 (D12); the
-	 * chosen label is turned back into the stored role name before the invitation is saved,
-	 * because ControllerNewAccount expects "Role1" when the account is created. </p>
+	 * an account and a specific role.  The role list shows "Contributor" for Role1 (D12) and
+	 * "Curator" for Role2 (TP3 Aspect 1); the chosen label is turned back into the stored role
+	 * name before the invitation is saved, because ControllerNewAccount expects "Role1" or
+	 * "Role2" when the account is created. </p>
 	 */
 	protected static void performInvitation () {
 		// Verify that the email address is valid - If not alert the user and return
@@ -87,7 +88,8 @@ public class ControllerAdminHome {
 
 		// Inform the user that the invitation has been sent and display the invitation code
 		String theSelectedRole = (String) ViewAdminHome.combobox_SelectRole.getValue();
-		// TP2 (D12): store "Role1" even though the Admin chose "Contributor"
+		// TP2 (D12): store "Role1" even though the Admin chose "Contributor"; TP3 (Aspect 1):
+		// store "Role2" even though the Admin chose "Curator"
 		String invitationCode = theDatabase.generateInvitationCode(emailAddress,
 				RoleLabels.toStoredName(theSelectedRole));
 		String msg = "Code: " + invitationCode + " for role " + theSelectedRole +
@@ -271,11 +273,12 @@ public class ControllerAdminHome {
 					email = "<none>";
 				}
 
-				// Roles set up (TP2, D12: the Role1 flag is shown as Contributor)
+				// Roles set up (TP2, D12: the Role1 flag is shown as Contributor; TP3 Aspect 1:
+				// the Role2 flag is shown as Curator)
 				String roles = "";
 				if (theDatabase.getCurrentAdminRole()) roles += "Admin, ";
 				if (theDatabase.getCurrentNewRole1()) roles += RoleLabels.ROLE1_LABEL + ", ";
-				if (theDatabase.getCurrentNewRole2()) roles += "Role2, ";
+				if (theDatabase.getCurrentNewRole2()) roles += RoleLabels.ROLE2_LABEL + ", ";
 
 				if (roles.endsWith(", ")) {
 					roles = roles.substring(0, roles.length() - 2);

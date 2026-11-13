@@ -45,6 +45,7 @@ import guiUserUpdate.ViewUserUpdate;
  *
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2026-10-16 TP2: the invitation role list shows "Contributor" for Role1
+ * @version 1.02		2026-11-10 TP3 Aspect 1: the invitation role list shows "Curator" for Role2
  * 							(design decision D12; see guiTools.RoleLabels)
  *
  */
@@ -103,10 +104,11 @@ public class ViewAdminHome {
 	protected static TextField text_InvitationEmailAddress = new TextField();
 	/** The role the invited user will have. */
 	protected static ComboBox <String> combobox_SelectRole = new ComboBox <String>();
-	// TP2 (D12): Role1 is the Contributor role, so the list shows "Contributor".  The Controller
-	// turns the chosen label back into "Role1" before the invitation is stored.
+	// TP2 (D12): Role1 is the Contributor role, so the list shows "Contributor".  TP3 (Aspect 1):
+	// Role2 is the Curator role, so the list shows "Curator".  The Controller turns the chosen
+	// label back into "Role1" or "Role2" before the invitation is stored.
 	/** The role names offered for an invitation, as shown on the screen. */
-	protected static String [] roles = {"Admin", RoleLabels.ROLE1_LABEL, "Role2"};
+	protected static String [] roles = {"Admin", RoleLabels.ROLE1_LABEL, RoleLabels.ROLE2_LABEL};
 	/** Sends the invitation. */
 	protected static Button button_SendInvitation = new Button("Send Invitation");
 	/** Reports an invalid or already-invited email address. */
@@ -167,8 +169,8 @@ public class ViewAdminHome {
 
 	/** The shared Scene each invocation populates. */
 	private static Scene theAdminHomeScene;		// The shared Scene each invocation populates
-	/** The home page code for Admin (Admin: 1; Contributor: 2; Role2: 3). */
-	private static final int theRole = 1;		// Admin: 1; Contributor: 2; Role2: 3
+	/** The home page code for Admin (Admin: 1; Contributor: 2; Curator: 3). */
+	private static final int theRole = 1;		// Admin: 1; Contributor: 2; Curator: 3
 
 	/*-*******************************************************************************************
 

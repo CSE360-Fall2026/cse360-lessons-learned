@@ -1,5 +1,7 @@
 package guiMultipleRoleDispatch;
 
+import guiTools.RoleLabels;
+
 /*******
  * <p> Title: ControllerMultipleRoleDispatch Class. </p>
  *
@@ -23,6 +25,8 @@ package guiMultipleRoleDispatch;
  * @version 1.01		2025-09-16 Update Javadoc documentation
  * @version 1.02		2026-10-14 TP2: the Role1 choice is shown as "Contributor" and opens the
  * 							Contributor Home Page
+ * @version 1.03		2026-11-10 TP3 Aspect 1: the Role2 choice is shown as "Curator" and opens
+ * 							the Curator Home Page
  *
  */
 
@@ -72,11 +76,11 @@ public class ControllerMultipleRoleDispatch {
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
 
-		// See if Role2
-		} else if (role.compareTo("Role2") == 0) {
+		// See if Curator (TP3: the Role2 flag is the Curator role, Aspect 1)
+		} else if (role.compareTo(RoleLabels.ROLE2_LABEL) == 0) {
 
-			// It is Role 2 Role
-			guiRole2.ViewRole2Home.displayRole2Home(
+			// It is the Curator Role
+			guiCuratorHome.ViewCuratorHome.displayCuratorHome(
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
 
