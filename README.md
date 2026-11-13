@@ -24,6 +24,12 @@ Close the app first (H2 allows one connection), then run:
 
 `Requirements-Test Traceability.pdf` lists every requirement and its tests.
 
+## Aspect 6 prototype (TP3-1)
+Run `.\scripts\Test-Aspect6.ps1 -RunDemo` in PowerShell to compile and verify the
+AI editing/refining model, related regression tests, and a deterministic terminal
+demo. The script uses disposable databases. See `docs/aspect6-prototype.md` for
+the AI-provider boundary, Eclipse setup, story traceability, and existing baseline failures.
+
 ## Working with Jira
 Put the Jira work item key at the start of every commit message, for example
 `TP2-25 Relabel Role1 as Contributor on admin pages`, so the commit shows up on that card.
