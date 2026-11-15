@@ -4,44 +4,63 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 /*******
- * <p> Title: LessonsLearnedList Class </p>
+ * <p>
+ * Title: LessonsLearnedList Class
+ * </p>
  *
- * <p> Description: This class holds a list of lessons learned and provides the Create, Read,
- * Update, and Delete (CRUD) operations for lists.  It is used for two kinds of list:</p>
+ * <p>
+ * Description: This class holds a list of lessons learned and provides the
+ * Create, Read, Update, and Delete (CRUD) operations for lists. It is used for
+ * two kinds of list:
+ * </p>
  * <ul>
- * <li> Persistent lists loaded from the database: loadAll() returns every lesson in the system,
- * 		and loadByOwner() returns the lessons one Contributor has added (US-R1, US-R4).</li>
- * <li> Subsets of a list, such as the results of a search.  A subset may be empty, may hold one
- * 		lesson, or may hold many with no upper limit (US-R2; Test Case "Subset List - Returns
- * 		Correct Sizes").</li>
+ * <li>Persistent lists loaded from the database: loadAll() returns every lesson
+ * in the system, and loadByOwner() returns the lessons one Contributor has
+ * added (US-R1, US-R4).</li>
+ * <li>Subsets of a list, such as the results of a search. A subset may be
+ * empty, may hold one lesson, or may hold many with no upper limit (US-R2; Test
+ * Case "Subset List - Returns Correct Sizes").</li>
  * </ul>
  *
- * <p> <b>Operations.</b>  Create: add().  Read: size(), isEmpty(), get(), getById(),
- * contains(), getLessons(), and the static loaders.  Update: replace().  Delete: removeById().
- * Subsets: filterByTitleContains() (the Contributor search, US-R2), filterByKeywords() (keyword
- * search across title, description, and tags, for the Phase Three Viewer story "I can use a
- * keyword search for lessons and receive a list of matches"), filterByCategory(), and
- * filterByTag().</p>
+ * <p>
+ * <b>Operations.</b> Create: add(). Read: size(), isEmpty(), get(), getById(),
+ * contains(), getLessons(), and the static loaders. Update: replace(). Delete:
+ * removeById(). Subsets: filterByTitleContains() (the Contributor search,
+ * US-R2), filterByKeywords() (keyword search across title, description, tags,
+ * and Curator-approved search terms for the Phase Three Viewer story "I can use
+ * a keyword search for lessons and receive a list of matches"),
+ * filterByCategory(), and filterByTag().
+ * </p>
  *
- * <p> <b>Design.</b>  The list operations change only this in-memory list; saving or deleting a
- * lesson in the database is done by the LessonsLearned object itself (create(), delete()).
- * Keeping the two separate means filtering or trimming a list can never delete data.  For the
- * same reason, every filter returns a NEW list and never changes the list it is called on, so
- * filtering "all my lessons" cannot accidentally throw lessons away.</p>
+ * <p>
+ * <b>Design.</b> The list operations change only this in-memory list; saving or
+ * deleting a lesson in the database is done by the LessonsLearned object itself
+ * (create(), delete()). Keeping the two separate means filtering or trimming a
+ * list can never delete data. For the same reason, every filter returns a NEW
+ * list and never changes the list it is called on, so filtering "all my
+ * lessons" cannot accidentally throw lessons away.
+ * </p>
  *
- * <p> <b>Privacy.</b>  loadAll() exists at the class level for the Viewer and Curator roles in
- * Phase Three and for administration and testing.  The Contributor screens use only
- * loadByOwner(), because the V1 story says a Contributor is "unable to see submissions from
- * other contributors" (US-R4).</p>
+ * <p>
+ * <b>Privacy.</b> loadAll() exists at the class level for the Viewer and
+ * Curator roles in Phase Three and for administration and testing. The
+ * Contributor screens use only loadByOwner(), because the V1 story says a
+ * Contributor is "unable to see submissions from other contributors" (US-R4).
+ * </p>
  *
- * <p> Copyright: Lynn Robert Carter © 2026 </p>
+ * <p>
+ * Copyright: Lynn Robert Carter © 2026
+ * </p>
  *
- * @author Emilia Davey
+ * @author David Nevarez and Emilia Davey
  *
- * @version 1.00		2026-09-29 Initial version for HW2 (as LessonCollection)
- * @version 2.00		2026-10-14 TP2: renamed LessonsLearnedList; persistent all-lessons and
- * 							per-owner lists; list CRUD; keyword search
+ * @version 1.00 2026-09-29 Initial version for HW2 (as LessonCollection)
+ * @version 2.00 2026-10-14 TP2: renamed LessonsLearnedList; persistent
+ *          all-lessons and per-owner lists; list CRUD; keyword search
+ * @version 2.01 2026-11-09 HW3: extended keyword search to include
+ *          Curator-approved search terms
  */
 
 public class LessonsLearnedList {
@@ -305,36 +324,58 @@ public class LessonsLearnedList {
 	}
 
 
-	/*****
-	 * <p> Method: LessonsLearnedList filterByKeywords(String keywords) </p>
-	 *
-	 * <p> Description: TP2.  The subset matching a keyword search (design decision D5).  The
-	 * search text is split into keywords at spaces and commas.  A lesson matches only if EVERY
-	 * keyword appears, ignoring case, somewhere in its title, description, or tags; adding a
-	 * keyword therefore narrows the results, which is how most search boxes behave.  For example,
-	 * "deploy rollback" matches a lesson whose title mentions deploying and whose description
-	 * mentions a rollback.</p>
-	 *
-	 * <p> As with filterByTitleContains(), empty search text returns an empty list.  The
-	 * Contributor screen keeps the title search that US-R2 specifies; this filter supports the
-	 * TP2 requirement for keyword subsets and the Phase Three Viewer keyword search. </p>
-	 *
-	 * @param keywords one or more keywords separated by spaces or commas
-	 *
-	 * @return a new list with the lessons that contain every keyword; empty if there are no
-	 * 		keywords or nothing matched
-	 */
+    /*****
+     * <p>
+     * Method: LessonsLearnedList filterByKeywords(String keywords)
+     * </p>
+     *
+     * <p>
+     * Description: TP2, extended for TP3. Returns a subset of lessons matching a
+     * keyword search (design decision D5). The search text is split into keywords
+     * at spaces and commas. A lesson matches only if EVERY keyword appears,
+     * ignoring case, somewhere in its title, description, tags, or saved search
+     * terms. Adding another keyword narrows the results.
+     * </p>
+     *
+     * <p>
+     * For TP3, the search now includes Curator-approved search terms. This allows
+     * Viewers to find lessons using terms that may not appear in the lesson's
+     * title, description, or tags. For example, a lesson about database connection
+     * failures could also be found by searching for "connectivity" if that term was
+     * saved by a Curator.
+     * </p>
+     *
+     * <p>
+     * As with filterByTitleContains(), an empty search returns an empty list
+     * instead of every lesson. Searches with no matches also return an empty list.
+     * The method creates a new list without changing the original list or any of
+     * its lessons.
+     * </p>
+     *
+     * <p>
+     * The Contributor screen continues using the title search required by US-R2.
+     * This method supports the TP2 keyword search functionality and the TP3 Viewer
+     * keyword search, including Curator-approved terms.
+     * </p>
+     *
+     * @param keywords one or more keywords separated by spaces or commas
+     *
+     * @return a new list containing lessons that match every keyword; empty if no
+     *         keywords are provided or nothing matches
+     */
+
 	public LessonsLearnedList filterByKeywords(String keywords) {
 		List<LessonsLearned> matches = new ArrayList<LessonsLearned>();
 		if (keywords == null || keywords.trim().isEmpty()) return new LessonsLearnedList(matches);
 
-		// Split on runs of spaces and commas; trim() first so there is no empty leading piece
+		// Splits the search into keywords separated by spaces or commas.
 		String[] words = keywords.trim().toLowerCase().split("[\\s,]+");
 
 		for (LessonsLearned lesson : lessons) {
-			String searchable = (nullToEmpty(lesson.getTitle()) + " "
-					+ nullToEmpty(lesson.getDescription()) + " "
-					+ nullToEmpty(lesson.getTags())).toLowerCase();
+			// Includes Curator-approved search terms so Viewers can find
+			// lessons even when those terms aren't in the title, description, or tags.
+            String searchable = (nullToEmpty(lesson.getTitle()) + " " + nullToEmpty(lesson.getDescription()) + " "
+                    + nullToEmpty(lesson.getTags()) + " " + nullToEmpty(lesson.getSearchTerms())).toLowerCase();
 			boolean allFound = true;
 			for (String word : words)
 				if (!word.isEmpty() && !searchable.contains(word)) {
