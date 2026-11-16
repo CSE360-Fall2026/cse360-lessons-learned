@@ -1,0 +1,6 @@
+# Local AI API Configuration (TP3 Aspect 8)
+# Setup: Rename this file to "config.properties" (remove the .example).
+# Copy and paste the groq.api.key value from the LessonShare project.
+# Note: config.properties is listed in .gitignore so the API key is never pushed to GitHub.
+
+groq.api.key=PASTE_YOUR_GROQ_API_KEY_HERE
