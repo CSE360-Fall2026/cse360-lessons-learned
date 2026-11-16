@@ -1,73 +1,121 @@
 package inputValidation;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import entityClasses.LessonSummary;
 
 /**
- * Utility engine for computing statistical aggregates across multiple 
- * lesson experience entries and member effort hours (Aspect 3 / Epic E4).
- * <p>
- * Validated by: {@code TimeEffortStatisticsCalculatorTest}.
- * 
+ * Utility class responsible for validating source lessons and computing aggregated
+ * time and effort statistics across merged experience records (Epic E4 / Aspect 3).
+ *
  * @author Alex Meyers
- * @version 1.0
+ * @version 3.0
  */
 public class TimeEffortStatisticsCalculator {
 
-    // Maximum threshold limit to prevent resource exhaustion on oversized collections (CWE-770 mitigation)
-    private static final int MAX_ENTRIES_LIMIT = 5000;
+    /** Maximum number of experience entries processed per merge to prevent resource exhaustion (CWE-770 / R10). */
+    public static final int MAX_ENTRIES_LIMIT = 5000;
+
+    /** Maximum number of distinct source lessons permitted in a single merge operation (CWE-770 / R10). */
+    public static final int MAX_LESSONS_LIMIT = 500;
+
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    private TimeEffortStatisticsCalculator() {
+    }
+
+    /**
+     * Validates and deduplicates selected source lesson IDs so each source contributes at most once.
+     *
+     * @param rawSourceIds list of selected source lesson IDs
+     * @return a deduplicated set of valid source lesson IDs
+     * @throws IllegalArgumentException if fewer than two distinct valid lessons are provided or limits are exceeded
+     */
+    public static Set<Integer> validateAndDeduplicateSources(List<Integer> rawSourceIds) {
+        if (rawSourceIds == null) {
+            throw new IllegalArgumentException("Select at least two lessons");
+        }
+
+        Set<Integer> distinctIds = new LinkedHashSet<>();
+        for (Integer id : rawSourceIds) {
+            if (id != null && id > 0) {
+                distinctIds.add(id);
+            }
+            if (distinctIds.size() > MAX_LESSONS_LIMIT) {
+                throw new IllegalArgumentException("Selected lessons exceed maximum allowed limit.");
+            }
+        }
+
+        if (distinctIds.size() < 2) {
+            throw new IllegalArgumentException("Select at least two lessons");
+        }
+
+        return distinctIds;
+    }
 
     /**
      * Computes comprehensive statistical metrics from a list of effort hour values.
-     * 
-     * @param targetLessonId the lesson ID receiving the summary
-     * @param effortHours list of numerical effort hours extracted from selected source lessons
-     * @return a LessonSummary object containing all computed metrics
+     *
+     * @param targetLessonId  the lesson ID receiving the summary
+     * @param sourceLessonIds the deduplicated set of contributing source lesson IDs
+     * @param effortHours     list of numerical effort hours extracted from selected source lessons
+     * @return a LessonSummary object containing all computed metrics (hidden by default per E5)
+     * @throws IllegalArgumentException if no valid, finite, non-negative experience hours exist
      */
-    public static LessonSummary computeStatistics(int targetLessonId, List<Double> effortHours) {
-        // Defensive check: Handle null or empty inputs gracefully without throwing NullPointerExceptions (CWE-476 / R9)
+    public static LessonSummary computeStatistics(int targetLessonId, Set<Integer> sourceLessonIds, List<Double> effortHours) {
         if (effortHours == null || effortHours.isEmpty()) {
-            return new LessonSummary(0, targetLessonId, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
+            throw new IllegalArgumentException("No experience data to merge.");
         }
 
-        // Resource constraint check (CWE-770 / R10): Throttling or capping collection size if unbounded
-        int count = effortHours.size();
-        if (count > MAX_ENTRIES_LIMIT) {
-            effortHours = effortHours.subList(0, MAX_ENTRIES_LIMIT);
-            count = MAX_ENTRIES_LIMIT;
+        List<Double> validHours = new ArrayList<>();
+        int inspected = 0;
+        for (Double val : effortHours) {
+            if (inspected >= MAX_ENTRIES_LIMIT) {
+                break;
+            }
+            inspected++;
+            if (val != null && Double.isFinite(val) && val >= 0.0) {
+                validHours.add(val);
+            }
         }
 
+        if (validHours.isEmpty()) {
+            throw new IllegalArgumentException("No experience data to merge.");
+        }
+
+        int count = validHours.size();
         double total = 0.0;
-        for (double val : effortHours) {
+        for (double val : validHours) {
             total += val;
         }
 
         double mean = total / count;
 
-        // Sort collection to accurately determine median, min, and max values.
-        Collections.sort(effortHours);
-        double min = effortHours.get(0);
-        double max = effortHours.get(count - 1);
-        
+        Collections.sort(validHours);
+        double min = validHours.get(0);
+        double max = validHours.get(count - 1);
+
         double median;
         if (count % 2 == 0) {
-            median = (effortHours.get(count / 2 - 1) + effortHours.get(count / 2)) / 2.0;
+            median = (validHours.get(count / 2 - 1) + validHours.get(count / 2)) / 2.0;
         } else {
-            median = effortHours.get(count / 2);
+            median = validHours.get(count / 2);
         }
 
-        // Calculate sample standard deviation (n-1 degrees of freedom)
-        double varianceSum = 0.0;
-        for (double val : effortHours) {
-            varianceSum += Math.pow(val - mean, 2);
+        double stdDev = Double.NaN;
+        if (count > 1) {
+            double varianceSum = 0.0;
+            for (double val : validHours) {
+                double diff = val - mean;
+                varianceSum += diff * diff;
+            }
+            stdDev = Math.sqrt(varianceSum / (count - 1));
         }
-        
-        // Internal comment: If count is 1, variance denominator (count - 1) would be 0; 
-        // handle gracefully to prevent NaN or arithmetic exceptions.
-        double stdDev = (count > 1) ? Math.sqrt(varianceSum / (count - 1)) : 0.0;
 
-        // Default visibility to false (hidden by default per E5 requirements)
-        return new LessonSummary(0, targetLessonId, count, total, mean, median, min, max, stdDev, false);
+        return new LessonSummary(targetLessonId, sourceLessonIds, count, total, mean, median, min, max, stdDev);
     }
 }
