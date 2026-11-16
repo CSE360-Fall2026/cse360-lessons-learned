@@ -63,6 +63,8 @@ import guiUpdateLesson.ModelUpdateLesson;
  * @author Emilia Davey
  *
  * @version 1.00		2026-11-01 HW3 Task 5: tests written before the prototype code
+ * @version 1.01		2026-11-16 TP3 B-20: LK-33 Javadoc updated now that the hw3Tests defects
+ * 							are fixed (comment only; no test changed)
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class CuratorLockTests {
@@ -929,8 +931,10 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-33, positive, regression (TR-10).  Runs the 66 TP2 requirement tests
 	 * and the 58 input validation tests, which throw an AssertionError if any test fails.  The
-	 * third part of LK-33, my hw3Tests package (54 runs with the same 7 expected failures), is
-	 * run separately in the JUnit window because its failures are intentional. </p>
+	 * third part of LK-33, my hw3Tests package, is run separately in the JUnit window.  It had 7
+	 * intentional failures in HW3; since TP3 B-20 fixed those defects, all 54 of its tests pass,
+	 * and LessonRecognizerTest is also a JUnit class, while main() still prints the same totals
+	 * this test checks. </p>
 	 *
 	 * @throws SQLException if the database cannot be reopened afterward
 	 */

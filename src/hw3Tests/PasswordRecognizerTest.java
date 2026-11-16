@@ -36,16 +36,22 @@ import inputValidation.PasswordRecognizer;
  * <p> <b>How to read the output.</b>  Every test prints its id, the input, the expected result,
  * and the actual result on the console, then asserts that they are identical.  The recognizer
  * prints a trace of every character it reads; that trace is switched off while a test calls it,
- * so the console shows only the Expected and Actual lines.  A green test passed.  The three tests
- * marked "EXPECTED FAIL" in their display name (PW-23, PW-24, PW-25) are designed to fail
- * because they expose defects D2, D1, and D3 in TP2 Test Designs.pdf, section IV.  HW3 asks for
- * those defects to be listed, not fixed, so the tests are left in place to prove each one.</p>
+ * so the console shows only the Expected and Actual lines.  A green test passed.</p>
+ *
+ * <p> <b>Defects found and fixed.</b>  In HW3, PW-23, PW-24, and PW-25 failed, as designed,
+ * because they exposed defects D2, D1, and D3 in TP2 Test Designs.pdf, section IV.  HW3 asked for
+ * those defects to be listed, not fixed.  TP3 backlog item B-20 fixed them in
+ * inputValidation.PasswordRecognizer (version 3.01), so all 26 tests now pass, and PW-23 to PW-25
+ * stay in the suite as regression tests that would fail again if a defect came back.</p>
  *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-11-01 HW3 Task 2.4: tests for the TP1 password rules
+ * @version 1.01		2026-11-16 TP3 B-20: defects D1, D2, and D3 fixed; PW-23 to PW-25 renamed
+ * 							from "EXPECTED FAIL" to regression tests, with the same inputs and
+ * 							expected results
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class PasswordRecognizerTest {
@@ -533,12 +539,13 @@ public class PasswordRecognizerTest {
 	/**********
 	 * <p> Method: void pw23_flagsAfterEarlyExit() </p>
 	 *
-	 * <p> Description: PW-23, EXPECTED FAIL (defect D2).  A 33-character input is rejected before
-	 * the flags are reset, so the flags should show nothing satisfied.  The code returns before
-	 * resetting them, so they still describe the previous, valid password. </p>
+	 * <p> Description: PW-23, regression test for defect D2.  A 33-character input is rejected
+	 * by the length check, so the flags must show nothing satisfied.  In HW3 the code returned
+	 * before resetting them, so they still described the previous, valid password; B-20 resets
+	 * the flags before any check can return. </p>
 	 */
 	@Test
-	@DisplayName("PW-23 EXPECTED FAIL (D2): flags are stale after an over-long input")
+	@DisplayName("PW-23 Fixed D2: the flags are reset after an over-long input")
 	void pw23_flagsAfterEarlyExit() {
 		// First make every flag true, so a stale value is easy to see
 		evaluate("Aa1!aaaa");
@@ -550,12 +557,12 @@ public class PasswordRecognizerTest {
 	/**********
 	 * <p> Method: void pw24_nullInput() </p>
 	 *
-	 * <p> Description: PW-24, EXPECTED FAIL (defect D1).  A null input should be treated as
-	 * empty without an exception (PW-R8, CWE-476).  The code calls input.length() first, which
-	 * throws a NullPointerException. </p>
+	 * <p> Description: PW-24, regression test for defect D1.  A null input must be treated as
+	 * empty without an exception (PW-R8, CWE-476).  In HW3 the code called input.length() first,
+	 * which threw a NullPointerException; B-20 treats null as empty before that call. </p>
 	 */
 	@Test
-	@DisplayName("PW-24 EXPECTED FAIL (D1): null input throws NullPointerException")
+	@DisplayName("PW-24 Fixed D1: null input is treated as empty, with no exception")
 	void pw24_nullInput() {
 		System.out.println("PW-24  Input:    null");
 		System.out.println("PW-24  Expected: \"" + EMPTY + "\" with no exception");
@@ -567,12 +574,13 @@ public class PasswordRecognizerTest {
 	/**********
 	 * <p> Method: void pw25_errorMessageField() </p>
 	 *
-	 * <p> Description: PW-25, EXPECTED FAIL (defect D3).  The public field passwordErrorMessage
-	 * is documented as "The error message text", so after a failed check it should hold the
-	 * returned message.  The code never assigns it a message. </p>
+	 * <p> Description: PW-25, regression test for defect D3.  The public field
+	 * passwordErrorMessage is documented as "The error message text", so after a failed check it
+	 * must hold the returned message.  In HW3 the code never assigned it a message; B-20 sends
+	 * every error return through one method that sets it. </p>
 	 */
 	@Test
-	@DisplayName("PW-25 EXPECTED FAIL (D3): passwordErrorMessage is never set")
+	@DisplayName("PW-25 Fixed D3: passwordErrorMessage holds the returned message")
 	void pw25_errorMessageField() {
 		String returned = evaluate("Aa1!aaa");
 		check("PW-25", "passwordErrorMessage after " + show("Aa1!aaa"), returned,

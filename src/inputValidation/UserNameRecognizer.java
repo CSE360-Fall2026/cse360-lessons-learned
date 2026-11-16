@@ -19,7 +19,13 @@ public class UserNameRecognizer {
 	 * 									message, and improve internal documentation
 	 * 
 	 * @version 2.00		2026-09-16	Updated username rules for TP1: alphabetic first character, updated separators (include &), max-length 32 characters
-	 * 
+	 * @version 2.01		2026-11-16	TP3 B-20: fixed HW3 defects D4 (a null input threw a
+	 * 									NullPointerException), D5 (an invalid character early in the
+	 * 									name was reported as "too short"), and D6 (a name over 32
+	 * 									characters ending after a separator got the separator
+	 * 									message); validated by hw3Tests.UserNameRecognizerTest
+	 * 									UN-23 to UN-26
+	 *
 	 */
 
 	/**********************************************************************************************
@@ -77,8 +83,9 @@ public class UserNameRecognizer {
 	 * 						with a helpful description of the error
 	 */
 	public static String checkForValidUserName(String input) {
-		// Check to ensure that there is input to process
-		if(input.length() <= 0) {
+		// Check to ensure that there is input to process.  A null input is treated as empty, so no
+		// input can make this method throw (defect D4, CWE-476; test UN-26)
+		if (input == null || input.length() <= 0) {
 			userNameRecognizerIndexofError = 0;	// Error at first character;
 			return "\n*** ERROR *** The input is empty";
 		}
@@ -232,21 +239,26 @@ public class UserNameRecognizer {
 			// State 1 is a final state.  Check to see if the UserName length is valid.  If so we
 			// we must ensure the whole string has been consumed.
 
-			if (userNameSize < 4) {
-				// UserName is too small
-				userNameRecognizerErrorMessage += "A UserName must have at least 4 characters.";
-				return userNameRecognizerErrorMessage;
-			}
-			else if (userNameSize > MAX_PASS_LENGTH) {
+			// The checks are in this order so the message names the rule that actually stopped the
+			// machine (defect D5; tests UN-23 and UN-24).  The size limit stops the machine with
+			// characters left over, so it is checked first.  Any other leftover characters mean
+			// the machine stopped at a character that is not allowed, which must be reported
+			// before "too short": "ab@cd" stops after 2 characters, but its problem is the @.
+			if (userNameSize > MAX_PASS_LENGTH) {
 				// UserName is too long
-				userNameRecognizerErrorMessage += 
+				userNameRecognizerErrorMessage +=
 					"A UserName must have no more than " + MAX_PASS_LENGTH + " characters.";
 				return userNameRecognizerErrorMessage;
 			}
 			else if (currentCharNdx < input.length()) {
 				// There are characters remaining in the input, so the input is not valid
-				userNameRecognizerErrorMessage += 
+				userNameRecognizerErrorMessage +=
 					"A UserName character may only contain alphanumeric characters (A-Z, a-z, 0-9), or separators ('-', '_', '.', '&').";
+				return userNameRecognizerErrorMessage;
+			}
+			else if (userNameSize < 4) {
+				// UserName is too small
+				userNameRecognizerErrorMessage += "A UserName must have at least 4 characters.";
 				return userNameRecognizerErrorMessage;
 			}
 			else {
@@ -257,6 +269,14 @@ public class UserNameRecognizer {
 			}
 
 		case 2:
+			// State 2 stops the machine when the size passes the maximum, before the move back to
+			// state 1, so a name that is too long can end here.  Report the length rule that was
+			// broken rather than the separator rule (defect D6; test UN-25).
+			if (userNameSize > MAX_PASS_LENGTH) {
+				userNameRecognizerErrorMessage +=
+					"A UserName must have no more than " + MAX_PASS_LENGTH + " characters.";
+				return userNameRecognizerErrorMessage;
+			}
 			// State 2 is not a final state, so we can return a very specific error message
 			userNameRecognizerErrorMessage +=
 				"A UserName cannot end with a separator, and any '-', '_', '.', or '&' must be followed by an alphanumeric character (A-Z, a-z, 0-9).";

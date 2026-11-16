@@ -40,15 +40,22 @@ import inputValidation.UserNameRecognizer;
  * <p> <b>How to read the output.</b>  Every test prints its id, the input, the expected result,
  * and the actual result, then asserts that they are identical.  Each error message starts with a
  * line break, which the console shows as \n.  The recognizer's own state trace is switched off
- * while a test calls it.  The four tests marked "EXPECTED FAIL" (UN-23 to UN-26) are designed to
- * fail because they expose defects D5, D6, and D4 in TP2 Test Designs.pdf, section IV.  HW3 asks
- * for those defects to be listed, not fixed, so the tests are left in place to prove each one.</p>
+ * while a test calls it.</p>
+ *
+ * <p> <b>Defects found and fixed.</b>  In HW3, UN-23 to UN-26 failed, as designed, because they
+ * exposed defects D5, D6, and D4 in TP2 Test Designs.pdf, section IV.  HW3 asked for those
+ * defects to be listed, not fixed.  TP3 backlog item B-20 fixed them in
+ * inputValidation.UserNameRecognizer (version 2.01), so all 28 tests now pass, and UN-23 to UN-26
+ * stay in the suite as regression tests that would fail again if a defect came back.</p>
  *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-11-01 HW3 Task 2.4: tests for the TP1 username rules
+ * @version 1.01		2026-11-16 TP3 B-20: defects D4, D5, and D6 fixed; UN-23 to UN-26 renamed
+ * 							from "EXPECTED FAIL" to regression tests, with the same inputs and
+ * 							expected results
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class UserNameRecognizerTest {
@@ -540,20 +547,21 @@ public class UserNameRecognizerTest {
 
 	/*-*******************************************************************************************
 
-	Expected failures: defects D5, D6, and D4
+	Regression tests for defects D5, D6, and D4 (found in HW3, fixed in TP3 B-20)
 
 	 */
 
 	/**********
 	 * <p> Method: void un23_invalidCharacterEarly() </p>
 	 *
-	 * <p> Description: UN-23, EXPECTED FAIL (defect D5).  "ab@cd" contains an invalid character,
-	 * so it should get the invalid-character message (UN-R5, UN-R9).  The machine stops at the @
-	 * after counting only 2 characters, and the exit logic checks "fewer than 4" before
-	 * "characters left over", so the user is wrongly told the name is too short. </p>
+	 * <p> Description: UN-23, regression test for defect D5.  "ab@cd" contains an invalid
+	 * character, so it must get the invalid-character message (UN-R5, UN-R9).  The machine stops
+	 * at the @ after counting only 2 characters.  In HW3 the exit logic checked "fewer than 4"
+	 * before "characters left over", so the user was wrongly told the name is too short; B-20
+	 * moved the leftover-characters check first. </p>
 	 */
 	@Test
-	@DisplayName("UN-23 EXPECTED FAIL (D5): ab@cd is reported as too short")
+	@DisplayName("UN-23 Fixed D5: ab@cd gets the invalid-character message")
 	void un23_invalidCharacterEarly() {
 		expect("UN-23", "ab@cd", INVALID_CHAR);
 	}
@@ -561,11 +569,11 @@ public class UserNameRecognizerTest {
 	/**********
 	 * <p> Method: void un24_invalidCharacterEarlyInLongName() </p>
 	 *
-	 * <p> Description: UN-24, EXPECTED FAIL (defect D5).  The same defect with an 8-character
-	 * name, which makes the "at least 4 characters" message clearly wrong. </p>
+	 * <p> Description: UN-24, regression test for defect D5.  The same defect with an
+	 * 8-character name, where the HW3 "at least 4 characters" message was clearly wrong. </p>
 	 */
 	@Test
-	@DisplayName("UN-24 EXPECTED FAIL (D5): ab!cdefg is reported as too short")
+	@DisplayName("UN-24 Fixed D5: ab!cdefg gets the invalid-character message")
 	void un24_invalidCharacterEarlyInLongName() {
 		expect("UN-24", "ab!cdefg", INVALID_CHAR);
 	}
@@ -573,13 +581,14 @@ public class UserNameRecognizerTest {
 	/**********
 	 * <p> Method: void un25_tooLongAfterSeparator() </p>
 	 *
-	 * <p> Description: UN-25, EXPECTED FAIL (defect D6).  A 33-character name whose last
-	 * character follows a separator should get the too-long message (UN-R4, UN-R9).  State 2
-	 * stops the machine when the count passes 32, and the exit logic then reports a separator
-	 * problem instead.  This test also covers the true branch of state 2's size check. </p>
+	 * <p> Description: UN-25, regression test for defect D6.  A 33-character name whose last
+	 * character follows a separator must get the too-long message (UN-R4, UN-R9).  State 2 stops
+	 * the machine when the count passes 32, and in HW3 the exit logic then reported a separator
+	 * problem instead; B-20 added a size check to state 2's exit.  This test also covers the true
+	 * branch of state 2's size check. </p>
 	 */
 	@Test
-	@DisplayName("UN-25 EXPECTED FAIL (D6): 33 chars ending in _c get the separator message")
+	@DisplayName("UN-25 Fixed D6: 33 chars ending in _c get the too-long message")
 	void un25_tooLongAfterSeparator() {
 		expect("UN-25", "a" + "b".repeat(30) + "_c", TOO_LONG);	// 1 + 30 + 2 = 33 characters
 	}
@@ -587,12 +596,12 @@ public class UserNameRecognizerTest {
 	/**********
 	 * <p> Method: void un26_nullInput() </p>
 	 *
-	 * <p> Description: UN-26, EXPECTED FAIL (defect D4).  A null input should be treated as
-	 * empty without an exception (UN-R8, CWE-476).  The code calls input.length() first, which
-	 * throws a NullPointerException. </p>
+	 * <p> Description: UN-26, regression test for defect D4.  A null input must be treated as
+	 * empty without an exception (UN-R8, CWE-476).  In HW3 the code called input.length() first,
+	 * which threw a NullPointerException; B-20 checks for null before that call. </p>
 	 */
 	@Test
-	@DisplayName("UN-26 EXPECTED FAIL (D4): null input throws NullPointerException")
+	@DisplayName("UN-26 Fixed D4: null input is treated as empty, with no exception")
 	void un26_nullInput() {
 		System.out.println("UN-26  Input:    null");
 		System.out.println("UN-26  Expected: \"" + EMPTY.replace("\n", "\\n")

@@ -19,6 +19,10 @@ package inputValidation;
  * @version 2.00	2025-07-30 Rewrite of this application for the Fall 2025 offering of CSE 360
  * and other ASU courses.
  * @version 3.00	2026-09-16 Removed GUI View/Model components; added max length; integrated into inputValidation package.
+ * @version 3.01	2026-11-16 TP3 B-20: fixed HW3 defects D1 (a null input threw a
+ * NullPointerException), D2 (the five flags were not reset when an empty or over-long input
+ * returned early), and D3 (passwordErrorMessage never held the returned message); validated by
+ * hw3Tests.PasswordRecognizerTest PW-23 to PW-25.
  */
 
 public class PasswordRecognizer {
@@ -100,34 +104,41 @@ public class PasswordRecognizer {
 		// The following are the local variable used to perform the Directed Graph simulation
 		passwordErrorMessage = "";
 		passwordIndexofError = 0;			// Initialize the IndexofError
-		inputLine = input;					// Save the reference to the input line as a global
 		currentCharNdx = 0;					// The index of the current character
-		
-		if(input.length() <= 0) {
-			return "*** Error *** The password is empty!";
-		}
-		
-		// Error for if password exceeds MAX_PASS_LENGTH
-		if (input.length() > MAX_PASS_LENGTH) {
-            return "*** Error *** The password exceeds the maximum allowed length of " + MAX_PASS_LENGTH + " characters!";
-        }
-		
-		// The input is not empty, so we can access the first character
-		currentChar = input.charAt(0);		// The current character from the above indexed position
 
-		// The Directed Graph simulation continues until the end of the input is reached or at some 
+		// A null input is treated as empty, so no input can make this method throw (defect D1,
+		// CWE-476; test PW-24)
+		if (input == null) input = "";
+		inputLine = input;					// Save the reference to the input line as a global
+
+		// The Directed Graph simulation continues until the end of the input is reached or at some
 		// state the current character does not match any valid transition to a next state.  This
 		// local variable is a working copy of the input.
 		passwordInput = input;				// Save a copy of the input
-		
-		// The following are the attributes associated with each of the requirements
+
+		// The following are the attributes associated with each of the requirements.  They are
+		// reset before any check can return, so after every call they describe the input just
+		// evaluated.  The live password checklists color themselves from these flags, so stale
+		// values would show requirements as met that are not (defect D2; test PW-23).
 		foundUpperCase = false;				// Reset the Boolean flag
 		foundLowerCase = false;				// Reset the Boolean flag
 		foundNumericDigit = false;			// Reset the Boolean flag
 		foundSpecialChar = false;			// Reset the Boolean flag
-		foundNumericDigit = false;			// Reset the Boolean flag
 		foundLongEnough = false;			// Reset the Boolean flag
-		
+
+		if (input.length() <= 0) {
+			return fail("*** Error *** The password is empty!");
+		}
+
+		// Error for if password exceeds MAX_PASS_LENGTH
+		if (input.length() > MAX_PASS_LENGTH) {
+			return fail("*** Error *** The password exceeds the maximum allowed length of "
+					+ MAX_PASS_LENGTH + " characters!");
+		}
+
+		// The input is not empty, so we can access the first character
+		currentChar = input.charAt(0);		// The current character from the above indexed position
+
 		// This flag determines whether the directed graph (FSM) loop is operating or not
 		running = true;						// Start the loop
 
@@ -151,7 +162,7 @@ public class PasswordRecognizer {
 				foundSpecialChar = true;
 			} else {
 				passwordIndexofError = currentCharNdx;
-				return "*** Error *** An invalid character has been found!";
+				return fail("*** Error *** An invalid character has been found!");
 			}
 			if (currentCharNdx >= 7) {
 				System.out.println("At least 8 characters found");
@@ -185,12 +196,30 @@ public class PasswordRecognizer {
 		if (!foundLongEnough)
 			errMessage += "Long Enough; ";
 		
-		if (errMessage == "")
+		// isEmpty() compares the contents; == would compare object references
+		if (errMessage.isEmpty())
 			return "";
-		
+
 		// If it gets here, there something was not found, so return an appropriate message
 		passwordIndexofError = currentCharNdx;
-		return errMessage + "conditions were not satisfied";
+		return fail(errMessage + "conditions were not satisfied");
+	}
+
+	/**********
+	 * <p> Method: String fail(String message) </p>
+	 *
+	 * <p> Description: Records an error message in passwordErrorMessage and returns it, so the
+	 * public field always holds the message evaluatePassword returned, as its documentation says
+	 * (defect D3; test PW-25).  Every error return in evaluatePassword goes through this method,
+	 * so no return can forget to set the field. </p>
+	 *
+	 * @param message the error message to record and return
+	 *
+	 * @return the same message
+	 */
+	private static String fail(String message) {
+		passwordErrorMessage = message;
+		return message;
 	}
 }
  

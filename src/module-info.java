@@ -9,4 +9,9 @@ module FoundationsF26 {
 	opens curatorHomeTests to org.junit.platform.commons;
 	opens curatorRefinementTests to org.junit.platform.commons;
 	opens lessonTests to org.junit.platform.commons;
+	opens curatorTests to org.junit.platform.commons;
+	opens viewerTests to org.junit.platform.commons;
+	opens entityClasses to org.junit.platform.commons;
+	opens inputValidation to org.junit.platform.commons;
+	opens database to org.junit.platform.commons;
 }
