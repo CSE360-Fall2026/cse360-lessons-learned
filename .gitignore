@@ -39,6 +39,7 @@ out/
 local.properties
 .loadpath
 .recommenders
+config.properties
 
 # OS specific files
 .DS_Store
