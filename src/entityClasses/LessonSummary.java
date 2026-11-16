@@ -1,5 +1,6 @@
 package entityClasses;
 
+import java.util.Locale;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -9,7 +10,10 @@ import java.util.Set;
  * across multiple lessons-learned instances (Aspects 3 and 4 / Epics E4 and E5).
  *
  * @author Alex Meyers
- * @version 3.0
+ * @author Emilia Davey
+ * @version 3.0  2026-11-16 Alex Meyers: summary entity for Aspects 3 and 4
+ * @version 3.1  2026-11-16 Numbers are formatted with Locale.ROOT, so they show "2.00" on every
+ *               computer (a Polish or German locale would otherwise show "2,00")
  */
 public class LessonSummary {
     private int summaryId;
@@ -72,7 +76,7 @@ public class LessonSummary {
         if (entryCount < 2 || Double.isNaN(standardDeviationHours)) {
             return "N/A: fewer than two observations";
         }
-        return String.format("%.2f hrs", standardDeviationHours);
+        return String.format(Locale.ROOT, "%.2f hrs", standardDeviationHours);
     }
 
     /**

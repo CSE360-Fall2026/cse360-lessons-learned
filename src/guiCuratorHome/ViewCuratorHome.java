@@ -58,6 +58,8 @@ import javafx.stage.Stage;
  * @version 2.00		2026-11-10 TP3 Aspect 1: the Curator Home Page, replacing the Role2 stub
  * @version 2.01		2026-11-13 TP3 Aspect 2: the Lock / Unlock button for the selected lesson
  * @version 2.02		2026-11-15 TP3 Aspect 5: Added Manage Search Terms to the Curator Home Page
+ * @version 2.03		2026-11-16 TP3 Aspects 3 and 4: the Merge Statistics button for the selected
+ * 							lesson
  *
  */
 
@@ -119,6 +121,9 @@ public class ViewCuratorHome {
 	protected static Button button_Lock = new Button("Lock / Unlock...");
 	/** Opens the Curator search-term management page (TP3 Aspect 5, E2). */
 	protected static Button button_SearchTerms = new Button("Manage Search Terms...");
+	/** Opens the Merge Statistics page with the selected lesson as the target.  Source: TP3
+	 * Aspects 3 and 4 (US-C-E4-01: "a target lesson"; US-C-E5-01). */
+	protected static Button button_Summary = new Button("Merge Statistics...");
 	/** Tells the user how to read a lesson.  Rationale: validation-as-guidance, User
 	 * Experience.pdf; the user is told what to do before having to guess. */
 	protected static Label label_ListHint =
@@ -310,6 +315,12 @@ public class ViewCuratorHome {
 		});
 		button_SearchTerms.setDisable(true);
 
+		// TP3 Aspects 3 and 4: under the Search Terms button, in the space above the separator;
+		// the status line beside it ends at x = 600, so the two never overlap
+		setupButtonUI(button_Summary, "Dialog", 14, 180, Pos.CENTER, 600, 492);
+		button_Summary.setOnAction((_) -> {ControllerCuratorHome.performSummary(); });
+		button_Summary.setDisable(true);
+
 		setupLabelUI(label_Status, "Arial", 14, 580, Pos.BASELINE_LEFT, 20, 497);
 
 		// GUI Area 3
@@ -326,7 +337,7 @@ public class ViewCuratorHome {
 				label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, label_ListHeading,
 				text_Search, button_Search, button_ClearSearch, label_SearchError, listView_Lessons,
 				label_DetailsHeading, text_Details, label_ListHint, label_ListStatus, label_Status,
-				button_Lock, button_SearchTerms, line_Separator4, button_Logout, button_Quit);
+				button_Lock, button_SearchTerms, button_Summary, line_Separator4, button_Logout, button_Quit);
 	}
 
 

@@ -28,6 +28,8 @@ import javafx.scene.paint.Color;
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9
+ * @version 1.01 2026-11-16 Emilia Davey, TP3 Aspect 4: the details show a
+ *          visible merged effort summary (US-V-04)
  */
 public class ControllerViewerHome {
 
@@ -276,7 +278,8 @@ public class ControllerViewerHome {
      *
      * <p> Description: Creates a read-only presentation of
      * the selected lesson for the Viewer. Only basic lesson
-     * fields are included; Curator-only statistics and lock
+     * fields are included, plus a Curator's merged effort
+     * summary only when the Curator made it visible; lock
      * controls are excluded (US-V-03, US-V-04). </p>
      *
      * @param lesson the selected lesson
@@ -309,6 +312,14 @@ public class ControllerViewerHome {
                     .append(lesson.getCuratedBy())
                     .append("\nLast curated: ")
                     .append(editedDate);
+        }
+
+        // TP3 Aspect 4: only a summary the Curator made visible
+        String summary = ModelViewerHome.visibleSummaryText(
+                lesson.getId(), applicationMain.FoundationsMain.database);
+        if (!summary.isEmpty()) {
+            details.append("\n\nMerged effort summary:\n")
+                    .append(summary);
         }
 
         return details.toString();

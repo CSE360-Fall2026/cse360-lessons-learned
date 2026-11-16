@@ -6,6 +6,7 @@ import database.Database;
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
 import entityClasses.User;
+import guiContributorHome.ContributorLessonView;
 import guiTools.LessonAccess;
 import guiTools.LessonResult;
 import guiTools.ViewerAccess;
@@ -32,6 +33,8 @@ import inputValidation.LessonRecognizer;
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9
  * @version 1.01 2026-11-16 Added database injection for testing
+ * @version 1.02 2026-11-16 Emilia Davey, TP3 Aspect 4: visibleSummaryText() shows a
+ *          Curator's merged summary only when it is visible (US-V-04)
  */
 public class ModelViewerHome {
 
@@ -179,8 +182,9 @@ public class ModelViewerHome {
      * regardless of which Contributor created them. </p>
      *
      * <p> This operation does not update or delete lessons.
-     * Curator-only statistics must remain restricted in the
-     * Viewer presentation workflow (US-V-04). </p>
+     * A Curator's merged statistics are shown only when the
+     * Curator made them visible; see visibleSummaryText()
+     * (US-V-04). </p>
      *
      * @param actingUser the currently logged-in user
      * @param lessonId the identifier of the lesson to retrieve
@@ -207,5 +211,34 @@ public class ModelViewerHome {
         }
 
         return LessonResult.passed("", lessonId, lesson);
+    }
+
+    /*****
+     * <p> Method: String visibleSummaryText(int lessonId,
+     * Database database) </p>
+     *
+     * <p> Description: TP3 Aspect 4.  A Curator's merged
+     * effort summary of the lesson, one statistic per line,
+     * or an empty String if the lesson has no summary or the
+     * Curator has not made it visible.  The summary is read
+     * through ContributorLessonView.readSummaryForContributor(),
+     * which drops hidden summaries at the read boundary, so a
+     * Viewer never sees one (US-V-04, US-C-E5-02). </p>
+     *
+     * @param lessonId the identifier of the lesson shown
+     * @param database the database used to read the summary
+     * @return the summary text, or an empty String
+     */
+    public static String visibleSummaryText(
+            int lessonId, Database database) {
+
+        entityClasses.LessonSummary visible =
+                ContributorLessonView.readSummaryForContributor(
+                        database, lessonId);
+        if (visible == null) {
+            return "";
+        }
+
+        return ContributorLessonView.renderSummaryPanelLines(visible);
     }
 }

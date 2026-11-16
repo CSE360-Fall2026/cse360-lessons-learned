@@ -1,5 +1,6 @@
 package guiContributorHome;
 
+import java.util.Locale;
 import database.Database;
 import entityClasses.LessonSummary;
 
@@ -16,8 +17,17 @@ import entityClasses.LessonSummary;
  * @version 3.0  2026-11-16 Alex Meyers: visibility filter and summary text for Aspect 4
  * @version 3.1  2026-11-16 Moved into src; added readSummaryForContributor, the database read
  *               that applies the visibility filter
+ * @version 3.2  2026-11-16 EMPTY_STATE and renderSummaryPanelLines for the summary panel on the
+ *               Lesson Details page and the Viewer's lesson details; numbers formatted with
+ *               Locale.ROOT, so every computer shows "12.00", not "12,00"
  */
 public class ContributorLessonView {
+
+    /** What a lesson page shows when there is no summary to show.  The same words are used
+     * whether the summary is hidden or does not exist, so a Contributor or Viewer cannot tell
+     * that a hidden summary exists (US-C-E5-02: no statistics and no made-up zeros). */
+    public static final String EMPTY_STATE = "No merged effort summary has been shared for "
+            + "this lesson.";
 
     /**
      * Private constructor to prevent instantiation of this view helper class.
@@ -67,6 +77,39 @@ public class ContributorLessonView {
     }
 
     /**
+     * Renders a summary one labeled statistic per line, for the narrow summary panel on the
+     * Contributor's Lesson Details page and for the Viewer's lesson details.  As in
+     * renderSummaryPanelText, a hidden or missing summary gives no numbers: the result is then
+     * EMPTY_STATE.  The count is labeled as experience records and every value is in hours, to
+     * two decimal places (US-C-E4-03).
+     *
+     * @param summary the summary attached to the lesson, as read for a Contributor
+     * @return the panel text, or EMPTY_STATE if the summary is hidden or missing
+     */
+    public static String renderSummaryPanelLines(LessonSummary summary) {
+        LessonSummary authorizedSummary = getSummaryForContributorRead(summary);
+        if (authorizedSummary == null) {
+            return EMPTY_STATE;
+        }
+        return String.format(Locale.ROOT,
+            "Experience records: %d\n" +
+            "Total: %.2f hrs\n" +
+            "Mean: %.2f hrs\n" +
+            "Median: %.2f hrs\n" +
+            "Minimum: %.2f hrs\n" +
+            "Maximum: %.2f hrs\n" +
+            "Std dev: %s",
+            authorizedSummary.getEntryCount(),
+            authorizedSummary.getTotalHours(),
+            authorizedSummary.getMeanHours(),
+            authorizedSummary.getMedianHours(),
+            authorizedSummary.getMinHours(),
+            authorizedSummary.getMaxHours(),
+            authorizedSummary.getFormattedStandardDeviation()
+        );
+    }
+
+    /**
      * Renders formatted statistics text for the Contributor UI without fabricated zeros
      * when a summary is hidden or absent (US-C-E5-02-V).
      *
@@ -79,7 +122,7 @@ public class ContributorLessonView {
             return "";
         }
 
-        return String.format(
+        return String.format(Locale.ROOT,
             "Merged Effort Summary (%d experience records)\n" +
             "Total Hours: %.2f hrs | Mean: %.2f hrs | Median: %.2f hrs\n" +
             "Min: %.2f hrs | Max: %.2f hrs | Std Dev: %s",

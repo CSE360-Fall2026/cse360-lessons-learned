@@ -48,6 +48,7 @@ import entityClasses.User;
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-14 Initial version for TP2 (details from the HW2 Role1 page)
+ * @version 1.01		2026-11-16 TP3 Aspect 4: the merged effort summary panel
  *
  */
 
@@ -118,6 +119,12 @@ public class ViewLessonDetails {
 	protected static Button button_AddExperience = new Button("Add Experience");
 	/** Heading of the isolated area for the destructive action. */
 	protected static Label label_DangerZone = new Label("Danger zone");
+	/** The heading over the merged effort summary.  Source: TP3 Aspect 4 (US-C-E5-02). */
+	protected static Label label_SummaryHeading = new Label("Merged effort summary");
+	/** A Curator's merged effort summary of this lesson, shown only when the Curator made it
+	 * visible; otherwise a sentence saying none has been shared, never made-up zeros.  Source:
+	 * TP3 Aspect 4 (US-C-E5-02). */
+	protected static TextArea text_Summary = new TextArea();
 	/** Deletes the lesson after an explicit "Yes" (US-D1).  Red and set apart (Khan Academy). */
 	protected static Button button_Delete = new Button("Delete Lesson");
 	/** Explains, when the lesson is locked, why deleting it will be refused (US-D1-V). */
@@ -273,6 +280,13 @@ public class ViewLessonDetails {
 		setupButtonUI(button_AddExperience, "Dialog", 16, 180, Pos.CENTER, 600, 153);
 		button_AddExperience.setOnAction((_) -> {ControllerLessonDetails.performAddExperience(); });
 
+		// TP3 Aspect 4: the merged effort summary in the free space of the right column,
+		// between Add Experience and the danger zone
+		setupLabelUI(label_SummaryHeading, "Arial", 13, 180, Pos.BASELINE_LEFT, 600, 200);
+		label_SummaryHeading.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+		setupReadOnlyAreaUI(text_Summary, 600, 222, 180, 136);
+		text_Summary.setFont(Font.font("Arial", 12));
+
 		// ... and the destructive action set apart at the bottom, in red
 		setupLabelUI(label_DangerZone, "Arial", 13, 180, Pos.BASELINE_LEFT, 600, 368);
 		label_DangerZone.setFont(Font.font("Arial", FontWeight.BOLD, 13));
@@ -297,7 +311,7 @@ public class ViewLessonDetails {
 			label_LessonTitle, label_LockBanner, hbox_CategoryTags,
 			label_DescriptionCaption, text_Description, label_Dates, label_ExperienceHeading,
 			text_Experience, label_Status, button_Edit, button_AddExperience,
-			label_DangerZone, button_Delete, label_DeleteHint,
+			label_DangerZone, button_Delete, label_DeleteHint, label_SummaryHeading, text_Summary,
 	        line_Separator4, button_Return, button_Logout, button_Quit);
 	}
 

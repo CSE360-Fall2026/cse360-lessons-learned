@@ -34,6 +34,7 @@ import javafx.scene.paint.Color;
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-14 Initial version for TP2
+ * @version 1.01		2026-11-16 TP3 Aspect 4: fills the merged effort summary panel
  */
 
 public class ControllerLessonDetails {
@@ -218,6 +219,9 @@ public class ControllerLessonDetails {
 		ViewLessonDetails.label_ExperienceHeading.setText("Experience log (" + entries.size()
 				+ (entries.size() == 1 ? " entry)" : " entries)"));
 		ViewLessonDetails.text_Experience.setText(formatExperience(entries));
+		// TP3 Aspect 4: read only after the Model has confirmed this is the user's own lesson
+		ViewLessonDetails.text_Summary.setText(
+				ModelLessonDetails.summaryPanelText(lesson.getId()));					// US-C-E5-02
 
 		boolean everythingLocked = true;
 		for (String field : new String[] { LessonsLearned.FIELD_TITLE,
@@ -249,6 +253,7 @@ public class ControllerLessonDetails {
 		ViewLessonDetails.label_Dates.setText("");
 		ViewLessonDetails.label_ExperienceHeading.setText("");
 		ViewLessonDetails.text_Experience.setText("");
+		ViewLessonDetails.text_Summary.setText("");
 		ViewLessonDetails.label_DeleteHint.setText("");
 		ViewLessonDetails.button_Edit.setDisable(true);
 		ViewLessonDetails.button_AddExperience.setDisable(true);
@@ -260,7 +265,8 @@ public class ControllerLessonDetails {
 	/**********
 	 * <p> Method: setContentVisible(boolean visible) </p>
 	 *
-	 * <p> Description: Shows or hides the description box, the experience log, and the danger
+	 * <p> Description: Shows or hides the description box, the experience log, the merged effort
+	 * summary, and the danger
 	 * zone.  They are hidden when no lesson can be shown, so the "Lesson not found." page does
 	 * not display empty boxes that look like a lesson failed to load. </p>
 	 *
@@ -271,6 +277,8 @@ public class ControllerLessonDetails {
 		ViewLessonDetails.text_Experience.setVisible(visible);
 		ViewLessonDetails.label_DangerZone.setVisible(visible);
 		ViewLessonDetails.button_Delete.setVisible(visible);
+		ViewLessonDetails.label_SummaryHeading.setVisible(visible);
+		ViewLessonDetails.text_Summary.setVisible(visible);
 	}
 
 

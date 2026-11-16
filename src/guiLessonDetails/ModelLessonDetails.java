@@ -1,6 +1,9 @@
 package guiLessonDetails;
 
+import applicationMain.FoundationsMain;
+import database.Database;
 import entityClasses.LessonsLearned;
+import guiContributorHome.ContributorLessonView;
 import guiTools.LessonAccess;
 import guiTools.LessonResult;
 
@@ -23,6 +26,7 @@ import guiTools.LessonResult;
  *
  * @version 1.00		2026-10-14 Initial version for TP2 (view and delete from HW2's
  * 							ModelRole1Home)
+ * @version 1.01		2026-11-16 TP3 Aspect 4: summaryPanelText() for the merged effort summary
  */
 
 public class ModelLessonDetails {
@@ -98,5 +102,43 @@ public class ModelLessonDetails {
 
 		if (!lesson.delete()) return LessonResult.failed(LessonAccess.NOT_FOUND, "");	// US-D1
 		return LessonResult.passed("Lesson deleted", lessonId, null);
+	}
+
+
+	/**********
+	 * <p> Method: String summaryPanelText(int lessonId) </p>
+	 *
+	 * <p> Description: TP3 Aspect 4.  The text of the merged effort summary panel for one of the
+	 * Contributor's own lessons: the Curator's summary, one statistic per line, if the Curator
+	 * made it visible; otherwise ContributorLessonView.EMPTY_STATE.  The summary is read through
+	 * ContributorLessonView.readSummaryForContributor(), which drops a hidden summary at the
+	 * read boundary, and the visibility is read from the database each time, so hiding it again
+	 * takes effect the next time the page is shown (US-C-E5-02).  The caller shows this only
+	 * after viewLesson() has confirmed the lesson is the user's own. </p>
+	 *
+	 * @param lessonId	the lesson being shown
+	 *
+	 * @return the panel text
+	 */
+	public static String summaryPanelText(int lessonId) {
+		return summaryPanelText(lessonId, FoundationsMain.database);
+	}
+
+
+	/**********
+	 * <p> Method: String summaryPanelText(int lessonId, Database database) </p>
+	 *
+	 * <p> Description: The same as summaryPanelText(int), on the given database, so the JUnit
+	 * tests can use an in-memory database. </p>
+	 *
+	 * @param lessonId	the lesson being shown
+	 *
+	 * @param database	the database to read
+	 *
+	 * @return the panel text
+	 */
+	public static String summaryPanelText(int lessonId, Database database) {
+		return ContributorLessonView.renderSummaryPanelLines(
+				ContributorLessonView.readSummaryForContributor(database, lessonId));
 	}
 }
