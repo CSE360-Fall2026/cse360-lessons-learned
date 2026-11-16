@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import applicationMain.FoundationsMain;
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
@@ -14,8 +16,8 @@ import guiTools.LessonResult;
 /*******
  * <p> Title: TestSupport Class. </p>
  *
- * <p> Description: The shared machinery used by every semi-automated test class in this
- * package.  It connects to the Foundations Database, prints the requirement headers and the
+ * <p> Description: The shared machinery used by every test class in this package, whether the
+ * tests are run by JUnit or as a console program.  It connects to the Foundations Database, prints the requirement headers and the
  * result of each test in one fixed format, remembers every lesson the tests create so they can
  * all be removed at the end, and prints the totals.  Keeping this in one place means every test
  * class reports its results the same way, so the output of one class reads like the output of
@@ -41,6 +43,12 @@ import guiTools.LessonResult;
  * the Foundations testbed classes (PasswordEvaluationTestingAutomation) print, and throws an
  * AssertionError if any test failed, so a failure cannot be missed.</p>
  *
+ * <p> <b>Under JUnit (TP3).</b>  Each test class calls startJUnit() before its first test and
+ * finishJUnit() after its last.  check() prints the same four lines and then asserts that the
+ * Expected and Actual lines are equal, so a failure fails that JUnit test and its message names
+ * the test id.  The console runner, runSuite(), is kept because curatorLockTests LK-33 uses it to
+ * show the TP2 tests still pass.</p>
+ *
  * <p> The tests use the real H2 database file.  H2 allows only one connection to that file, so
  * FoundationsMain must not be running while the tests run.  Each test uses its own brand-new
  * username, so lessons left from any earlier run, or created by real users, cannot change the
@@ -52,6 +60,8 @@ import guiTools.LessonResult;
  *
  * @version 1.00		2026-10-16 TP2 Task 6: shared support for the requirement-based test
  * 							classes (replaces the helpers in ContributorFunctionalTest)
+ * @version 1.01		2026-11-14 TP3 Task 5.4: startJUnit(), finishJUnit(), and a JUnit
+ * 							assertion in check()
  */
 public class TestSupport {
 
@@ -63,6 +73,9 @@ public class TestSupport {
 
 	/** Whether this run has opened the database connection. */
 	private static boolean connected = false;
+
+	/** True while runSuite is running the tests as a console program, false under JUnit. */
+	private static boolean consoleMode = false;
 
 	/** Every lesson the tests create, remembered so cleanUp() can delete it at the end. */
 	private static List<Integer> createdLessonIds = new ArrayList<Integer>();
@@ -113,6 +126,7 @@ public class TestSupport {
 
 		numberOfTests = 0;
 		numberFailed = 0;
+		consoleMode = true;
 		System.out.println(title);
 		System.out.println("Each test prints what the requirement expects and what the code actually "
 				+ "did.\nA test passes only when the Expected and Actual lines are identical.");
@@ -124,6 +138,7 @@ public class TestSupport {
 			cleanUp();
 			FoundationsMain.database.closeConnection();
 			connected = false;
+			consoleMode = false;
 		}
 
 		// Same footer wording as the testbed automation files (PasswordEvaluationTestingAutomation)
@@ -133,6 +148,43 @@ public class TestSupport {
 		System.out.println("Number of tests failed: " + numberFailed);
 		if (numberFailed > 0)
 			throw new AssertionError(numberFailed + " test(s) failed in: " + title);
+	}
+
+
+	/**********
+	 * <p> Method: void startJUnit() </p>
+	 *
+	 * <p> Description: Opens the database for a test class run by JUnit.  Each test class calls
+	 * this from its @BeforeAll method, so every class can be run on its own, or the whole
+	 * lessonTests package at once. </p>
+	 *
+	 * @throws IllegalStateException if the database cannot be opened, for example because
+	 * 		FoundationsMain is still running
+	 */
+	public static void startJUnit() {
+		// The same database and the same unique test users as the console runs, so the JUnit
+		// results are directly comparable with the TP2 results
+		try {
+			FoundationsMain.database.connectToDatabase();
+			connected = true;
+		} catch (SQLException e) {
+			throw new IllegalStateException("Could not connect to the database.  Is FoundationsMain "
+					+ "still running?  " + e.getMessage());
+		}
+	}
+
+
+	/**********
+	 * <p> Method: void finishJUnit() </p>
+	 *
+	 * <p> Description: Deletes every lesson the class's tests created and closes the database.
+	 * Each test class calls this from its @AfterAll method, which JUnit runs even when a test
+	 * failed, so no test data is left behind. </p>
+	 */
+	public static void finishJUnit() {
+		cleanUp();
+		FoundationsMain.database.closeConnection();
+		connected = false;
 	}
 
 
@@ -171,7 +223,9 @@ public class TestSupport {
 	/**********
 	 * Records and prints one test.  The test passes only when the expected and actual
 	 * descriptions are exactly equal; the comparison is done on text so that the printed output
-	 * is itself the evidence for the result.
+	 * is itself the evidence for the result.  Run by JUnit, a failed check also fails the JUnit
+	 * test, with the test id and name in the message; run as a console program, it is counted
+	 * and the remaining tests still run.
 	 *
 	 * @param testId	the test id, for example "C1-P1"
 	 * @param positive	true for a positive test (the action must succeed), false for a negative
@@ -191,6 +245,9 @@ public class TestSupport {
 		System.out.println("          Expected: " + expected);
 		System.out.println("          Actual:   " + actual);
 		System.out.println("          Result:   " + (passed ? "PASS" : "*** FAIL ***"));
+		// Printed first, then asserted, so the Expected and Actual lines show in the JUnit
+		// console even for a failure
+		if (!consoleMode) assertEquals(expected, actual, testId + " " + name);
 	}
 
 

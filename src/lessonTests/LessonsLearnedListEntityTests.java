@@ -7,13 +7,21 @@ import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.titles;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
 
 /*******
  * <p> Title: LessonsLearnedListEntityTests Class. </p>
  *
- * <p> Description: Semi-automated tests for the LessonsLearnedList entity class itself (TP2
+ * <p> Description: JUnit 5 tests for the LessonsLearnedList entity class itself (TP2
  * Task 3).  The requirements are:</p>
  * <ul>
  * <li> E3: LessonsLearnedList implements CRUD for a collection of lessons: it loads lessons from
@@ -28,16 +36,26 @@ import entityClasses.LessonsLearnedList;
  * collection operations do not touch the database; that makes their expected results
  * independent of anything else stored.  See TestSupport for how to read the output.</p>
  *
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: entity tests for LessonsLearnedList
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LessonsLearnedListEntityTests {
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public LessonsLearnedListEntityTests() {
 	}
@@ -53,18 +71,41 @@ public class LessonsLearnedListEntityTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		LessonsLearnedListEntityTests tests = new LessonsLearnedListEntityTests();
 		requirement("E3", "LessonsLearnedList loads, adds, finds, replaces, and removes lessons");
-		run(LessonsLearnedListEntityTests::testLoadByOwnerAndLoadAll);
-		run(LessonsLearnedListEntityTests::testAddFindReplaceAndRemove);
-		run(LessonsLearnedListEntityTests::testInvalidCollectionOperationsRefused);
+		run(tests::testLoadByOwnerAndLoadAll);
+		run(tests::testAddFindReplaceAndRemove);
+		run(tests::testInvalidCollectionOperationsRefused);
 
 		requirement("E4", "LessonsLearnedList returns subsets as new lists, original unchanged");
-		run(LessonsLearnedListEntityTests::testFilterByKeywordsRequiresEveryKeyword);
-		run(LessonsLearnedListEntityTests::testFilterByCategoryAndTag);
-		run(LessonsLearnedListEntityTests::testFiltersReturnEmptyListForBlankOrNoMatch);
+		run(tests::testFilterByKeywordsRequiresEveryKeyword);
+		run(tests::testFilterByCategoryAndTag);
+		run(tests::testFiltersReturnEmptyListForBlankOrNoMatch);
 	}
 
 
@@ -125,7 +166,10 @@ public class LessonsLearnedListEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the owner's list holds exactly those two
 	 * titles and the full list contains both of them. </p>
 	 */
-	private static void testLoadByOwnerAndLoadAll() {
+	@Test
+	@Order(1)
+	@DisplayName("E3-P1 loadByOwner and loadAll Read Lessons From the Database (E3, P)")
+	void testLoadByOwnerAndLoadAll() {
 		String owner = uniqueUser("listLoad");
 		int first = makeLesson(owner, "Loaded lesson one", "General");
 		int second = makeLesson(owner, "Loaded lesson two", "General");
@@ -153,7 +197,10 @@ public class LessonsLearnedListEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means each step reports the value shown and the
 	 * list ends holding only the replaced lesson. </p>
 	 */
-	private static void testAddFindReplaceAndRemove() {
+	@Test
+	@Order(2)
+	@DisplayName("E3-P2 Add, Find, Replace, and Remove Work on the List (E3, P)")
+	void testAddFindReplaceAndRemove() {
 		LessonsLearnedList list = new LessonsLearnedList();
 		boolean added = list.add(lesson(1, "One", "First description.", "", "General"))
 				&& list.add(lesson(2, "Two", "Second description.", "", "General"));
@@ -186,7 +233,10 @@ public class LessonsLearnedListEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means every operation is refused as shown and the
 	 * list still holds 1 lesson. </p>
 	 */
-	private static void testInvalidCollectionOperationsRefused() {
+	@Test
+	@Order(3)
+	@DisplayName("E3-N1 Invalid Collection Operations Are Refused (E3, N)")
+	void testInvalidCollectionOperationsRefused() {
 		LessonsLearnedList list = new LessonsLearnedList();
 		list.add(lesson(1, "Only lesson", "The only description.", "", "General"));
 
@@ -223,7 +273,10 @@ public class LessonsLearnedListEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the two lessons mentioning both words are
 	 * returned, "Sprint retro notes" is not, and the original list still holds 3. </p>
 	 */
-	private static void testFilterByKeywordsRequiresEveryKeyword() {
+	@Test
+	@Order(4)
+	@DisplayName("E4-P1 Keyword Subset Requires Every Keyword, Ignoring Case (E4, P)")
+	void testFilterByKeywordsRequiresEveryKeyword() {
 		LessonsLearnedList list = sampleList();
 		LessonsLearnedList subset = list.filterByKeywords("RELEASE smoke");
 		check("E4-P1", true, "Keyword Subset Requires Every Keyword, Ignoring Case",
@@ -248,7 +301,10 @@ public class LessonsLearnedListEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the category subset holds the two Technical
 	 * lessons and the tag subset holds "Sprint retro notes". </p>
 	 */
-	private static void testFilterByCategoryAndTag() {
+	@Test
+	@Order(5)
+	@DisplayName("E4-P2 Category and Tag Subsets (E4, P)")
+	void testFilterByCategoryAndTag() {
 		LessonsLearnedList list = sampleList();
 		check("E4-P2", true, "Category and Tag Subsets",
 				"Technical: 2 lesson(s): Deploy pipeline fix, Release checklist; tag TEAMWORK: "
@@ -273,7 +329,10 @@ public class LessonsLearnedListEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means all four subsets are empty. </p>
 	 */
-	private static void testFiltersReturnEmptyListForBlankOrNoMatch() {
+	@Test
+	@Order(6)
+	@DisplayName("E4-N1 Subsets Are Empty for Blank Text or No Match (E4, N)")
+	void testFiltersReturnEmptyListForBlankOrNoMatch() {
 		LessonsLearnedList list = sampleList();
 		check("E4-N1", false, "Subsets Are Empty for Blank Text or No Match",
 				"blank keywords: 0 lesson(s); release teamwork: 0 lesson(s); category technical: "

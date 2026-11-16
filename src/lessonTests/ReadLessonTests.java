@@ -11,6 +11,14 @@ import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.titles;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
 import guiAddExperience.ModelAddExperience;
@@ -22,7 +30,7 @@ import guiUpdateLesson.ModelUpdateLesson;
 /*******
  * <p> Title: ReadLessonTests Class. </p>
  *
- * <p> Description: Semi-automated tests for the Read user stories: US-R1 (view my list),
+ * <p> Description: JUnit 5 tests for the Read user stories: US-R1 (view my list),
  * US-R2 (search my titles and view the subset), US-R2-V (search input validation), US-R3 (open
  * one lesson and see its details, experience entries, and locks), US-R3-V (a lesson that does
  * not exist or is not mine fails safely), and US-R4 (Contributors cannot see each other's
@@ -33,16 +41,26 @@ import guiUpdateLesson.ModelUpdateLesson;
  * Add Experience pages for US-R3-V, because that story says the same check applies before every
  * update, experience entry, and delete.  See TestSupport for how to read the output.</p>
  *
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: Read tests, one method per test
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReadLessonTests {
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public ReadLessonTests() {
 	}
@@ -58,42 +76,65 @@ public class ReadLessonTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		ReadLessonTests tests = new ReadLessonTests();
 		requirement("US-R1", "A Contributor can view a list of all the lessons they have added");
-		run(ReadLessonTests::testViewMyLessonsPopulatedList);
-		run(ReadLessonTests::testViewMyLessonsEmptyList);
-		run(ReadLessonTests::testViewMyLessonsUnknownUser);
+		run(tests::testViewMyLessonsPopulatedList);
+		run(tests::testViewMyLessonsEmptyList);
+		run(tests::testViewMyLessonsUnknownUser);
 
 		requirement("US-R2", "A Contributor can search their titles and view the matching subset");
-		run(ReadLessonTests::testSubsetListOneMatch);
-		run(ReadLessonTests::testSubsetListMultipleMatchesIgnoringCase);
-		run(ReadLessonTests::testSubsetListZeroMatches);
+		run(tests::testSubsetListOneMatch);
+		run(tests::testSubsetListMultipleMatchesIgnoringCase);
+		run(tests::testSubsetListZeroMatches);
 
 		requirement("US-R2-V", "Invalid search text gets a specific message; empty text finds "
 				+ "nothing");
-		run(ReadLessonTests::testEmptySearchTextFindsNothing);
-		run(ReadLessonTests::testSearchTextAtMaximumAccepted);
-		run(ReadLessonTests::testSearchTextTooLongRejected);
-		run(ReadLessonTests::testSearchTextInvalidCharacterRejected);
+		run(tests::testEmptySearchTextFindsNothing);
+		run(tests::testSearchTextAtMaximumAccepted);
+		run(tests::testSearchTextTooLongRejected);
+		run(tests::testSearchTextInvalidCharacterRejected);
 
 		requirement("US-R3", "A Contributor can open one lesson and see its details, experience "
 				+ "entries, and locks");
-		run(ReadLessonTests::testViewSingleLessonFullDetails);
-		run(ReadLessonTests::testLockedFieldDisplayedAsReadOnly);
-		run(ReadLessonTests::testOpenLessonSelectedFromMyList);
+		run(tests::testViewSingleLessonFullDetails);
+		run(tests::testLockedFieldDisplayedAsReadOnly);
+		run(tests::testOpenLessonSelectedFromMyList);
 
 		requirement("US-R3-V", "A lesson that does not exist or is not mine gives \"Lesson not "
 				+ "found.\"");
-		run(ReadLessonTests::testOwnerPassesTheOwnershipCheck);
-		run(ReadLessonTests::testSelectNonexistentLessonId);
-		run(ReadLessonTests::testCannotViewAnotherContributorsLesson);
-		run(ReadLessonTests::testAnotherContributorCannotChangeOrDeleteMyLesson);
+		run(tests::testOwnerPassesTheOwnershipCheck);
+		run(tests::testSelectNonexistentLessonId);
+		run(tests::testCannotViewAnotherContributorsLesson);
+		run(tests::testAnotherContributorCannotChangeOrDeleteMyLesson);
 
 		requirement("US-R4", "A Contributor sees only their own lessons");
-		run(ReadLessonTests::testMyListShowsOnlyMyLessons);
-		run(ReadLessonTests::testSearchNeverReturnsAnotherContributorsLessons);
+		run(tests::testMyListShowsOnlyMyLessons);
+		run(tests::testSearchNeverReturnsAnotherContributorsLessons);
 	}
 
 
@@ -118,7 +159,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> the Actual line lists the titles returned (sorted).
 	 * PASS means both lessons, and only those, are in the list. </p>
 	 */
-	private static void testViewMyLessonsPopulatedList() {
+	@Test
+	@Order(1)
+	@DisplayName("R1-P1 View My Lessons - Populated List (US-R1, P)")
+	void testViewMyLessonsPopulatedList() {
 		String user = uniqueUser("listPopulated");
 		makeLesson(user, "Sprint retro notes", "Teamwork");
 		makeLesson(user, "Deploy pipeline fix", "Technical");
@@ -142,7 +186,10 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the result is an empty list, not null. </p>
 	 */
-	private static void testViewMyLessonsEmptyList() {
+	@Test
+	@Order(2)
+	@DisplayName("R1-P2 View My Lessons - Empty List (US-R1, P)")
+	void testViewMyLessonsEmptyList() {
 		LessonsLearnedList list = ModelContributorHome.viewMyLessons(uniqueUser("listEmpty"));
 		String actual = (list == null) ? "null" : (list.isEmpty() ? "empty list (not null)"
 				: titles(list));
@@ -163,7 +210,10 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means both requests return an empty list. </p>
 	 */
-	private static void testViewMyLessonsUnknownUser() {
+	@Test
+	@Order(3)
+	@DisplayName("R1-N1 View My Lessons - Blank or Unknown Username (US-R1, N)")
+	void testViewMyLessonsUnknownUser() {
 		String actual = "blank username: " + titles(ModelContributorHome.viewMyLessons(""))
 				+ "; unknown username: "
 				+ titles(ModelContributorHome.viewMyLessons(uniqueUser("neverRegistered")));
@@ -204,7 +254,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means exactly one lesson, "Deploy pipeline fix",
 	 * is returned. </p>
 	 */
-	private static void testSubsetListOneMatch() {
+	@Test
+	@Order(4)
+	@DisplayName("R2-P1 Subset List - One Match (US-R2, P)")
+	void testSubsetListOneMatch() {
 		String user = uniqueUser("searchOne");
 		makeSearchLessons(user);
 		LessonResult result = ModelContributorHome.searchMyLessons(user, "Deploy");
@@ -228,7 +281,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the two "Sprint ..." lessons are returned
 	 * and "Deploy pipeline fix" is not. </p>
 	 */
-	private static void testSubsetListMultipleMatchesIgnoringCase() {
+	@Test
+	@Order(5)
+	@DisplayName("R2-P2 Subset List - Multiple Matches, Ignoring Case (US-R2, P)")
+	void testSubsetListMultipleMatchesIgnoringCase() {
 		String user = uniqueUser("searchMany");
 		makeSearchLessons(user);
 		LessonResult result = ModelContributorHome.searchMyLessons(user, "SPRINT");
@@ -252,7 +308,10 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the search succeeds with 0 lessons. </p>
 	 */
-	private static void testSubsetListZeroMatches() {
+	@Test
+	@Order(6)
+	@DisplayName("R2-N1 Subset List - Zero Matches (Titles Only) (US-R2, N)")
+	void testSubsetListZeroMatches() {
 		String user = uniqueUser("searchZero");
 		makeSearchLessons(user);
 		LessonResult result = ModelContributorHome.searchMyLessons(user, "definitely");
@@ -281,7 +340,10 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means success with 0 lessons. </p>
 	 */
-	private static void testEmptySearchTextFindsNothing() {
+	@Test
+	@Order(7)
+	@DisplayName("R2V-P1 Subset List - Empty Search Text Finds Nothing (US-R2-V, P)")
+	void testEmptySearchTextFindsNothing() {
 		String user = uniqueUser("searchEmpty");
 		makeLesson(user, "Sprint retro notes", "Teamwork");
 		LessonResult result = ModelContributorHome.searchMyLessons(user, "");
@@ -305,7 +367,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the search runs (success) and finds 0
 	 * lessons. </p>
 	 */
-	private static void testSearchTextAtMaximumAccepted() {
+	@Test
+	@Order(8)
+	@DisplayName("R2V-P2 Search Input - 254 Characters Accepted (US-R2-V, P)")
+	void testSearchTextAtMaximumAccepted() {
 		String user = uniqueUser("searchMax");
 		makeLesson(user, "Sprint retro notes", "Teamwork");
 		LessonResult result = ModelContributorHome.searchMyLessons(user, rep("a", 254));
@@ -329,7 +394,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the search is refused with "Search text is
 	 * too long." for the search field, and no list is returned. </p>
 	 */
-	private static void testSearchTextTooLongRejected() {
+	@Test
+	@Order(9)
+	@DisplayName("R2V-N1 Search Input - Invalid Text Rejected (Too Long) (US-R2-V, N)")
+	void testSearchTextTooLongRejected() {
 		String user = uniqueUser("searchLong");
 		LessonResult result = ModelContributorHome.searchMyLessons(user, rep("a", 255));
 		check("R2V-N1", false, "Search Input - Invalid Text Rejected (Too Long)",
@@ -353,7 +421,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the invalid-character message is returned
 	 * for the search field. </p>
 	 */
-	private static void testSearchTextInvalidCharacterRejected() {
+	@Test
+	@Order(10)
+	@DisplayName("R2V-N2 Search Input - Invalid Character Rejected (US-R2-V, N)")
+	void testSearchTextInvalidCharacterRejected() {
 		String user = uniqueUser("searchTab");
 		LessonResult result = ModelContributorHome.searchMyLessons(user, "java\tdebug");
 		check("R2V-N2", false, "Search Input - Invalid Character Rejected",
@@ -384,7 +455,10 @@ public class ReadLessonTests {
 	 * category, and experience entries of the opened lesson.  PASS means every part matches
 	 * what was stored. </p>
 	 */
-	private static void testViewSingleLessonFullDetails() {
+	@Test
+	@Order(11)
+	@DisplayName("R3-P1 View Single Lesson - Full Details and Experience Entries (US-R3, P)")
+	void testViewSingleLessonFullDetails() {
 		String user = uniqueUser("viewFull");
 		LessonResult created = guiCreateLesson.ModelCreateLesson.createLesson(user,
 				"Reusable checklist", DESCRIPTION, "java, testing", "Research");
@@ -421,7 +495,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means only the title reports locked and the other
 	 * three fields remain editable. </p>
 	 */
-	private static void testLockedFieldDisplayedAsReadOnly() {
+	@Test
+	@Order(12)
+	@DisplayName("R3-P2 View Single Lesson - Locked Field Displayed as Read-Only (US-R3, P)")
+	void testLockedFieldDisplayedAsReadOnly() {
 		String user = uniqueUser("viewLocked");
 		int id = makeLesson(user, "Lesson with a locked title", "General");
 		lock(id, "title", true);
@@ -454,7 +531,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the opened lesson has the selected id and
 	 * the title "Second lesson", not the other lesson. </p>
 	 */
-	private static void testOpenLessonSelectedFromMyList() {
+	@Test
+	@Order(13)
+	@DisplayName("R3-P3 Open Lesson - The Lesson Selected From My List Opens (US-R3, P)")
+	void testOpenLessonSelectedFromMyList() {
 		String user = uniqueUser("openFromList");
 		makeLesson(user, "First lesson", "General");
 		makeLesson(user, "Second lesson", "General");
@@ -497,7 +577,10 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means all three succeed. </p>
 	 */
-	private static void testOwnerPassesTheOwnershipCheck() {
+	@Test
+	@Order(14)
+	@DisplayName("R3V-P1 Ownership Check - The Owner Passes Before Every Action (US-R3-V, P)")
+	void testOwnerPassesTheOwnershipCheck() {
 		String user = uniqueUser("ownerCheck");
 		int id = makeLesson(user, "My own lesson", "General");
 		String actual = "view: " + describe(ModelLessonDetails.viewLesson(user, id))
@@ -524,7 +607,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means all four are refused with "Lesson not
 	 * found." and nothing throws an exception. </p>
 	 */
-	private static void testSelectNonexistentLessonId() {
+	@Test
+	@Order(15)
+	@DisplayName("R3V-N1 Select Nonexistent Lesson ID (US-R3-V, N)")
+	void testSelectNonexistentLessonId() {
 		String user = uniqueUser("missingId");
 		String actual = "view: " + describe(ModelLessonDetails.viewLesson(user, -999))
 				+ "; update: " + describe(ModelUpdateLesson.updateLesson(user, -999, "Title",
@@ -554,7 +640,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means B is refused and no lesson content is
 	 * returned. </p>
 	 */
-	private static void testCannotViewAnotherContributorsLesson() {
+	@Test
+	@Order(16)
+	@DisplayName("R3V-N2 Cannot View Another Contributor's Lesson (US-R3-V, N)")
+	void testCannotViewAnotherContributorsLesson() {
 		String userA = uniqueUser("privacyOwnerA");
 		String userB = uniqueUser("privacyOtherB");
 		int id = makeLesson(userA, "Private lesson of A", "General");
@@ -583,7 +672,10 @@ public class ReadLessonTests {
 	 * found." and A's lesson still exists with its original title and no experience
 	 * entries. </p>
 	 */
-	private static void testAnotherContributorCannotChangeOrDeleteMyLesson() {
+	@Test
+	@Order(17)
+	@DisplayName("R3V-N3 Another Contributor Cannot Change or Delete My Lesson (US-R3-V, N)")
+	void testAnotherContributorCannotChangeOrDeleteMyLesson() {
 		String userA = uniqueUser("privacyOwnerA");
 		String userB = uniqueUser("privacyOtherB");
 		int id = makeLesson(userA, "Original title of A", "General");
@@ -625,7 +717,10 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means A sees only A's two titles and B sees only
 	 * B's one title. </p>
 	 */
-	private static void testMyListShowsOnlyMyLessons() {
+	@Test
+	@Order(18)
+	@DisplayName("R4-P1 My List Shows Only My Lessons (US-R4, P)")
+	void testMyListShowsOnlyMyLessons() {
 		String userA = uniqueUser("ownListA");
 		String userB = uniqueUser("ownListB");
 		makeLesson(userA, "Lesson A1", "General");
@@ -653,7 +748,10 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means A gets only "Deploy checklist". </p>
 	 */
-	private static void testSearchNeverReturnsAnotherContributorsLessons() {
+	@Test
+	@Order(19)
+	@DisplayName("R4-N1 Search Never Returns Another Contributor's Lessons (US-R4, N)")
+	void testSearchNeverReturnsAnotherContributorsLessons() {
 		String userA = uniqueUser("searchPrivA");
 		String userB = uniqueUser("searchPrivB");
 		makeLesson(userA, "Deploy checklist", "Technical");

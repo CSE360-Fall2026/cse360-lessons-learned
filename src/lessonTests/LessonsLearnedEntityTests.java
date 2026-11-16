@@ -9,6 +9,14 @@ import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.stored;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import java.sql.SQLException;
 
 import entityClasses.LessonsLearned;
@@ -17,7 +25,7 @@ import entityClasses.LessonsLearnedList;
 /*******
  * <p> Title: LessonsLearnedEntityTests Class. </p>
  *
- * <p> Description: Semi-automated tests for the LessonsLearned entity class itself (TP2 Task
+ * <p> Description: JUnit 5 tests for the LessonsLearned entity class itself (TP2 Task
  * 3), called directly rather than through a page's Model.  The requirements are:</p>
  * <ul>
  * <li> E1: LessonsLearned fully implements CRUD against the database (create, read, update,
@@ -35,16 +43,26 @@ import entityClasses.LessonsLearnedList;
  * reports it; each test catches the exception and prints its message so the output shows the
  * exact text.  See TestSupport for how to read the output.</p>
  *
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: entity tests for LessonsLearned
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LessonsLearnedEntityTests {
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public LessonsLearnedEntityTests() {
 	}
@@ -60,29 +78,52 @@ public class LessonsLearnedEntityTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		LessonsLearnedEntityTests tests = new LessonsLearnedEntityTests();
 		requirement("E1", "LessonsLearned implements Create, Read, Update, and Delete in the "
 				+ "database");
-		run(LessonsLearnedEntityTests::testCreateAndReadLesson);
-		run(LessonsLearnedEntityTests::testUpdateAndDeleteLesson);
-		run(LessonsLearnedEntityTests::testReadOrDeleteMissingLesson);
+		run(tests::testCreateAndReadLesson);
+		run(tests::testUpdateAndDeleteLesson);
+		run(tests::testReadOrDeleteMissingLesson);
 
 		requirement("E2", "LessonsLearned validates its fields and refuses to store invalid data");
-		run(LessonsLearnedEntityTests::testValidationReportsFirstInvalidFieldInScreenOrder);
-		run(LessonsLearnedEntityTests::testCreateRefusesInvalidLesson);
-		run(LessonsLearnedEntityTests::testUpdateRefusesInvalidChange);
+		run(tests::testValidationReportsFirstInvalidFieldInScreenOrder);
+		run(tests::testCreateRefusesInvalidLesson);
+		run(tests::testUpdateRefusesInvalidChange);
 
 		requirement("E5", "Lock flags are saved and reported for each field and the whole lesson");
-		run(LessonsLearnedEntityTests::testFieldLockSavedAndReported);
-		run(LessonsLearnedEntityTests::testEntireLockCoversEveryFieldAndCanBeCleared);
-		run(LessonsLearnedEntityTests::testUnknownLockScopeRefused);
+		run(tests::testFieldLockSavedAndReported);
+		run(tests::testEntireLockCoversEveryFieldAndCanBeCleared);
+		run(tests::testUnknownLockScopeRefused);
 
 		requirement("E6", "TP3 and AICoaching attributes are saved, read back, and validated");
-		run(LessonsLearnedEntityTests::testFutureAttributesSavedAndReadBack);
-		run(LessonsLearnedEntityTests::testRootCauseTooLongRefused);
-		run(LessonsLearnedEntityTests::testSearchTermsTooLongRefused);
+		run(tests::testFutureAttributesSavedAndReadBack);
+		run(tests::testRootCauseTooLongRefused);
+		run(tests::testSearchTermsTooLongRefused);
 	}
 
 
@@ -124,7 +165,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means an id was assigned and the row read back
 	 * holds the same title, category, tags, and owner. </p>
 	 */
-	private static void testCreateAndReadLesson() {
+	@Test
+	@Order(1)
+	@DisplayName("E1-P1 Create Stores the Lesson and Read Returns It (E1, P)")
+	void testCreateAndReadLesson() {
 		String owner = uniqueUser("entityCreate");
 		LessonsLearned lesson = saveLesson(owner, "Entity title");
 		LessonsLearned readBack = LessonsLearned.read(lesson.getId());
@@ -154,7 +198,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means update() returned true and the new title is
 	 * stored, then delete() returned true and the lesson can no longer be read. </p>
 	 */
-	private static void testUpdateAndDeleteLesson() {
+	@Test
+	@Order(2)
+	@DisplayName("E1-P2 Update Saves Changes and Delete Removes the Row (E1, P)")
+	void testUpdateAndDeleteLesson() {
 		LessonsLearned lesson = saveLesson(uniqueUser("entityUpdate"), "Before update");
 		lesson.setTitle("After update");
 		boolean updated = lesson.update();
@@ -183,7 +230,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means read gives null and delete gives
 	 * false. </p>
 	 */
-	private static void testReadOrDeleteMissingLesson() {
+	@Test
+	@Order(3)
+	@DisplayName("E1-N1 Reading or Deleting a Missing Lesson Fails Safely (E1, N)")
+	void testReadOrDeleteMissingLesson() {
 		LessonsLearned ghost = new LessonsLearned();
 		ghost.setId(-999);
 		check("E1-N1", false, "Reading or Deleting a Missing Lesson Fails Safely",
@@ -217,7 +267,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the title is reported first, then the
 	 * category, and finally the lesson is valid. </p>
 	 */
-	private static void testValidationReportsFirstInvalidFieldInScreenOrder() {
+	@Test
+	@Order(4)
+	@DisplayName("E2-P1 Validation Reports the First Invalid Field in Screen Order (E2, P)")
+	void testValidationReportsFirstInvalidFieldInScreenOrder() {
 		LessonsLearned lesson = new LessonsLearned("anyone", "", DESCRIPTION, "", "Marketing");
 		String first = lesson.findInvalidField() + " \"" + lesson.validate() + "\"";
 		lesson.setTitle("Fixed title");
@@ -248,7 +301,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the exception carries "Title is required."
 	 * and 0 lessons were stored. </p>
 	 */
-	private static void testCreateRefusesInvalidLesson() {
+	@Test
+	@Order(5)
+	@DisplayName("E2-N1 Create Refuses an Invalid Lesson (E2, N)")
+	void testCreateRefusesInvalidLesson() {
 		String owner = uniqueUser("entityBadCreate");
 		LessonsLearned lesson = new LessonsLearned(owner, "", DESCRIPTION, "java", "General");
 		String outcome;
@@ -282,7 +338,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the description-length message is in the
 	 * exception and the stored description is still the original. </p>
 	 */
-	private static void testUpdateRefusesInvalidChange() {
+	@Test
+	@Order(6)
+	@DisplayName("E2-N2 Update Refuses an Invalid Change (E2, N)")
+	void testUpdateRefusesInvalidChange() {
 		LessonsLearned lesson = saveLesson(uniqueUser("entityBadUpdate"), "Valid lesson");
 		lesson.setDescription("short");
 		String outcome;
@@ -321,7 +380,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means setLock returned true and the stored lesson
 	 * reports the title locked, the description unlocked, and the lesson locked. </p>
 	 */
-	private static void testFieldLockSavedAndReported() {
+	@Test
+	@Order(7)
+	@DisplayName("E5-P1 A Field Lock Is Saved and Reported (E5, P)")
+	void testFieldLockSavedAndReported() {
 		LessonsLearned lesson = saveLesson(uniqueUser("entityLock"), "Lesson to lock");
 		boolean set = lesson.setLock(LessonsLearned.FIELD_TITLE, true);
 		LessonsLearned fresh = LessonsLearned.read(lesson.getId());
@@ -349,7 +411,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means 4 of 4 fields are locked while the lock is
 	 * set, and the lesson is unlocked after clearing it. </p>
 	 */
-	private static void testEntireLockCoversEveryFieldAndCanBeCleared() {
+	@Test
+	@Order(8)
+	@DisplayName("E5-P2 The Whole-Lesson Lock Covers Every Field and Can Be Cleared (E5, P)")
+	void testEntireLockCoversEveryFieldAndCanBeCleared() {
 		LessonsLearned lesson = saveLesson(uniqueUser("entityEntire"), "Lesson to lock fully");
 		lesson.setLock(LessonsLearned.LOCK_ENTIRE, true);
 		LessonsLearned locked = LessonsLearned.read(lesson.getId());
@@ -380,7 +445,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means setLock returned false and the lesson is
 	 * not locked. </p>
 	 */
-	private static void testUnknownLockScopeRefused() {
+	@Test
+	@Order(9)
+	@DisplayName("E5-N1 An Unknown Lock Scope Is Refused (E5, N)")
+	void testUnknownLockScopeRefused() {
 		LessonsLearned lesson = saveLesson(uniqueUser("entityBadScope"), "Lesson with bad scope");
 		boolean set = lesson.setLock("owner", true);
 		check("E5-N1", false, "An Unknown Lock Scope Is Refused",
@@ -414,7 +482,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means every value read back equals the value
 	 * saved. </p>
 	 */
-	private static void testFutureAttributesSavedAndReadBack() {
+	@Test
+	@Order(10)
+	@DisplayName("E6-P1 TP3 Attributes Are Saved and Read Back (E6, P)")
+	void testFutureAttributesSavedAndReadBack() {
 		String owner = uniqueUser("entityFuture");
 		LessonsLearned lesson = new LessonsLearned(owner, "Lesson with TP3 fields", DESCRIPTION,
 				"java", "Technical");
@@ -459,7 +530,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the root-cause message is shown and 0
 	 * lessons were stored. </p>
 	 */
-	private static void testRootCauseTooLongRefused() {
+	@Test
+	@Order(11)
+	@DisplayName("E6-N1 A Root Cause Over 2000 Characters Is Refused (E6, N)")
+	void testRootCauseTooLongRefused() {
 		String owner = uniqueUser("entityLongRoot");
 		LessonsLearned lesson = new LessonsLearned(owner, "Lesson with a long root cause",
 				DESCRIPTION, "java", "General");
@@ -496,7 +570,10 @@ public class LessonsLearnedEntityTests {
 	 * <p> <b>How to read the output:</b> PASS means the search-terms message is shown and the
 	 * stored search terms are still empty. </p>
 	 */
-	private static void testSearchTermsTooLongRefused() {
+	@Test
+	@Order(12)
+	@DisplayName("E6-N2 A Search Term Over 50 Characters Is Refused (E6, N)")
+	void testSearchTermsTooLongRefused() {
 		LessonsLearned lesson = saveLesson(uniqueUser("entityLongTerm"), "Lesson with long terms");
 		lesson.setSearchTerms("ok, " + rep("a", 51));
 		String outcome;

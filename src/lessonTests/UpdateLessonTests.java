@@ -10,6 +10,14 @@ import static lessonTests.TestSupport.requirement;
 import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import entityClasses.LessonsLearned;
 import guiTools.LessonResult;
 import guiUpdateLesson.ModelUpdateLesson;
@@ -17,7 +25,7 @@ import guiUpdateLesson.ModelUpdateLesson;
 /*******
  * <p> Title: UpdateLessonTests Class. </p>
  *
- * <p> Description: Semi-automated tests for US-U1 (a Contributor can update the title,
+ * <p> Description: JUnit 5 tests for US-U1 (a Contributor can update the title,
  * description, tags, and category of their lesson as long as the field is not locked) and
  * US-U1-V (a change to a locked field, or invalid new information, is refused with a clear
  * message and the lesson is left unchanged).</p>
@@ -28,16 +36,26 @@ import guiUpdateLesson.ModelUpdateLesson;
  * the Phase Three Curator will set them, because no Contributor action can lock a field.  See
  * TestSupport for how to read the output.</p>
  *
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: Update tests, one method per test
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UpdateLessonTests {
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public UpdateLessonTests() {
 	}
@@ -53,20 +71,43 @@ public class UpdateLessonTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		UpdateLessonTests tests = new UpdateLessonTests();
 		requirement("US-U1", "A Contributor can update the core information of their lesson "
 				+ "when the field is not locked");
-		run(UpdateLessonTests::testUpdateValidChangeToUnlockedField);
-		run(UpdateLessonTests::testUpdateAllFourCoreFields);
-		run(UpdateLessonTests::testOtherFieldsEditableWhileOneIsLocked);
+		run(tests::testUpdateValidChangeToUnlockedField);
+		run(tests::testUpdateAllFourCoreFields);
+		run(tests::testOtherFieldsEditableWhileOneIsLocked);
 
 		requirement("US-U1-V", "A locked field or invalid new value is refused with a clear "
 				+ "message; the lesson is unchanged");
-		run(UpdateLessonTests::testUpdateRejectedBecauseFieldIsLocked);
-		run(UpdateLessonTests::testUpdateRejectedBecauseNewValueIsInvalid);
-		run(UpdateLessonTests::testUpdateRejectedBecauseEntireLessonIsLocked);
+		run(tests::testUpdateRejectedBecauseFieldIsLocked);
+		run(tests::testUpdateRejectedBecauseNewValueIsInvalid);
+		run(tests::testUpdateRejectedBecauseEntireLessonIsLocked);
 	}
 
 
@@ -100,7 +141,10 @@ public class UpdateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means "Lesson updated" was returned and the
 	 * database now holds the new title with the other fields unchanged. </p>
 	 */
-	private static void testUpdateValidChangeToUnlockedField() {
+	@Test
+	@Order(1)
+	@DisplayName("U1-P1 Update Lesson - Valid Change to an Unlocked Field (US-U1, P)")
+	void testUpdateValidChangeToUnlockedField() {
 		String user = uniqueUser("updateValid");
 		int id = makeLesson(user, "Original title", "General");
 
@@ -126,7 +170,10 @@ public class UpdateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means every new value is stored. </p>
 	 */
-	private static void testUpdateAllFourCoreFields() {
+	@Test
+	@Order(2)
+	@DisplayName("U1-P2 Update Lesson - All Four Core Fields Changed (US-U1, P)")
+	void testUpdateAllFourCoreFields() {
 		String user = uniqueUser("updateAll");
 		int id = makeLesson(user, "Old title", "General");
 
@@ -155,7 +202,10 @@ public class UpdateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the update succeeded, the description
 	 * changed, and the locked title is the same as before. </p>
 	 */
-	private static void testOtherFieldsEditableWhileOneIsLocked() {
+	@Test
+	@Order(3)
+	@DisplayName("U1-P3 Update Lesson - Other Fields Stay Editable While One Is Locked (US-U1, P)")
+	void testOtherFieldsEditableWhileOneIsLocked() {
 		String user = uniqueUser("updatePartLock");
 		int id = makeLesson(user, "Locked title", "General");
 		lock(id, "title", true);
@@ -186,7 +236,10 @@ public class UpdateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the locked-field message is returned for
 	 * the title and the stored lesson is exactly as it was. </p>
 	 */
-	private static void testUpdateRejectedBecauseFieldIsLocked() {
+	@Test
+	@Order(4)
+	@DisplayName("U1V-N1 Update Lesson - Rejected Because Field Is Locked (US-U1-V, N)")
+	void testUpdateRejectedBecauseFieldIsLocked() {
 		String user = uniqueUser("updateLocked");
 		int id = makeLesson(user, "Locked title", "General");
 		lock(id, "title", true);
@@ -214,7 +267,10 @@ public class UpdateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the description-length message is returned
 	 * for the description and the stored description is still the original one. </p>
 	 */
-	private static void testUpdateRejectedBecauseNewValueIsInvalid() {
+	@Test
+	@Order(5)
+	@DisplayName("U1V-N2 Update Lesson - Rejected Because New Value Is Invalid (US-U1-V, N)")
+	void testUpdateRejectedBecauseNewValueIsInvalid() {
 		String user = uniqueUser("updateInvalid");
 		int id = makeLesson(user, "Valid title", "General");
 
@@ -242,7 +298,10 @@ public class UpdateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the locked-field message names the category
 	 * and the stored category is still General. </p>
 	 */
-	private static void testUpdateRejectedBecauseEntireLessonIsLocked() {
+	@Test
+	@Order(6)
+	@DisplayName("U1V-N3 Update Lesson - Rejected Because the Whole Lesson Is Locked (US-U1-V, N)")
+	void testUpdateRejectedBecauseEntireLessonIsLocked() {
 		String user = uniqueUser("updateEntireLock");
 		int id = makeLesson(user, "Fully locked lesson", "General");
 		lock(id, "entire", true);

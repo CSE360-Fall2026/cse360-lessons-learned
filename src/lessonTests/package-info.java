@@ -32,16 +32,21 @@
  * 		DeleteLessonTests test the user stories through each page's Model. </li>
  * <li> LessonsLearnedEntityTests and LessonsLearnedListEntityTests test the entity classes
  * 		directly. </li>
- * <li> AllContributorTests runs all seven classes as one suite; TestSupport holds the shared
- * 		output format and test data helpers. </li>
+ * <li> AllContributorTests runs all seven classes as one console program; TestSupport holds
+ * 		the shared output format and test data helpers. </li>
+ * <li> SharedAiServiceTests holds the JUnit tests for the shared AI service (TP3 Aspect 8). </li>
  * <li> ManualGuiTests walks a tester through the GUI checks M1 to M7 and adds the sample
  * 		lessons they use. </li>
  * <li> inputValidation.LessonRecognizerTest holds the field-by-field boundary tests (Tests
  * 		1-58). </li>
  * </ul>
  *
- * <p> The tests are console programs with a main method, in the style of the Foundations
- * PasswordEvaluationTestingAutomation class (decision D17); they use the real H2 database, so
- * FoundationsMain must be closed while they run. </p>
+ * <p> In TP2 the tests were console programs with a main method, in the style of the
+ * Foundations PasswordEvaluationTestingAutomation class (decision D17).  In TP3 (Task 5.4) the
+ * seven test classes were converted to JUnit 5: run the package with Run As &gt; JUnit Test to run
+ * all 66 tests, listed under their TP2 ids.  The console programs still work and print the same
+ * output as in TP2.  The tests use the real H2 database, so FoundationsMain must be closed while
+ * they run.  ManualGuiTests stays a manual walkthrough, because what a page shows can only be
+ * judged by looking at it. </p>
  */
 package lessonTests;

@@ -8,6 +8,14 @@ import static lessonTests.TestSupport.requirement;
 import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import entityClasses.ExperienceEntry;
 import entityClasses.LessonsLearned;
 import guiAddExperience.ModelAddExperience;
@@ -18,7 +26,7 @@ import guiTools.LessonResult;
 /*******
  * <p> Title: DeleteLessonTests Class. </p>
  *
- * <p> Description: Semi-automated tests for US-D1 (a Contributor can delete their lesson after
+ * <p> Description: JUnit 5 tests for US-D1 (a Contributor can delete their lesson after
  * confirming an "Are you sure?" prompt with an explicit "Yes") and US-D1-V (a locked lesson, or
  * a lesson with any locked field, cannot be deleted, and answering anything but "Yes" cancels
  * the deletion).</p>
@@ -29,19 +37,29 @@ import guiTools.LessonResult;
  * closing the dialog.  The dialog itself is shown in the manual test M7 (ManualGuiTests).  See
  * TestSupport for how to read the output.</p>
  *
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: Delete tests, one method per test
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DeleteLessonTests {
 
 	/** The message the Model returns when a locked lesson cannot be deleted. */
 	private static final String LOCKED = "refused \"This lesson is locked and cannot be deleted.\"";
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public DeleteLessonTests() {
 	}
@@ -57,20 +75,43 @@ public class DeleteLessonTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		DeleteLessonTests tests = new DeleteLessonTests();
 		requirement("US-D1", "A Contributor can delete their lesson by answering \"Yes\" to "
 				+ "\"Are you sure?\"");
-		run(DeleteLessonTests::testConfirmedDeletionOfUnlockedLesson);
-		run(DeleteLessonTests::testDeletionAlsoRemovesExperienceEntries);
-		run(DeleteLessonTests::testDeclinedConfirmationCancelsDeletion);
+		run(tests::testConfirmedDeletionOfUnlockedLesson);
+		run(tests::testDeletionAlsoRemovesExperienceEntries);
+		run(tests::testDeclinedConfirmationCancelsDeletion);
 
 		requirement("US-D1-V", "A locked lesson, or one with any locked field, cannot be "
 				+ "deleted");
-		run(DeleteLessonTests::testDeleteRejectedBecauseLessonIsLocked);
-		run(DeleteLessonTests::testDeleteRejectedBecauseSingleFieldIsLocked);
-		run(DeleteLessonTests::testDeleteAllowedAfterLockIsRemoved);
+		run(tests::testDeleteRejectedBecauseLessonIsLocked);
+		run(tests::testDeleteRejectedBecauseSingleFieldIsLocked);
+		run(tests::testDeleteAllowedAfterLockIsRemoved);
 	}
 
 
@@ -100,7 +141,10 @@ public class DeleteLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means "Lesson deleted" was returned, the list is
 	 * empty, and the row is gone. </p>
 	 */
-	private static void testConfirmedDeletionOfUnlockedLesson() {
+	@Test
+	@Order(1)
+	@DisplayName("D1-P1 Delete Lesson - Confirmed Deletion of an Unlocked Lesson (US-D1, P)")
+	void testConfirmedDeletionOfUnlockedLesson() {
 		String user = uniqueUser("deleteYes");
 		int id = makeLesson(user, "Lesson to delete", "General");
 
@@ -127,7 +171,10 @@ public class DeleteLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means 1 entry before and 0 after. </p>
 	 */
-	private static void testDeletionAlsoRemovesExperienceEntries() {
+	@Test
+	@Order(2)
+	@DisplayName("D1-P2 Delete Lesson - Its Experience Entries Are Removed Too (US-D1, P)")
+	void testDeletionAlsoRemovesExperienceEntries() {
 		String user = uniqueUser("deleteCascade");
 		int id = makeLesson(user, "Lesson with experience", "General");
 		ModelAddExperience.addExperience(user, id, "1", "Reused once before deleting.");
@@ -157,7 +204,10 @@ public class DeleteLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the action is refused with no message and
 	 * the lesson is still stored. </p>
 	 */
-	private static void testDeclinedConfirmationCancelsDeletion() {
+	@Test
+	@Order(3)
+	@DisplayName("D1-N1 Delete Lesson - Declined Confirmation Cancels the Deletion (US-D1, N)")
+	void testDeclinedConfirmationCancelsDeletion() {
 		String user = uniqueUser("deleteNo");
 		int id = makeLesson(user, "Lesson to keep", "General");
 
@@ -182,7 +232,10 @@ public class DeleteLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the locked-lesson message is returned and
 	 * the lesson is still stored. </p>
 	 */
-	private static void testDeleteRejectedBecauseLessonIsLocked() {
+	@Test
+	@Order(4)
+	@DisplayName("D1V-N1 Delete Lesson - Rejected Because Lesson Is Locked (US-D1-V, N)")
+	void testDeleteRejectedBecauseLessonIsLocked() {
 		String user = uniqueUser("deleteLocked");
 		int id = makeLesson(user, "Locked lesson", "General");
 		lock(id, "entire", true);
@@ -208,7 +261,10 @@ public class DeleteLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the locked-lesson message is returned and
 	 * the lesson is still stored. </p>
 	 */
-	private static void testDeleteRejectedBecauseSingleFieldIsLocked() {
+	@Test
+	@Order(5)
+	@DisplayName("D1V-N2 Delete Lesson - Rejected Because a Single Field Is Locked (US-D1-V, N)")
+	void testDeleteRejectedBecauseSingleFieldIsLocked() {
 		String user = uniqueUser("deleteFieldLocked");
 		int id = makeLesson(user, "Lesson with one locked field", "General");
 		lock(id, "tags", true);
@@ -233,7 +289,10 @@ public class DeleteLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the first attempt is refused with the
 	 * locked message and the second returns "Lesson deleted". </p>
 	 */
-	private static void testDeleteAllowedAfterLockIsRemoved() {
+	@Test
+	@Order(6)
+	@DisplayName("D1V-P1 Delete Lesson - Allowed Again After the Lock Is Removed (US-D1-V, P)")
+	void testDeleteAllowedAfterLockIsRemoved() {
 		String user = uniqueUser("deleteUnlocked");
 		int id = makeLesson(user, "Lesson unlocked later", "General");
 		lock(id, "category", true);

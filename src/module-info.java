@@ -8,4 +8,5 @@ module FoundationsF26 {
 	opens curatorLockTests to org.junit.platform.commons;
 	opens curatorHomeTests to org.junit.platform.commons;
 	opens curatorRefinementTests to org.junit.platform.commons;
+	opens lessonTests to org.junit.platform.commons;
 }

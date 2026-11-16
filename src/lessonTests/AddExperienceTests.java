@@ -7,6 +7,14 @@ import static lessonTests.TestSupport.requirement;
 import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +28,7 @@ import guiTools.LessonResult;
 /*******
  * <p> Title: AddExperienceTests Class. </p>
  *
- * <p> Description: Semi-automated tests for US-U2 (a Contributor can add experience
+ * <p> Description: JUnit 5 tests for US-U2 (a Contributor can add experience
  * information, a description of what was done and the time/effort in hours, to their lesson),
  * US-U2-V (invalid experience values get a specific message and nothing is saved), and E7, the
  * entity requirement for the optional per-member effort list (each member needs a valid name
@@ -31,16 +39,26 @@ import guiTools.LessonResult;
  * Controller calls, and then reads the entries back with ExperienceEntry.readForLesson to prove
  * what was stored.  See TestSupport for how to read the output.</p>
  *
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: Add Experience tests, one method per test
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AddExperienceTests {
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public AddExperienceTests() {
 	}
@@ -56,28 +74,51 @@ public class AddExperienceTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		AddExperienceTests tests = new AddExperienceTests();
 		requirement("US-U2", "A Contributor can add experience information (what was done, "
 				+ "time/effort in hours) to their lesson");
-		run(AddExperienceTests::testAddExperienceValidInput);
-		run(AddExperienceTests::testSecondAttemptAddsSecondEntry);
+		run(tests::testAddExperienceValidInput);
+		run(tests::testSecondAttemptAddsSecondEntry);
 
 		requirement("US-U2-V", "Invalid experience information gets a specific message and "
 				+ "nothing is saved");
-		run(AddExperienceTests::testAddExperienceSmallestValidValuesAccepted);
-		run(AddExperienceTests::testAddExperienceRejectedNegativeValue);
-		run(AddExperienceTests::testAddExperienceRejectedNonNumericValue);
-		run(AddExperienceTests::testAddExperienceRejectedMissingDescription);
+		run(tests::testAddExperienceSmallestValidValuesAccepted);
+		run(tests::testAddExperienceRejectedNegativeValue);
+		run(tests::testAddExperienceRejectedNonNumericValue);
+		run(tests::testAddExperienceRejectedMissingDescription);
 
 		requirement("E7", "Team-member effort: valid name and hours each, total of members' "
 				+ "hours <= total, at most 20 members");
-		run(AddExperienceTests::testTeamMemberSharesSaved);
-		run(AddExperienceTests::testTwentyMembersWithHoursEqualToTotalAccepted);
-		run(AddExperienceTests::testMemberHoursExceedingTotalRejected);
-		run(AddExperienceTests::testMoreThanTwentyMembersRejected);
-		run(AddExperienceTests::testBlankMemberNameRejected);
+		run(tests::testTeamMemberSharesSaved);
+		run(tests::testTwentyMembersWithHoursEqualToTotalAccepted);
+		run(tests::testMemberHoursExceedingTotalRejected);
+		run(tests::testMoreThanTwentyMembersRejected);
+		run(tests::testBlankMemberNameRejected);
 	}
 
 
@@ -144,7 +185,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means "Experience added" was returned, one
 	 * 3.5-hour entry is stored for this lesson, and the lesson title is unchanged. </p>
 	 */
-	private static void testAddExperienceValidInput() {
+	@Test
+	@Order(1)
+	@DisplayName("U2-P1 Add Experience Information - Valid Input (US-U2, P)")
+	void testAddExperienceValidInput() {
 		String user = uniqueUser("expValid");
 		int id = makeLesson(user, "Reusable lesson", "Research");
 
@@ -172,7 +216,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means both entries are stored, in the order they
 	 * were added. </p>
 	 */
-	private static void testSecondAttemptAddsSecondEntry() {
+	@Test
+	@Order(2)
+	@DisplayName("U2-P2 Add Experience - A Second Attempt Adds a Second Entry (US-U2, P)")
+	void testSecondAttemptAddsSecondEntry() {
 		String user = uniqueUser("expTwice");
 		int id = makeLesson(user, "Lesson reused twice", "General");
 
@@ -205,7 +252,10 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the entry is saved with 0.1 hours. </p>
 	 */
-	private static void testAddExperienceSmallestValidValuesAccepted() {
+	@Test
+	@Order(3)
+	@DisplayName("U2V-P1 Add Experience - Smallest Valid Values Accepted (US-U2-V, P)")
+	void testAddExperienceSmallestValidValuesAccepted() {
 		String user = uniqueUser("expSmallest");
 		int id = makeLesson(user, "Lesson for smallest values", "General");
 
@@ -232,7 +282,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the time/effort message is returned for the
 	 * hours field and 0 entries are stored. </p>
 	 */
-	private static void testAddExperienceRejectedNegativeValue() {
+	@Test
+	@Order(4)
+	@DisplayName("U2V-N1 Add Experience Information - Rejected on Invalid Input (US-U2-V, N)")
+	void testAddExperienceRejectedNegativeValue() {
 		String user = uniqueUser("expNegative");
 		int id = makeLesson(user, "Lesson for negative hours", "General");
 
@@ -259,7 +312,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the time/effort message is returned and 0
 	 * entries are stored. </p>
 	 */
-	private static void testAddExperienceRejectedNonNumericValue() {
+	@Test
+	@Order(5)
+	@DisplayName("U2V-N2 Add Experience - Non-Numeric Hours Rejected (US-U2-V, N)")
+	void testAddExperienceRejectedNonNumericValue() {
 		String user = uniqueUser("expNonNumeric");
 		int id = makeLesson(user, "Lesson for non-numeric hours", "General");
 
@@ -285,7 +341,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the description message is returned for the
 	 * description field and 0 entries are stored. </p>
 	 */
-	private static void testAddExperienceRejectedMissingDescription() {
+	@Test
+	@Order(6)
+	@DisplayName("U2V-N3 Add Experience - Missing Description Rejected (US-U2-V, N)")
+	void testAddExperienceRejectedMissingDescription() {
 		String user = uniqueUser("expNoDescription");
 		int id = makeLesson(user, "Lesson for missing description", "General");
 
@@ -318,7 +377,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the stored entry has exactly those two
 	 * members with those hours. </p>
 	 */
-	private static void testTeamMemberSharesSaved() {
+	@Test
+	@Order(7)
+	@DisplayName("E7-P1 Team Member Shares Are Saved With the Entry (E7, P)")
+	void testTeamMemberSharesSaved() {
 		String user = uniqueUser("membersValid");
 		int id = makeLesson(user, "Lesson with team members", "Teamwork");
 
@@ -355,7 +417,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the entry is saved with 20 member
 	 * shares. </p>
 	 */
-	private static void testTwentyMembersWithHoursEqualToTotalAccepted() {
+	@Test
+	@Order(8)
+	@DisplayName("E7-P2 Twenty Members Whose Hours Equal the Total Are Accepted (E7, P)")
+	void testTwentyMembersWithHoursEqualToTotalAccepted() {
 		String user = uniqueUser("membersTwenty");
 		int id = makeLesson(user, "Lesson with twenty members", "Teamwork");
 
@@ -384,7 +449,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the sum message is returned for the member
 	 * list and 0 entries are stored. </p>
 	 */
-	private static void testMemberHoursExceedingTotalRejected() {
+	@Test
+	@Order(9)
+	@DisplayName("E7-N1 Members' Hours Exceeding the Total Are Rejected (E7, N)")
+	void testMemberHoursExceedingTotalRejected() {
 		String user = uniqueUser("membersOver");
 		int id = makeLesson(user, "Lesson with too many hours", "Teamwork");
 
@@ -412,7 +480,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the 20-member message is returned and 0
 	 * entries are stored. </p>
 	 */
-	private static void testMoreThanTwentyMembersRejected() {
+	@Test
+	@Order(10)
+	@DisplayName("E7-N2 More Than Twenty Members Are Rejected (E7, N)")
+	void testMoreThanTwentyMembersRejected() {
 		String user = uniqueUser("membersTooMany");
 		int id = makeLesson(user, "Lesson with too many members", "Teamwork");
 
@@ -438,7 +509,10 @@ public class AddExperienceTests {
 	 * <p> <b>How to read the output:</b> PASS means the name message is returned for the member
 	 * name field and 0 entries are stored. </p>
 	 */
-	private static void testBlankMemberNameRejected() {
+	@Test
+	@Order(11)
+	@DisplayName("E7-N3 A Blank Member Name Is Rejected (E7, N)")
+	void testBlankMemberNameRejected() {
 		String user = uniqueUser("membersBlank");
 		int id = makeLesson(user, "Lesson with a blank member", "Teamwork");
 

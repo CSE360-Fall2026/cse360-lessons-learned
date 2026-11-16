@@ -10,6 +10,14 @@ import static lessonTests.TestSupport.run;
 import static lessonTests.TestSupport.stored;
 import static lessonTests.TestSupport.uniqueUser;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import entityClasses.LessonsLearned;
 import guiContributorHome.ModelContributorHome;
 import guiCreateLesson.ModelCreateLesson;
@@ -18,7 +26,7 @@ import guiTools.LessonResult;
 /*******
  * <p> Title: CreateLessonTests Class. </p>
  *
- * <p> Description: Semi-automated tests for the Create user stories, US-C1 (a Contributor can
+ * <p> Description: JUnit 5 tests for the Create user stories, US-C1 (a Contributor can
  * add a new lesson learned by entering its title, description, tags, and category) and US-C1-V
  * (invalid core information gets a specific, helpful message and nothing is saved).</p>
  *
@@ -29,19 +37,26 @@ import guiTools.LessonResult;
  * inputValidation.LessonRecognizerTest; these tests prove that the Model applies those rules
  * before saving.</p>
  *
- * <p> Run this class on its own to see only the Create tests, or run AllContributorTests to run
- * every test class.  FoundationsMain must not be running.</p>
+ * <p> <b>Running the tests.</b>  These are JUnit 5 tests: run the class, or the whole
+ * lessonTests package, with Run As &gt; JUnit Test.  Each test's display name is its TP2 id, its
+ * name, its requirement, and P or N, for example "C1-P1 Create Lesson - Valid Input (US-C1, P)",
+ * and the tests run in the order of the Requirements-Test Traceability list.  The same tests
+ * still run as a console program through main() and AllContributorTests, with the same output
+ * as in TP2.  FoundationsMain must not be running.</p>
  *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
  *
  * @version 1.00		2026-10-16 TP2 Task 6: Create tests, one method per test
+ * @version 1.01		2026-11-14 TP3 Task 5.4: converted to JUnit 5; the console runner is kept
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CreateLessonTests {
 
 	/**********
-	 * Default constructor is not used; every member is static.
+	 * Default constructor.  JUnit creates an instance for each test, and runAll creates one
+	 * to run the same test methods as a console program.
 	 */
 	public CreateLessonTests() {
 	}
@@ -57,20 +72,43 @@ public class CreateLessonTests {
 	}
 
 	/**********
+	 * <p> Method: void connectForJUnit() </p>
+	 *
+	 * <p> Description: Opens the database once before the first JUnit test of this class.
+	 * FoundationsMain must not be running, because H2 allows one connection. </p>
+	 */
+	@BeforeAll
+	static void connectForJUnit() {
+		TestSupport.startJUnit();
+	}
+
+	/**********
+	 * <p> Method: void cleanUpForJUnit() </p>
+	 *
+	 * <p> Description: After the last JUnit test of this class, deletes every lesson the tests
+	 * created and closes the database. </p>
+	 */
+	@AfterAll
+	static void cleanUpForJUnit() {
+		TestSupport.finishJUnit();
+	}
+
+	/**********
 	 * Runs every test in this class, grouped under the requirement each one demonstrates.
 	 */
 	public static void runAll() {
+		CreateLessonTests tests = new CreateLessonTests();
 		requirement("US-C1", "A Contributor can add a new lesson (title, description, tags, "
 				+ "category) and it is saved");
-		run(CreateLessonTests::testCreateLessonValidInput);
-		run(CreateLessonTests::testCreateLessonTrimsTextAndAllowsEmptyTags);
+		run(tests::testCreateLessonValidInput);
+		run(tests::testCreateLessonTrimsTextAndAllowsEmptyTags);
 
 		requirement("US-C1-V", "Invalid core information gets a specific message and nothing "
 				+ "is saved");
-		run(CreateLessonTests::testCreateLessonBoundaryValuesAccepted);
-		run(CreateLessonTests::testCreateLessonInvalidCategoryBlocksSave);
-		run(CreateLessonTests::testCreateLessonMissingTitleBlocksSave);
-		run(CreateLessonTests::testCreateLessonDescriptionTooShortAfterTrimming);
+		run(tests::testCreateLessonBoundaryValuesAccepted);
+		run(tests::testCreateLessonInvalidCategoryBlocksSave);
+		run(tests::testCreateLessonMissingTitleBlocksSave);
+		run(tests::testCreateLessonDescriptionTooShortAfterTrimming);
 	}
 
 
@@ -92,7 +130,10 @@ public class CreateLessonTests {
 	 * lessons the Contributor now has, and the title, category, and tags read back from the
 	 * database.  PASS means the lesson was really stored with exactly the values entered. </p>
 	 */
-	private static void testCreateLessonValidInput() {
+	@Test
+	@Order(1)
+	@DisplayName("C1-P1 Create Lesson - Valid Input (US-C1, P)")
+	void testCreateLessonValidInput() {
 		String user = uniqueUser("createValid");
 		LessonResult result = ModelCreateLesson.createLesson(user, "Valid title", DESCRIPTION,
 				"java, testing", "Technical");
@@ -124,7 +165,10 @@ public class CreateLessonTests {
 	 * around it, and the tags must be "(none)".  PASS means an optional field may be left empty
 	 * and the stored text is clean. </p>
 	 */
-	private static void testCreateLessonTrimsTextAndAllowsEmptyTags() {
+	@Test
+	@Order(2)
+	@DisplayName("C1-P2 Create Lesson - Text Is Trimmed and Empty Tags Are Allowed (US-C1, P)")
+	void testCreateLessonTrimsTextAndAllowsEmptyTags() {
 		String user = uniqueUser("createTrim");
 		LessonResult result = ModelCreateLesson.createLesson(user, "  Padded title  ",
 				DESCRIPTION, "", "General");
@@ -152,7 +196,10 @@ public class CreateLessonTests {
 	 * <p> <b>How to read the output:</b> the Actual line shows the lengths read back from the
 	 * database.  PASS means both limits are accepted and stored in full. </p>
 	 */
-	private static void testCreateLessonBoundaryValuesAccepted() {
+	@Test
+	@Order(3)
+	@DisplayName("C1V-P1 Create Lesson - Boundary Values Accepted (US-C1-V, P)")
+	void testCreateLessonBoundaryValuesAccepted() {
 		String user = uniqueUser("createBoundary");
 		LessonResult result = ModelCreateLesson.createLesson(user, rep("T", 100), rep("D", 10),
 				"", "Teamwork");
@@ -185,7 +232,10 @@ public class CreateLessonTests {
 	 * field "category", and 0 lessons.  PASS means the invalid input was refused and nothing
 	 * was stored. </p>
 	 */
-	private static void testCreateLessonInvalidCategoryBlocksSave() {
+	@Test
+	@Order(4)
+	@DisplayName("C1V-N1 Create Lesson - Invalid Input Blocks the Save (US-C1-V, N)")
+	void testCreateLessonInvalidCategoryBlocksSave() {
 		String user = uniqueUser("createBadCategory");
 		LessonResult result = ModelCreateLesson.createLesson(user, "Another valid title",
 				DESCRIPTION, "java", "Marketing");
@@ -214,7 +264,10 @@ public class CreateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the message names the missing title, the
 	 * field is "title", and 0 lessons were stored. </p>
 	 */
-	private static void testCreateLessonMissingTitleBlocksSave() {
+	@Test
+	@Order(5)
+	@DisplayName("C1V-N2 Create Lesson - Missing Title Blocks the Save (US-C1-V, N)")
+	void testCreateLessonMissingTitleBlocksSave() {
 		String user = uniqueUser("createNoTitle");
 		LessonResult result = ModelCreateLesson.createLesson(user, "", DESCRIPTION, "java",
 				"General");
@@ -243,7 +296,10 @@ public class CreateLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means the length message is shown for the
 	 * description and 0 lessons were stored. </p>
 	 */
-	private static void testCreateLessonDescriptionTooShortAfterTrimming() {
+	@Test
+	@Order(6)
+	@DisplayName("C1V-N3 Create Lesson - Description Too Short After Trimming (US-C1-V, N)")
+	void testCreateLessonDescriptionTooShortAfterTrimming() {
 		String user = uniqueUser("createPadded");
 		LessonResult result = ModelCreateLesson.createLesson(user, "Padded description",
 				"   short   ", "", "General");
