@@ -1,0 +1,66 @@
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+.root {
+	-purple: #5865f2;
+	-white: #f2f3f5;
+    -fx-background-color: #2b2d31;
+    -fx-font-family: "Helvetica", "Arial", sans-serif;
+}
+
+.label {
+    -fx-text-fill: -white;
+}
+
+.text-field {
+    -fx-background-color: #1e1f22;
+    -fx-text-fill: -white;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px 12px;
+}
+
+.text-field:focused {
+    -fx-border-color: -purple;
+    -fx-border-width: 2px;
+}
+
+.button {
+    -fx-background-color: #4e5058;
+    -fx-background-radius: 4px;
+    -fx-text-fill: -white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 16px;
+    -fx-cursor: hand;
+}
+
+.button:focused {
+    -fx-border-color: -purple;
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+    -fx-border-insets: -2px;
+}
+
+.button:hover {
+    -fx-background-color: #6d6f78;
+}
+
+.primary-button {
+    -fx-background-color: -purple;
+    -fx-background-radius: 4px;
+    -fx-text-fill: -white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 16px;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #4752c4;
+}
+
+.primary-button:focused {
+    -fx-border-color: -white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+    -fx-border-insets: -2px;
+}

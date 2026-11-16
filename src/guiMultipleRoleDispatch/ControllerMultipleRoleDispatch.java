@@ -1,0 +1,128 @@
+package guiMultipleRoleDispatch;
+
+import guiTools.RoleLabels;
+
+/*******
+ * <p> Title: ControllerMultipleRoleDispatch Class. </p>
+ *
+ * <p> Description: The Java/FX-based Multiple Role Dispatch Page.  This class provides the
+ * controller actions to allow the user to select which role to use for this particular user.
+ * If the user has only one authorized role, this page is not used.  Only when a specific user
+ * has been authorized to play more than one role, that user must select which role to play
+ * after logging in.  The fact that this user has multiple authorized roles is not made visible
+ * before the user logs in.  We believe the system should provide no information until that user
+ * has logged in.
+ *
+ * The class has been written assuming that the View or the Model are the only class methods that
+ * can invoke these methods.  This is why each has been declared at "protected".  Do not change any
+ * of these methods to public.</p>
+ *
+ * <p> Copyright: Lynn Robert Carter © 2025 </p>
+ *
+ * @author Lynn Robert Carter
+ *
+ * @version 1.00		2025-08-17 Initial version
+ * @version 1.01		2025-09-16 Update Javadoc documentation
+ * @version 1.02		2026-10-14 TP2: the Role1 choice is shown as "Contributor" and opens the
+ * 							Contributor Home Page
+ * @version 1.03		2026-11-10 TP3 Aspect 1: the Role2 choice is shown as "Curator" and opens
+ * 							the Curator Home Page
+ *
+ */
+
+public class ControllerMultipleRoleDispatch {
+
+	/*-********************************************************************************************
+
+	User Interface Actions for this page
+
+	This controller is not a class that gets instantiated.  Rather, it is a collection of protected
+	static methods that can be called by the View (which is a singleton instantiated object) and
+	the Model is often just a stub, or will be a singleton instantiated object.
+
+	 */
+
+	/**
+	 * Default constructor is not used.
+	 */
+	public ControllerMultipleRoleDispatch() {
+	}
+
+	/**********
+	 * <p> Method: performRole() </p>
+	 *
+	 * <p> Description: This method directs the execution to one of the various home pages based on
+	 * the current value of the SelectRole ComboBox. </p>
+	 *
+	 */
+	static protected void performRole() {
+
+		// Fetch the role from the SelectRole ComboBox
+		String role = guiMultipleRoleDispatch.ViewMultipleRoleDispatch.combobox_SelectRole.getValue();
+
+		// See if Admin
+		if (role.compareTo("Admin") == 0) {
+
+			// It is Admin Role
+			guiAdminHome.ViewAdminHome.displayAdminHome(
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
+
+		// See if Contributor (TP2: the Role1 flag is the Contributor role, design decision D12)
+		} else if (role.compareTo("Contributor") == 0) {
+
+			// It is the Contributor Role
+			guiContributorHome.ViewContributorHome.displayContributorHome(
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
+
+		// See if Curator (TP3: the Role2 flag is the Curator role, Aspect 1)
+		} else if (role.compareTo(RoleLabels.ROLE2_LABEL) == 0) {
+
+			// It is the Curator Role
+			guiCuratorHome.ViewCuratorHome.displayCuratorHome(
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
+
+		} else if (role.compareTo("Viewer") == 0) {
+
+			// TP3 Aspect 9: Route users with the Viewer role
+			// to the read-only Viewer Home Page (US-V-01).
+			guiViewerHome.ViewViewerHome.displayViewerHome(guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
+		} else {
+			// Invalid role
+			System.out.println("*** ERROR *** GUIMultipleRoleDispatch was asked to dispatch to " +
+					"a role, " + role + ", that is not supported!");
+			System.exit(0);
+		}
+	}
+
+
+	/**********
+	 * <p> Method: performLogout() </p>
+	 *
+	 * <p> Description: This method logs out the current user and proceeds to the normal login
+	 * page where existing users can log in or potential new users with a invitation code can
+	 * start the process of setting up an account. </p>
+	 *
+	 */
+	static protected void performLogout() {
+		guiUserLogin.ViewUserLogin.displayUserLogin(
+				guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage);
+	}
+
+
+	/**********
+	 * <p> Method: performQuit() </p>
+	 *
+	 * <p> Description: This method terminates the execution of the program.  It leaves the
+	 * database in a state where the normal login page will be displayed when the application is
+	 * restarted.</p>
+	 *
+	 */
+	static protected void performQuit() {
+		System.exit(0);
+	}
+
+}
