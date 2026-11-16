@@ -1,17 +1,19 @@
 package entityClasses;
 
+
 /*******
  * <p> Title: User Class </p>
- * 
+ *
  * <p> Description: This User class represents a user entity in the system.  It contains the user's
  *  details such as userName, password, and roles being played. </p>
- * 
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
- * 
+ *
  * @author Lynn Robert Carter
- * 
- * 
- */ 
+ * @author David Nevarez
+ *
+ * @version 1.01 2026-11-15 TP3 Aspect 9: Added Viewer role support
+ */
 
 public class User {
 	
@@ -39,6 +41,8 @@ public class User {
     /** Whether the user has Role2, which TP3 shows as the Curator role (TP3 Aspect 1; the rule
      * that reads it is guiTools.CuratorAccess). */
     private boolean role2;
+	/** Whether the user has Role3, which TP3 uses for the Viewer role (Aspect 9, US-V-01 through US-V-04). */
+	private boolean role3;
     
     
     /*****
@@ -93,6 +97,28 @@ public class User {
         this.role2 = r3;
     }
 
+	/**
+	 * Creates a user with Admin, Contributor, Curator, and Viewer roles.
+	 *
+	 * @param userName account username
+	 * @param password account password
+	 * @param fn       first name
+	 * @param mn       middle name
+	 * @param ln       last name
+	 * @param pfn      preferred first name
+	 * @param ea       email address
+	 * @param r1       Admin role
+	 * @param r2       Contributor role
+	 * @param r3       Curator role
+	 * @param r4       Viewer role
+	 */
+	public User(String userName, String password, String fn, String mn, String ln, String pfn, String ea, boolean r1,
+			boolean r2, boolean r3, boolean r4) {
+
+		this(userName, password, fn, mn, ln, pfn, ea, r1, r2, r3);
+		this.role3 = r4;
+	}
+
     
     /*****
      * <p> Method: void setAdminRole(boolean role) </p>
@@ -134,6 +160,15 @@ public class User {
     public void setRole2User(boolean role) {
     	this.role2=role;
     }
+
+	/**
+	 * Sets the Viewer role.
+	 *
+	 * @param role true to grant Viewer access, false to remove it
+	 */
+	public void setRole3User(boolean role) {
+		this.role3 = role;
+	}
 
     
     /*****
@@ -286,26 +321,36 @@ public class User {
      * <p> Description: This getter returns the value of the role2 attribute. </p>
      * 
      * @return a String of "TRUE" or "FALSE" based on state of the attribute
-	 *
+     *
      */
     // Gets the current value of the role2 attribute.
     public boolean getNewRole2() { return role2; }
 
-        
-    /*****
-     * <p> Method: int getNumRoles() </p>
-     * 
-     * <p> Description: This getter returns the number of roles this user plays (0 - 5). </p>
-     * 
-     * @return a value 0 - 5 of the number of roles this user plays
+	/**
+	 * Returns whether the user has the Viewer role.
 	 *
-     */
-    // Gets the current value of the Staff role attribute.
-    public int getNumRoles() {
-    	int numRoles = 0;
-    	if (adminRole) numRoles++;
-    	if (role1) numRoles++;
-    	if (role2) numRoles++;
-    	return numRoles;
-    }
+	 * @return true if the user has the Viewer role
+	 */
+	public boolean getNewRole3() {
+		return role3;
+	}
+
+        
+	/*****
+	 * <p> Method: int getNumRoles() </p>
+	 *
+	 * <p> Description: This getter returns the number of roles this user plays
+	 * (0 - 4), including the Viewer role introduced in TP3 Aspect 9. </p>
+	 *
+	 * @return the number of roles assigned to this user, from 0 to 4
+	 */
+	// Returns the total number of roles assigned to the user.
+	public int getNumRoles() {
+	    int numRoles = 0;
+	    if (adminRole) numRoles++;
+	    if (role1) numRoles++;
+	    if (role2) numRoles++;
+	    if (role3) numRoles++;
+	    return numRoles;
+	}
 }

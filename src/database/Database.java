@@ -33,6 +33,7 @@ import entityClasses.User;
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter
+ * @author David Nevarez
  *
  * @version 2.00		2025-04-29 Updated and expanded from the version produce by Pravalika
  * 							Mukkiri and Ishwarya Hidkimath Basavaraj
@@ -47,6 +48,8 @@ import entityClasses.User;
  * 							setLessonLock()
  * @version 2.05		2026-11-10 TP3 Aspect 1: updateUserRole() also accepts "Curator" for the
  * 							Role2 flag
+ * @version 2.06		2026-11-15 TP3 Aspects 5 and 9: Viewer role support and Curator
+ * 							search-term persistence
  */
 
 /*
@@ -59,7 +62,9 @@ public class Database {
 	/** JDBC driver name. */
 	static final String JDBC_DRIVER = "org.h2.Driver";
 	/** Database URL: an H2 file named FoundationDatabase in the user's home folder. */
-    static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
+	static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
+
+	private final String databaseUrl;
 
 	/** Database user name (H2 default). */
 	static final String USER = "sa";
@@ -93,6 +98,8 @@ public class Database {
 	private boolean currentNewRole1;
 	/** Whether the current user has Role2 (shown as Curator since TP3 Aspect 1). */
 	private boolean currentNewRole2;
+	/** Whether the current user has Role3 (Viewer). */
+	private boolean currentNewRole3;
 
 	/*******
 	 * <p> Method: Database </p>
@@ -101,8 +108,15 @@ public class Database {
 	 *
 	 */
 
-	public Database () {
+	public Database() {
+	    this(DB_URL);
+	}
 
+	public Database(String databaseUrl) {
+	    if (databaseUrl == null || databaseUrl.isBlank()) {
+	        throw new IllegalArgumentException("Database URL cannot be empty.");
+	    }
+	    this.databaseUrl = databaseUrl;
 	}
 
 
@@ -118,7 +132,7 @@ public class Database {
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
-			connection = DriverManager.getConnection(DB_URL, USER, PASS);
+			connection = DriverManager.getConnection(databaseUrl, USER, PASS);
 			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
 			//statement.execute("DROP ALL OBJECTS");
@@ -150,8 +164,11 @@ public class Database {
 				+ "emailAddress VARCHAR(255), "
 				+ "adminRole BOOL DEFAULT FALSE, "
 				+ "newRole1 BOOL DEFAULT FALSE, "
-				+ "newRole2 BOOL DEFAULT FALSE)";
+				+ "newRole2 BOOL DEFAULT FALSE, " + "newRole3 BOOL DEFAULT FALSE)";
 		statement.execute(userTable);
+
+		// TP3 Aspect 9: Support existing databases without deleting user data.
+		statement.execute("ALTER TABLE userDB ADD COLUMN IF NOT EXISTS newRole3 BOOL DEFAULT FALSE");
 
 		// Create the invitation codes table
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
@@ -314,10 +331,13 @@ public class Database {
  *
  */
 	public void register(User user) throws SQLException {
+
 		String insertUser = "INSERT INTO userDB (userName, password, firstName, middleName, "
-				+ "lastName, preferredFirstName, emailAddress, adminRole, newRole1, newRole2) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+ "lastName, preferredFirstName, emailAddress, adminRole, " + "newRole1, newRole2, newRole3) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
+
 			currentUsername = user.getUserName();
 			pstmt.setString(1, currentUsername);
 
@@ -347,6 +367,9 @@ public class Database {
 
 			currentNewRole2 = user.getNewRole2();
 			pstmt.setBoolean(10, currentNewRole2);
+
+			currentNewRole3 = user.getNewRole3();
+			pstmt.setBoolean(11, currentNewRole3);
 
 			pstmt.executeUpdate();
 		}
@@ -461,6 +484,37 @@ public class Database {
 		return false;
 	}
 
+	/**********
+	 * <p> Method: boolean loginRole3(User user) </p>
+	 *
+	 * <p> Description: Validates the user's login credentials and
+	 * verifies that the account has the Viewer role (Role3).
+	 * Supports TP3 Aspect 9, US-V-01. </p>
+	 *
+	 * @param user the user attempting to log in as a Viewer
+	 *
+	 * @return true if the credentials are valid and the user
+	 *         has the Viewer role; false otherwise
+	 */
+	public boolean loginRole3(User user) {
+
+		String query = "SELECT 1 FROM userDB WHERE userName = ? " + "AND password = ? AND newRole3 = TRUE";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+
+			pstmt.setString(1, user.getUserName());
+			pstmt.setString(2, user.getPassword());
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+				return rs.next();
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 
 	/*******
 	 * <p> Method: boolean doesUserExist(User user) </p>
@@ -492,21 +546,28 @@ public class Database {
 
 
 	/*******
-	 * <p> Method: int getNumberOfRoles(User user) </p>
+	 * <p> Method: int getNumberOfRoles(User user)</p>
 	 *
 	 * <p> Description: Determine the number of roles a specified user plays. </p>
 	 *
-	 * @param user specifies the specific user that we want to determine if it is in the table.
+	 * @param user the user whose roles are counted
 	 *
-	 * @return the number of roles this user plays (0 - 5).
+	 * @return the number of assigned roles, from 0 to 4
 	 *
 	 */
 	// Get the number of roles that this user plays
 	public int getNumberOfRoles (User user) {
 		int numberOfRoles = 0;
-		if (user.getAdminRole()) numberOfRoles++;
-		if (user.getNewRole1()) numberOfRoles++;
-		if (user.getNewRole2()) numberOfRoles++;
+
+		if (user.getAdminRole())
+			numberOfRoles++;
+		if (user.getNewRole1())
+			numberOfRoles++;
+		if (user.getNewRole2())
+			numberOfRoles++;
+		if (user.getNewRole3())
+			numberOfRoles++;
+
 		return numberOfRoles;
 	}
 
@@ -1029,36 +1090,46 @@ public class Database {
 	/*******
 	 * <p> Method: boolean getUserAccountDetails(String username) </p>
 	 *
-	 * <p> Description: Get all the attributes of a user given that user's username.</p>
+	 * <p> Description: Get all the attributes of a user given that user's username. </p>
 	 *
-	 * @param username is the username of the user
-	 *
-	 * @return true of the get is successful, else false
-	 *
+	 * @param username the username of the account to retrieve
+	 * @return true if the account exists and was loaded successfully; false
+	 *         otherwise
 	 */
 	// get the attributes for a specified user
 	public boolean getUserAccountDetails(String username) {
 		String query = "SELECT * FROM userDB WHERE username = ?";
+
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-			rs.next();
-	    	currentUsername = rs.getString(2);
-	    	currentPassword = rs.getString(3);
-	    	currentFirstName = rs.getString(4);
-	    	currentMiddleName = rs.getString(5);
-	    	currentLastName = rs.getString(6);
-	    	currentPreferredFirstName = rs.getString(7);
-	    	currentEmailAddress = rs.getString(8);
-	    	currentAdminRole = rs.getBoolean(9);
-	    	currentNewRole1 = rs.getBoolean(10);
-	    	currentNewRole2 = rs.getBoolean(11);
-			return true;
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+
+				if (!rs.next()) {
+					return false;
+				}
+
+				currentUsername = rs.getString("userName");
+				currentPassword = rs.getString("password");
+				currentFirstName = rs.getString("firstName");
+				currentMiddleName = rs.getString("middleName");
+				currentLastName = rs.getString("lastName");
+				currentPreferredFirstName = rs.getString("preferredFirstName");
+				currentEmailAddress = rs.getString("emailAddress");
+
+				currentAdminRole = rs.getBoolean("adminRole");
+				currentNewRole1 = rs.getBoolean("newRole1");
+				currentNewRole2 = rs.getBoolean("newRole2");
+				currentNewRole3 = rs.getBoolean("newRole3");
+
+				return true;
+			}
+
 	    } catch (SQLException e) {
 			return false;
 	    }
 	}
-
 
 	/*******
 	 * <p> Method: boolean updateUserRole(String username, String role, String value) </p>
@@ -1130,6 +1201,36 @@ public class Database {
 				return false;
 			}
 		}
+
+		/**
+		 * TP3 Aspect 9: Role3 represents the Viewer role. Supports both the internal
+		 * role name and the displayed role name.
+		 */
+		if ("Role3".equals(role) || "Viewer".equals(role)) {
+
+			String query = "UPDATE userDB SET newRole3 = ? WHERE username = ?";
+
+			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+
+				boolean enabled = Boolean.parseBoolean(value);
+
+				pstmt.setBoolean(1, enabled);
+				pstmt.setString(2, username);
+
+				int rowsUpdated = pstmt.executeUpdate();
+
+				if (rowsUpdated == 0) {
+					return false;
+				}
+
+				currentNewRole3 = enabled;
+				return true;
+
+			} catch (SQLException e) {
+				return false;
+			}
+		}
+
 		return false;
 	}
 
@@ -1395,6 +1496,55 @@ public class Database {
 			pstmt.setBoolean(7, lesson.isStatsVisibleToContributor());
 			pstmt.setInt(8, lesson.getId());
 			return pstmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	/**********
+	 * <p> Method: boolean saveCuratorSearchTerms(int lessonId, String curator,
+	 * String expectedTerms, String searchTerms) </p>
+	 *
+	 * <p> Description: Atomically saves Curator-approved search terms for
+	 * TP3 Aspect 5 (E2). The update succeeds only if the Curator still
+	 * has permission and the stored terms have not changed since the
+	 * lesson was opened. </p>
+	 *
+	 * <p> Only the searchTerms field is updated, preventing unrelated
+	 * Curator information from being overwritten. </p>
+	 *
+	 * @param lessonId the lesson being updated
+	 * @param curator the acting Curator's username
+	 * @param expectedTerms the search terms originally loaded
+	 * @param searchTerms the final approved search terms
+	 * @return true if exactly one lesson was updated
+	 */
+	public boolean saveCuratorSearchTerms(int lessonId, String curator, String expectedTerms, String searchTerms) {
+
+		if (lessonId <= 0 || curator == null || curator.isBlank() || expectedTerms == null || searchTerms == null) {
+			return false;
+		}
+
+		String error = inputValidation.LessonRecognizer.checkForValidSearchTerms(searchTerms);
+
+		if (!error.isEmpty()) {
+			return false;
+		}
+
+		String query = "UPDATE lessonsLearnedDB SET searchTerms = ? " + "WHERE id = ? AND searchTerms = ? "
+				+ "AND EXISTS (SELECT 1 FROM userDB " + "WHERE userName = ? AND newRole2 = TRUE)";
+
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+
+			pstmt.setString(1, searchTerms.trim());
+			pstmt.setInt(2, lessonId);
+			pstmt.setString(3, expectedTerms);
+			pstmt.setString(4, curator);
+
+			return pstmt.executeUpdate() == 1;
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
@@ -1888,6 +2038,18 @@ public class Database {
 	 */
 	public boolean getCurrentNewRole2() { return currentNewRole2;};
 
+	/**********
+	 * <p> Method: boolean getCurrentNewRole3() </p>
+	 *
+	 * <p> Description: Returns whether the current user has
+	 * the Viewer role (Role3), added for TP3 Aspect 9. </p>
+	 *
+	 * @return true if the current user has the Viewer role;
+	 *         false otherwise
+	 */
+	public boolean getCurrentNewRole3() {
+		return currentNewRole3;
+	}
 
 	/*******
 	 * <p> Debugging method</p>

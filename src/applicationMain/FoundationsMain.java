@@ -1,11 +1,12 @@
 package applicationMain;
 	
 import java.sql.SQLException;
+
 import database.Database;
 import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: FoundationsMain Class </p>
@@ -34,30 +35,28 @@ import javafx.scene.control.Alert.AlertType;
  * anything else can happen.  Doing this eliminates a common weakness of "hard coded credentials".
  * With that done, the admin can provide more details to the system (e.g., name and email address),
  * and then proceed to do other admin activities.</p>
- * 
+ *
  *  <p>If the database is not empty, the system brings up the standard login page and requires an 
  * an existing user to log in or a potential user to provide an invitation code to establish a new
  * account.  Once logged or after creating an account, the user can perform what ever role(s) set
  * for that user.  This class's method stops as soon as the Graphical User Interface (GUI) for the
  * one of the two options has been set up.  From that point forward, and actions are performed in
  * reaction to the user engaging with widgets on the currently visible page.</p>
- * 
+ *
  *  <p>This application uses singletons and Model View Controller (MVC) View pattern to control the 
  * use of memory by avoiding multiple copies of the same page.</p>
- * 
+ *
  *  <p>This application does not use the command line arguments *i.e., "String[] args"), but Java and
  * JavaFX in Eclipse requires they be made available in the application's main method, even if they
  * are not needed.</p>
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
- *  <p>@author Lynn Robert Carter</p>
+ * <p>@author Lynn Robert Carter</p>
  *
  * @version 3.00	2025-08-17 Rewrite of this application for the Fall offering of CSE 360 and
  * other ASU courses.
  * @version 3.02	2025-12-17 Enhancements in support of Spring 2026
- * 
- * TESTING THAT THIS WORKS :) - Virgil
  */
 
 public class FoundationsMain extends Application {
@@ -89,8 +88,8 @@ public class FoundationsMain extends Application {
     /** Shown if the database is already in use by another copy of the application. */
     private Alert databaseInUse = new Alert(AlertType.INFORMATION);
 
-	/** Which role's home page is currently active (1 Admin, 2 Role1/Contributor,
-	 * 3 Role2/Curator). */
+    /** Which role's home page is currently active:
+     * 1 Admin, 2 Contributor, 3 Curator, 4 Viewer. */
 	public static int activeHomePage = 0;		// Which role's home page is currently active?
 												// Role 0 is the admin role number
 	@Override

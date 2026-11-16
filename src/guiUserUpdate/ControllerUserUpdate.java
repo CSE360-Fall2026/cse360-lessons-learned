@@ -9,8 +9,11 @@ import javafx.stage.Stage;
  * <p> Description: This static class supports the actions initiated by the ViewUserUpdate
  * class.</p>
  *
- * @version 1.01		2026-10-14 TP2: home page 2 is now the Contributor Home Page
- * @version 1.02		2026-11-10 TP3 Aspect 1: home page 3 is now the Curator Home Page
+ * @author David Nevarez
+ *
+ * @version 1.01               2026-10-14 TP2: home page 2 is now the Contributor Home Page
+ * @version 1.02               2026-11-10 TP3 Aspect 1: home page 3 is now the Curator Home Page
+ * @version 1.03               2026-11-15 TP3 Aspect 9: Added Viewer Home Page navigation
  */
 public class ControllerUserUpdate {
 
@@ -69,6 +72,12 @@ public class ControllerUserUpdate {
 		case 3:
 			// TP3: home page 3 (the Role2 flag) is the Curator Home Page
 			guiCuratorHome.ViewCuratorHome.displayCuratorHome(theStage, theUser);
+			break;
+		case 4:
+
+			// TP3 Aspect 9: Home page 4 is the Viewer Home Page.
+			guiViewerHome.ViewViewerHome.displayViewerHome(theStage, theUser);
+
 			break;
 		default:
 			System.out.println("*** ERROR *** UserUpdate goToUserHome has an invalid role: " +

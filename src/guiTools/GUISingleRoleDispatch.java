@@ -1,8 +1,8 @@
 package guiTools;
 
+import entityClasses.User;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import entityClasses.User;
 
 
 /*******
@@ -19,6 +19,7 @@ import entityClasses.User;
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter
+ * @author David Nevarez
  *
  * @version 1.00		2025-04-20 Initial version
  * @version 1.01		2026-10-14 TP2: Role1 users go to the Contributor Home Page
@@ -80,8 +81,15 @@ public class GUISingleRoleDispatch {
 			// TP2: the Role1 flag is the Contributor role (design decision D12)
 			guiContributorHome.ViewContributorHome.displayContributorHome(ps, user);
 		} else if (user.getNewRole2()) {
+
 			// TP3: the Role2 flag is the Curator role (Aspect 1; ConOps assumption A1)
 			guiCuratorHome.ViewCuratorHome.displayCuratorHome(ps, user);
+
+		} else if (user.getNewRole3()) {
+
+			// TP3 Aspect 9: Role3 is the Viewer role (US-V-01).
+			guiViewerHome.ViewViewerHome.displayViewerHome(ps, user);
+
 		} else {
 			// Invalid role
 			System.out.println("*** ERROR *** GUISingleRoleDispatch was asked to dispatch to " +

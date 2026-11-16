@@ -2,6 +2,10 @@ package guiMultipleRoleDispatch;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import database.Database;
+import entityClasses.User;
+import guiTools.RoleLabels;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,9 +16,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import database.Database;
-import entityClasses.User;
-import guiTools.RoleLabels;
 
 /*******
  * <p> Title: ViewMultipleRoleDispatch Class. </p>
@@ -146,6 +147,9 @@ public class ViewMultipleRoleDispatch {
 		if (theDatabase.getCurrentNewRole1()) list.add("Contributor");
 		// TP3: the Role2 flag is the Curator role (Aspect 1), shown by that name in the same way
 		if (theDatabase.getCurrentNewRole2()) list.add(RoleLabels.ROLE2_LABEL);
+		// TP3 Aspect 9: Display Viewer when the user has Role3 (US-V-01).
+		if (theDatabase.getCurrentNewRole3())
+			list.add("Viewer");
 		combobox_SelectRole.setItems(FXCollections.observableArrayList(list));
 
 		// Populate the dynamic aspects of the GUI with the data from the user and the current

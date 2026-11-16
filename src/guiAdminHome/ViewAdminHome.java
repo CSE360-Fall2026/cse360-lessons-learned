@@ -3,23 +3,23 @@ package guiAdminHome;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.collections.FXCollections;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.Pane;
-import javafx.scene.shape.Line;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import database.Database;
 import entityClasses.User;
 import guiTools.RoleLabels;
 import guiUserUpdate.ViewUserUpdate;
+import javafx.collections.FXCollections;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 /*******
  * <p> Title: ViewAdminHome Class. </p>
@@ -42,11 +42,13 @@ import guiUserUpdate.ViewUserUpdate;
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter
+ * @author David Nevarez
  *
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2026-10-16 TP2: the invitation role list shows "Contributor" for Role1
- * @version 1.02		2026-11-10 TP3 Aspect 1: the invitation role list shows "Curator" for Role2
- * 							(design decision D12; see guiTools.RoleLabels)
+ * @version 1.02        2026-11-10 TP3 Aspect 1: the invitation role list shows "Curator" for Role2
+ *                      	(design decision D12; see guiTools.RoleLabels)
+ * @version 1.03        2026-11-15 TP3 Aspect 9: Added Viewer to invitation roles
  *
  */
 
@@ -105,10 +107,15 @@ public class ViewAdminHome {
 	/** The role the invited user will have. */
 	protected static ComboBox <String> combobox_SelectRole = new ComboBox <String>();
 	// TP2 (D12): Role1 is the Contributor role, so the list shows "Contributor".  TP3 (Aspect 1):
-	// Role2 is the Curator role, so the list shows "Curator".  The Controller turns the chosen
-	// label back into "Role1" or "Role2" before the invitation is stored.
+	// Role1, Role2, and Role3 are displayed as Contributor, Curator, and Viewer.
+	// The Controller converts the selected label to its stored role name.
 	/** The role names offered for an invitation, as shown on the screen. */
-	protected static String [] roles = {"Admin", RoleLabels.ROLE1_LABEL, RoleLabels.ROLE2_LABEL};
+	protected static String [] roles = {
+		    "Admin",
+		    RoleLabels.ROLE1_LABEL,
+		    RoleLabels.ROLE2_LABEL,
+		    RoleLabels.ROLE3_LABEL
+		};
 	/** Sends the invitation. */
 	protected static Button button_SendInvitation = new Button("Send Invitation");
 	/** Reports an invalid or already-invited email address. */
