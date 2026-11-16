@@ -62,7 +62,9 @@ public class Database {
 	/** JDBC driver name. */
 	static final String JDBC_DRIVER = "org.h2.Driver";
 	/** Database URL: an H2 file named FoundationDatabase in the user's home folder. */
-    static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
+	static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
+
+	private final String databaseUrl;
 
 	/** Database user name (H2 default). */
 	static final String USER = "sa";
@@ -106,8 +108,15 @@ public class Database {
 	 *
 	 */
 
-	public Database () {
+	public Database() {
+	    this(DB_URL);
+	}
 
+	public Database(String databaseUrl) {
+	    if (databaseUrl == null || databaseUrl.isBlank()) {
+	        throw new IllegalArgumentException("Database URL cannot be empty.");
+	    }
+	    this.databaseUrl = databaseUrl;
 	}
 
 
@@ -123,7 +132,7 @@ public class Database {
 	public void connectToDatabase() throws SQLException {
 		try {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
-			connection = DriverManager.getConnection(DB_URL, USER, PASS);
+			connection = DriverManager.getConnection(databaseUrl, USER, PASS);
 			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
 			//statement.execute("DROP ALL OBJECTS");

@@ -1,6 +1,8 @@
 
 package guiViewerHome;
 
+import applicationMain.FoundationsMain;
+import database.Database;
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
 import entityClasses.User;
@@ -23,12 +25,13 @@ import inputValidation.LessonRecognizer;
  *
  * <p> The Model reuses LessonsLearnedList and LessonResult
  * rather than duplicating the existing lesson storage and
- * search functionality. </p>
- *
+ * search functionality. Database overloads allow isolated
+ * integration testing without modifying the shared database. </p>
  *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9
+ * @version 1.01 2026-11-16 Added database injection for testing
  */
 public class ModelViewerHome {
 
@@ -48,57 +51,84 @@ public class ModelViewerHome {
     /*****
      * <p> Method: LessonResult viewAllLessons(User actingUser) </p>
      *
-     * <p> Description: Retrieves all lessons learned from every
-     * Contributor for an authorized Viewer (US-V-01).
-     * An empty collection is returned successfully rather than
-     * producing an error. </p>
+     * <p> Description: Retrieves all lessons using the shared
+     * application database. Preserves the original Viewer
+     * interface behavior. </p>
      *
-     * <p> Viewer authorization is checked before accessing
-     * lesson data. This prevents users without the Viewer
-     * role from retrieving the complete collection. </p>
-     *
-     * @param actingUser the currently logged-in user; may be null
-     *
-     * @return a successful result containing all lessons,
-     *         or a failed result if the user is not a Viewer
+     * @param actingUser the currently logged-in user
+     * @return the Viewer lesson list result
      */
     public static LessonResult viewAllLessons(User actingUser) {
+        return viewAllLessons(actingUser, FoundationsMain.database);
+    }
+
+    /*****
+     * <p> Method: LessonResult viewAllLessons(
+     * User actingUser, Database database) </p>
+     *
+     * <p> Description: Retrieves lessons from every Contributor
+     * for an authorized Viewer (US-V-01). The database can be
+     * supplied by integration tests. </p>
+     *
+     * @param actingUser the currently logged-in user
+     * @param database the database used to retrieve lessons
+     * @return a successful lesson list or an authorization error
+     */
+    public static LessonResult viewAllLessons(
+            User actingUser, Database database) {
 
         if (!ViewerAccess.isViewer(actingUser)) {
             return LessonResult.failed(NOT_VIEWER, "");
         }
 
-        LessonsLearnedList lessons = LessonsLearnedList.loadAll();
+        if (database == null) {
+            return LessonResult.failed(
+                    "Database is unavailable.", "");
+        }
+
+        LessonsLearnedList lessons = database.getAllLessons();
 
         return LessonResult.passedList("All lessons", lessons);
     }
 
     /*****
-     * <p> Method: LessonResult searchAllLessons(User actingUser,
-     * String searchText) </p>
+     * <p> Method: LessonResult searchAllLessons(
+     * User actingUser, String searchText) </p>
      *
-     * <p> Description: Searches all lessons using the provided
-     * keywords (US-V-02, US-C-E2-03). The search includes
-     * titles, descriptions, tags, and saved Curator-approved
-     * search terms. </p>
+     * <p> Description: Searches the shared application database
+     * for lessons matching the provided keywords (US-V-02,
+     * US-C-E2-03). </p>
      *
-     * <p> Search input is validated before execution. Invalid
-     * input produces a specific error, while an empty search
-     * or a search with no matches returns an empty list. </p>
-     *
-     * <p> The search is case-insensitive and requires every
-     * keyword to match at least one searchable field. </p>
-     *
-     * @param actingUser the currently logged-in user; may be null
-     *
+     * @param actingUser the currently logged-in user
      * @param searchText the keywords used to search lessons
-     *
-     * @return a successful result containing matching lessons,
-     *         or a failed result with an authorization or
-     *         validation error
+     * @return the keyword search result
      */
     public static LessonResult searchAllLessons(
             User actingUser, String searchText) {
+
+        return searchAllLessons(
+                actingUser, searchText, FoundationsMain.database);
+    }
+
+    /*****
+     * <p> Method: LessonResult searchAllLessons(
+     * User actingUser, String searchText, Database database) </p>
+     *
+     * <p> Description: Searches all lessons using their titles,
+     * descriptions, tags, and Curator-approved search terms.
+     * The search is case-insensitive and requires all keywords
+     * to match (US-V-02, US-C-E2-03). </p>
+     *
+     * <p> Authorization and search text validation are checked
+     * before retrieving lessons. </p>
+     *
+     * @param actingUser the currently logged-in user
+     * @param searchText the keywords used to search lessons
+     * @param database the database used to retrieve lessons
+     * @return matching lessons or an error result
+     */
+    public static LessonResult searchAllLessons(
+            User actingUser, String searchText, Database database) {
 
         if (!ViewerAccess.isViewer(actingUser)) {
             return LessonResult.failed(NOT_VIEWER, "");
@@ -111,47 +141,69 @@ public class ModelViewerHome {
             return LessonResult.failed(error, "searchText");
         }
 
-        LessonsLearnedList matches = LessonsLearnedList.loadAll()
+        if (database == null) {
+            return LessonResult.failed(
+                    "Database is unavailable.", "");
+        }
+
+        LessonsLearnedList matches = database.getAllLessons()
                 .filterByKeywords(searchText);
 
         return LessonResult.passedList("Search complete", matches);
     }
 
     /*****
-     * <p> Method: LessonResult viewLesson(User actingUser,
-     * int lessonId) </p>
+     * <p> Method: LessonResult viewLesson(
+     * User actingUser, int lessonId) </p>
+     *
+     * <p> Description: Retrieves a specific lesson using the
+     * shared application database (US-V-03). </p>
+     *
+     * @param actingUser the currently logged-in user
+     * @param lessonId the identifier of the lesson to retrieve
+     * @return the lesson or an error result
+     */
+    public static LessonResult viewLesson(
+            User actingUser, int lessonId) {
+
+        return viewLesson(
+                actingUser, lessonId, FoundationsMain.database);
+    }
+
+    /*****
+     * <p> Method: LessonResult viewLesson(
+     * User actingUser, int lessonId, Database database) </p>
      *
      * <p> Description: Retrieves a specific lesson for an
      * authorized Viewer (US-V-03). Lessons can be opened
      * regardless of which Contributor created them. </p>
      *
-     * <p> The Viewer role is checked before reading the
-     * lesson. If the lesson no longer exists, the method
-     * returns "Lesson not found." rather than an error. </p>
+     * <p> This operation does not update or delete lessons.
+     * Curator-only statistics must remain restricted in the
+     * Viewer presentation workflow (US-V-04). </p>
      *
-     * <p> This operation does not update or delete the lesson.
-     * Presentation of Curator-only statistics must be
-     * restricted by the Viewer read workflow (US-V-04). </p>
-     *
-     * @param actingUser the currently logged-in user; may be null
-     *
+     * @param actingUser the currently logged-in user
      * @param lessonId the identifier of the lesson to retrieve
-     *
-     * @return a successful result containing the lesson,
-     *         or a failed result if access is denied or
-     *         the lesson does not exist
+     * @param database the database used to retrieve the lesson
+     * @return the lesson or an error result
      */
     public static LessonResult viewLesson(
-            User actingUser, int lessonId) {
+            User actingUser, int lessonId, Database database) {
 
         if (!ViewerAccess.isViewer(actingUser)) {
             return LessonResult.failed(NOT_VIEWER, "");
         }
 
-        LessonsLearned lesson = LessonsLearned.read(lessonId);
+        if (database == null) {
+            return LessonResult.failed(
+                    "Database is unavailable.", "");
+        }
+
+        LessonsLearned lesson = database.getLessonById(lessonId);
 
         if (lesson == null) {
-            return LessonResult.failed(LessonAccess.NOT_FOUND, "");
+            return LessonResult.failed(
+                    LessonAccess.NOT_FOUND, "");
         }
 
         return LessonResult.passed("", lessonId, lesson);
