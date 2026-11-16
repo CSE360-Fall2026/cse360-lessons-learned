@@ -295,6 +295,22 @@ public class ControllerViewerHome {
         details.append("Description:\n")
                 .append(lesson.getDescription());
 
+        if (lesson.getCuratedBy() != null
+                && !lesson.getCuratedBy().isBlank()
+                && lesson.getCuratedAt() > 0) {
+
+            String editedDate = java.time.Instant
+                    .ofEpochMilli(lesson.getCuratedAt())
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .format(java.time.format.DateTimeFormatter
+                            .ofPattern("MMM d, yyyy 'at' h:mm a"));
+
+            details.append("\n\nEdited by curator: ")
+                    .append(lesson.getCuratedBy())
+                    .append("\nLast curated: ")
+                    .append(editedDate);
+        }
+
         return details.toString();
     }
 }
