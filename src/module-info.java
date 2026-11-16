@@ -14,4 +14,5 @@ module FoundationsF26 {
 	opens entityClasses to org.junit.platform.commons;
 	opens inputValidation to org.junit.platform.commons;
 	opens database to org.junit.platform.commons;
+	opens curatorSummaryTests to org.junit.platform.commons;
 }

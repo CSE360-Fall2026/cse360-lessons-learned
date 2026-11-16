@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import entityClasses.ExperienceEntry;
+import entityClasses.LessonSummary;
 import entityClasses.LessonsLearned;
 import entityClasses.LessonsLearnedList;
 import entityClasses.MemberEffort;
@@ -50,6 +51,8 @@ import entityClasses.User;
  * 							Role2 flag
  * @version 2.06		2026-11-15 TP3 Aspects 5 and 9: Viewer role support and Curator
  * 							search-term persistence
+ * @version 2.07		2026-11-16 TP3 Aspects 3 and 4: lessonSummaryDB table; save, read, and
+ * 							Contributor-visibility methods for merged time and effort summaries
  */
 
 /*
@@ -233,6 +236,28 @@ public class Database {
 				+ "hours DOUBLE NOT NULL, "
 				+ "FOREIGN KEY (experienceId) REFERENCES experienceDB(id) ON DELETE CASCADE)";
 		statement.execute(memberEffortTable);
+
+		// TP3 Aspect 3 (Epic E4): one merged time and effort summary per target lesson.
+		// UNIQUE (targetLessonId) means repeating a merge replaces the summary instead of adding
+		// a second one (US-C-E4-02), and ON DELETE CASCADE removes the summary with its target
+		// lesson.  sourceLessonIds is the comma-separated list of contributing lessons, which keeps
+		// the summary traceable to its sources (US-C-E4-01); 4000 characters holds the 500-lesson
+		// limit (TimeEffortStatisticsCalculator.MAX_LESSONS_LIMIT) at up to 7 digits per id.
+		// standardDeviationHours is NULL when there are fewer than two observations (US-C-E4-03).
+		// The Contributor visibility flag stays on the lesson row (statsVisibleToContributor).
+		String summaryTable = "CREATE TABLE IF NOT EXISTS lessonSummaryDB ("
+				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
+				+ "targetLessonId INT NOT NULL UNIQUE, "
+				+ "sourceLessonIds VARCHAR(4000) NOT NULL, "
+				+ "entryCount INT NOT NULL, "
+				+ "totalHours DOUBLE NOT NULL, "
+				+ "meanHours DOUBLE NOT NULL, "
+				+ "medianHours DOUBLE NOT NULL, "
+				+ "minHours DOUBLE NOT NULL, "
+				+ "maxHours DOUBLE NOT NULL, "
+				+ "standardDeviationHours DOUBLE, "
+				+ "FOREIGN KEY (targetLessonId) REFERENCES lessonsLearnedDB(id) ON DELETE CASCADE)";
+		statement.execute(summaryTable);
 	}
 
 
@@ -1883,6 +1908,171 @@ public class Database {
 			e.printStackTrace();
 		}
 		return shares;
+	}
+
+
+	/*******
+	 * <p> Method: int saveLessonSummary(LessonSummary summary) </p>
+	 *
+	 * <p> Description: TP3 Aspect 3 (Epic E4) CREATE or REPLACE.  Saves a confirmed merged time
+	 * and effort summary on its target lesson, in one transaction: any earlier summary for that
+	 * target is deleted, the new one is inserted, and the target lesson's summaryId is set to
+	 * the new row while its statsVisibleToContributor flag is reset to hidden.  So repeating a
+	 * merge replaces the summary rather than adding to it (US-C-E4-02), a new summary always
+	 * starts hidden (US-C-E5-02), and if any step fails nothing is changed ("commit all changes
+	 * or none," InputValidation.pdf).  The source lessons and their experience records are only
+	 * read, never written, so they stay unchanged.</p>
+	 *
+	 * <p> The same save-and-restore of auto-commit as createExperience() is used, because the
+	 * connection is shared by the whole application.</p>
+	 *
+	 * @param summary the computed summary; its target lesson must exist
+	 *
+	 * @return the new summary's id (also stored in the summary, which is marked hidden), or -1
+	 *         if nothing was saved
+	 */
+	public int saveLessonSummary(LessonSummary summary) {
+		if (summary == null || !doesLessonExist(summary.getTargetLessonId())) return -1;
+
+		StringBuilder sources = new StringBuilder();
+		for (Integer id : summary.getSourceLessonIds()) {
+			if (sources.length() > 0) sources.append(',');
+			sources.append(id);
+		}
+		String deleteOld = "DELETE FROM lessonSummaryDB WHERE targetLessonId = ?";
+		String insert = "INSERT INTO lessonSummaryDB (targetLessonId, sourceLessonIds, entryCount, "
+				+ "totalHours, meanHours, medianHours, minHours, maxHours, standardDeviationHours) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String link = "UPDATE lessonsLearnedDB SET summaryId = ?, statsVisibleToContributor = FALSE "
+				+ "WHERE id = ?";
+		boolean previousAutoCommit = true;
+		try {
+			previousAutoCommit = connection.getAutoCommit();
+			connection.setAutoCommit(false);
+
+			try (PreparedStatement pstmt = connection.prepareStatement(deleteOld)) {
+				pstmt.setInt(1, summary.getTargetLessonId());
+				pstmt.executeUpdate();
+			}
+
+			int newId = -1;
+			try (PreparedStatement pstmt = connection.prepareStatement(insert,
+					Statement.RETURN_GENERATED_KEYS)) {
+				pstmt.setInt(1, summary.getTargetLessonId());
+				pstmt.setString(2, sources.toString());
+				pstmt.setInt(3, summary.getEntryCount());
+				pstmt.setDouble(4, summary.getTotalHours());
+				pstmt.setDouble(5, summary.getMeanHours());
+				pstmt.setDouble(6, summary.getMedianHours());
+				pstmt.setDouble(7, summary.getMinHours());
+				pstmt.setDouble(8, summary.getMaxHours());
+				// NaN (fewer than two observations) is stored as NULL, not as a number
+				if (Double.isNaN(summary.getStandardDeviationHours()))
+					pstmt.setNull(9, java.sql.Types.DOUBLE);
+				else
+					pstmt.setDouble(9, summary.getStandardDeviationHours());
+				pstmt.executeUpdate();
+				try (ResultSet keys = pstmt.getGeneratedKeys()) {
+					if (keys.next()) newId = keys.getInt(1);
+				}
+			}
+			if (newId < 0) throw new SQLException("No id was generated for the lesson summary.");
+
+			try (PreparedStatement pstmt = connection.prepareStatement(link)) {
+				pstmt.setInt(1, newId);
+				pstmt.setInt(2, summary.getTargetLessonId());
+				if (pstmt.executeUpdate() != 1)
+					throw new SQLException("The target lesson could not be linked to its summary.");
+			}
+
+			connection.commit();
+			summary.setSummaryId(newId);
+			summary.setVisibleToContributor(false);
+			return newId;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException rollbackError) {
+				rollbackError.printStackTrace();
+			}
+			return -1;
+		} finally {
+			try {
+				connection.setAutoCommit(previousAutoCommit);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+	/*******
+	 * <p> Method: LessonSummary getLessonSummary(int targetLessonId) </p>
+	 *
+	 * <p> Description: TP3 Aspect 3 (Epic E4) READ.  Loads the saved merged summary of a lesson,
+	 * with its source lesson ids and the lesson's Contributor visibility flag, so reopening the
+	 * target shows the same summary (US-C-E4-01).  This is the Curator's read: it returns the
+	 * summary whether it is visible or hidden.  Contributor-facing code must go through
+	 * guiContributorHome.ContributorLessonView, which drops hidden summaries (US-C-E5-02).</p>
+	 *
+	 * @param targetLessonId the lesson whose summary is wanted
+	 *
+	 * @return the summary, or null if the lesson has none
+	 */
+	public LessonSummary getLessonSummary(int targetLessonId) {
+		String query = "SELECT s.*, l.statsVisibleToContributor FROM lessonSummaryDB s "
+				+ "JOIN lessonsLearnedDB l ON l.id = s.targetLessonId WHERE s.targetLessonId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setInt(1, targetLessonId);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (!rs.next()) return null;
+				Set<Integer> sources = new LinkedHashSet<Integer>();
+				for (String id : rs.getString("sourceLessonIds").split(","))
+					if (!id.isEmpty()) sources.add(Integer.parseInt(id));
+				double stdDev = rs.getDouble("standardDeviationHours");
+				if (rs.wasNull()) stdDev = Double.NaN;
+				LessonSummary summary = new LessonSummary(rs.getInt("targetLessonId"), sources,
+						rs.getInt("entryCount"), rs.getDouble("totalHours"),
+						rs.getDouble("meanHours"), rs.getDouble("medianHours"),
+						rs.getDouble("minHours"), rs.getDouble("maxHours"), stdDev);
+				summary.setSummaryId(rs.getInt("id"));
+				summary.setVisibleToContributor(rs.getBoolean("statsVisibleToContributor"));
+				return summary;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+
+	/*******
+	 * <p> Method: boolean setStatsVisibleToContributor(int lessonId, boolean visible) </p>
+	 *
+	 * <p> Description: TP3 Aspect 4 (Epic E5) UPDATE.  Shows or hides a lesson's merged summary
+	 * for Contributors by changing only the lesson's statsVisibleToContributor flag, so the
+	 * summary's numbers and the raw experience records are never touched (US-C-E5-02).  The
+	 * flag is changed only on a lesson that has a saved summary.  Checking that the user is a
+	 * Curator happens before this is called (guiCuratorSummary.CuratorSummaryController).</p>
+	 *
+	 * @param lessonId	the target lesson of the summary
+	 * @param visible	true to show the summary to Contributors, false to hide it
+	 *
+	 * @return true if the flag was saved, false if the lesson has no summary or the update failed
+	 */
+	public boolean setStatsVisibleToContributor(int lessonId, boolean visible) {
+		String query = "UPDATE lessonsLearnedDB SET statsVisibleToContributor = ? WHERE id = ? "
+				+ "AND EXISTS (SELECT 1 FROM lessonSummaryDB WHERE targetLessonId = ?)";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setBoolean(1, visible);
+			pstmt.setInt(2, lessonId);
+			pstmt.setInt(3, lessonId);
+			return pstmt.executeUpdate() == 1;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 
