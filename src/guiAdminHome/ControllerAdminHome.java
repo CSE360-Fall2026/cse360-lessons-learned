@@ -1,14 +1,15 @@
 package guiAdminHome;
 
-import database.Database;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import database.Database;
+import guiTools.RoleLabels;
+import inputValidation.EmailAddressRecognizer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
-import java.util.Optional;
-import java.util.ArrayList;
-import guiTools.RoleLabels;
-import inputValidation.EmailAddressRecognizer;
 
 /*******
  * <p> Title: GUIAdminHomePage Class. </p>
@@ -88,8 +89,8 @@ public class ControllerAdminHome {
 
 		// Inform the user that the invitation has been sent and display the invitation code
 		String theSelectedRole = (String) ViewAdminHome.combobox_SelectRole.getValue();
-		// TP2 (D12): store "Role1" even though the Admin chose "Contributor"; TP3 (Aspect 1):
-		// store "Role2" even though the Admin chose "Curator"
+		// Store the internal role name rather than the displayed label.
+		// Contributor, Curator, and Viewer map to Role1, Role2, and Role3.
 		String invitationCode = theDatabase.generateInvitationCode(emailAddress,
 				RoleLabels.toStoredName(theSelectedRole));
 		String msg = "Code: " + invitationCode + " for role " + theSelectedRole +

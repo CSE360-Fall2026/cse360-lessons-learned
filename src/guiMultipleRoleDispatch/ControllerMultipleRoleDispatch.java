@@ -84,6 +84,12 @@ public class ControllerMultipleRoleDispatch {
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
 
+		} else if (role.compareTo("Viewer") == 0) {
+
+			// TP3 Aspect 9: Route users with the Viewer role
+			// to the read-only Viewer Home Page (US-V-01).
+			guiViewerHome.ViewViewerHome.displayViewerHome(guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage,
+					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theUser);
 		} else {
 			// Invalid role
 			System.out.println("*** ERROR *** GUIMultipleRoleDispatch was asked to dispatch to " +

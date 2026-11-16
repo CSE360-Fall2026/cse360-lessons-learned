@@ -28,9 +28,11 @@ package guiTools;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
+ * @author David Nevarez
  *
  * @version 1.00		2026-10-16 TP2: Role1 is shown as "Contributor" on the admin pages
  * @version 1.01		2026-11-10 TP3 Aspect 1: Role2 is shown as "Curator"
+ * @version 1.02        2026-11-15 TP3 Aspect 9: Added Viewer role translations
  */
 public class RoleLabels {
 
@@ -45,6 +47,12 @@ public class RoleLabels {
 
 	/** The name every screen shows for that role (TP3 Aspect 1; ConOps assumption A1). */
 	public static final String ROLE2_LABEL = "Curator";
+
+	/** The name the database uses for the Viewer role. */
+	public static final String ROLE3_STORED_NAME = "Role3";
+
+	/** The name every screen shows for the Viewer role (TP3 Aspect 9). */
+	public static final String ROLE3_LABEL = "Viewer";
 
 	/**********
 	 * Default constructor is not used; every member is static.
@@ -68,6 +76,7 @@ public class RoleLabels {
 		// The constant is on the left of equals() so a null name is returned, not dereferenced
 		if (ROLE1_STORED_NAME.equals(storedName)) return ROLE1_LABEL;
 		if (ROLE2_STORED_NAME.equals(storedName)) return ROLE2_LABEL;
+		if (ROLE3_STORED_NAME.equals(storedName)) return ROLE3_LABEL;
 		return storedName;
 	}
 
@@ -88,6 +97,8 @@ public class RoleLabels {
 		// constants, so "curator" typed some other way is deliberately not a role (CH-04)
 		if (ROLE1_LABEL.equals(label)) return ROLE1_STORED_NAME;
 		if (ROLE2_LABEL.equals(label)) return ROLE2_STORED_NAME;
+		if (ROLE3_LABEL.equals(label))
+			return ROLE3_STORED_NAME;
 		return label;
 	}
 }

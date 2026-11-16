@@ -2,7 +2,7 @@ package guiUserLogin;
 
 import database.Database;
 import entityClasses.User;
-import javafx.stage.Stage;
+import inputValidation.PasswordRecognizer;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -14,7 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
-import inputValidation.PasswordRecognizer;
+import javafx.stage.Stage;
 
 
 /*******
@@ -37,12 +37,14 @@ import inputValidation.PasswordRecognizer;
  *
  * @author Lynn Robert Carter
  * @author Virgil Jones &amp; Team Fall 2026
+ * @author David Nevarez
  *
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2025-09-16 Update Javadoc documentation *
  * @version 2.00		2026-09-18 Add one-time password check with a required password reset before log in
  * @version 2.01		2026-10-14 TP2: a Role1 user is taken to the Contributor Home Page
  * @version 2.02		2026-11-10 TP3 Aspect 1: a Role2 user is taken to the Curator Home Page
+ * @version 2.03        2026-11-15 TP3 Aspect 9: Added Viewer login and home page navigation
  */
 
 public class ControllerUserLogin {
@@ -196,10 +198,10 @@ public class ControllerUserLogin {
 
 		// Establish this user's details
     	User user = new User(username, password, theDatabase.getCurrentFirstName(),
-    			theDatabase.getCurrentMiddleName(), theDatabase.getCurrentLastName(),
-    			theDatabase.getCurrentPreferredFirstName(), theDatabase.getCurrentEmailAddress(),
-    			theDatabase.getCurrentAdminRole(),
-    			theDatabase.getCurrentNewRole1(), theDatabase.getCurrentNewRole2());
+        theDatabase.getCurrentMiddleName(), theDatabase.getCurrentLastName(),
+        theDatabase.getCurrentPreferredFirstName(), theDatabase.getCurrentEmailAddress(),
+        theDatabase.getCurrentAdminRole(), theDatabase.getCurrentNewRole1(),
+        theDatabase.getCurrentNewRole2(), theDatabase.getCurrentNewRole3());
 
     	// See which home page dispatch to use
 		int numberOfRoles = theDatabase.getNumberOfRoles(user);
@@ -224,6 +226,16 @@ public class ControllerUserLogin {
 				if (loginResult) {
 					// TP3: the Role2 flag is the Curator role (Aspect 1; ConOps assumption A1)
 					guiCuratorHome.ViewCuratorHome.displayCuratorHome(theStage, user);
+				}
+			} else if (user.getNewRole3()) {
+
+				loginResult = theDatabase.loginRole3(user);
+
+				if (loginResult) {
+
+					// TP3 Aspect 9: Role3 is the Viewer role (US-V-01).
+					guiViewerHome.ViewViewerHome.displayViewerHome(theStage, user);
+
 				}
 				// Other roles
 			} else {

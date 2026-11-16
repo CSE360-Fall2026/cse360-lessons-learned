@@ -23,6 +23,7 @@ import javafx.scene.control.ComboBox;
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter
+ * @author David Nevarez
  *
  * @version 1.00		2025-08-17 Initial version
  * @version 1.01		2025-09-16 Update Javadoc documentation *
@@ -31,6 +32,7 @@ import javafx.scene.control.ComboBox;
  * 							decision D12; see guiTools.RoleLabels)
  * @version 1.03		2026-11-10 TP3 Aspect 1: Role2 is shown as "Curator" in the same places
  * 							and changed in the database as "Role2"
+ * @version 1.04               2026-11-15 TP3 Aspect 9: Added Viewer to role management
  */
 
 public class ControllerAddRemoveRoles {
@@ -142,6 +144,9 @@ public class ControllerAddRemoveRoles {
 			ViewAddRemoveRoles.addList.add(RoleLabels.ROLE1_LABEL);		// TP2: was "Role1"
 		if (!theDatabase.getCurrentNewRole2())
 			ViewAddRemoveRoles.addList.add(RoleLabels.ROLE2_LABEL);		// TP3: was "Role2"
+		// TP3 Aspect 9: Offer Viewer if the user does not have Role3.
+		if (!theDatabase.getCurrentNewRole3())
+			ViewAddRemoveRoles.addList.add(RoleLabels.ROLE3_LABEL);
 
 		// Create the list of roles that could be removed for the currently selected user (e.g., Do
 		// not show a role to remove that the user does not have!)
@@ -158,6 +163,9 @@ public class ControllerAddRemoveRoles {
 			ViewAddRemoveRoles.removeList.add(RoleLabels.ROLE1_LABEL);	// TP2: was "Role1"
 		if (theDatabase.getCurrentNewRole2())
 			ViewAddRemoveRoles.removeList.add(RoleLabels.ROLE2_LABEL);	// TP3: was "Role2"
+		// TP3 Aspect 9: Allow Admins to remove an existing Viewer role.
+		if (theDatabase.getCurrentNewRole3())
+			ViewAddRemoveRoles.removeList.add(RoleLabels.ROLE3_LABEL);
 
 		// Create the list or roles that the user currently has with proper use of a comma between
 		// items
@@ -188,6 +196,16 @@ public class ControllerAddRemoveRoles {
 				theCurrentRoles += ", " + RoleLabels.ROLE2_LABEL;
 			else {
 				theCurrentRoles += RoleLabels.ROLE2_LABEL;
+				notTheFirst = true;
+			}
+		}
+		// TP3 Aspect 9: Include Viewer in the current role summary.
+		if (theDatabase.getCurrentNewRole3()) {
+
+			if (notTheFirst) {
+				theCurrentRoles += ", " + RoleLabels.ROLE3_LABEL;
+			} else {
+				theCurrentRoles += RoleLabels.ROLE3_LABEL;
 				notTheFirst = true;
 			}
 		}

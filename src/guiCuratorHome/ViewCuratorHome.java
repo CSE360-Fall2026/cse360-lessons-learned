@@ -3,6 +3,8 @@ package guiCuratorHome;
 import java.util.ArrayList;
 import java.util.List;
 
+import database.Database;
+import entityClasses.User;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,8 +18,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import database.Database;
-import entityClasses.User;
 
 
 /*******
@@ -52,10 +52,12 @@ import entityClasses.User;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Lynn Robert Carter (Curator home page by Emilia Davey)
+ * @author David Nevarez
  *
  * @version 1.00		2025-04-20 Initial version (as the Role2 home page stub)
  * @version 2.00		2026-11-10 TP3 Aspect 1: the Curator Home Page, replacing the Role2 stub
  * @version 2.01		2026-11-13 TP3 Aspect 2: the Lock / Unlock button for the selected lesson
+ * @version 2.02		2026-11-15 TP3 Aspect 5: Added Manage Search Terms to the Curator Home Page
  *
  */
 
@@ -115,6 +117,8 @@ public class ViewCuratorHome {
 	 * the Initial ConOps storyboard, "Lock / Unlock...".  Rationale: disabled until a lesson is
 	 * selected, so it can never be pressed with nothing to act on. */
 	protected static Button button_Lock = new Button("Lock / Unlock...");
+	/** Opens the Curator search-term management page (TP3 Aspect 5, E2). */
+	protected static Button button_SearchTerms = new Button("Manage Search Terms...");
 	/** Tells the user how to read a lesson.  Rationale: validation-as-guidance, User
 	 * Experience.pdf; the user is told what to do before having to guess. */
 	protected static Label label_ListHint =
@@ -293,10 +297,18 @@ public class ViewCuratorHome {
 		label_ListHint.setTextFill(Color.GRAY);
 		setupLabelUI(label_ListStatus, "Arial", 12, 380, Pos.BASELINE_LEFT, 20, 475);
 
-		// The Curator actions for the selected lesson sit under its details (Epics E2 to E6)
-		setupButtonUI(button_Lock, "Dialog", 14, 365, Pos.CENTER, 415, 460);
-		button_Lock.setOnAction((_) -> {ControllerCuratorHome.performLock(); });
+		// TP3 Aspect 5: Two Curator actions share the details area.
+		setupButtonUI(button_Lock, "Dialog", 14, 175, Pos.CENTER, 415, 460);
+		button_Lock.setOnAction((_) -> {
+			ControllerCuratorHome.performLock();
+		});
 		button_Lock.setDisable(true);
+
+		setupButtonUI(button_SearchTerms, "Dialog", 14, 180, Pos.CENTER, 600, 460);
+		button_SearchTerms.setOnAction((_) -> {
+			ControllerCuratorHome.performSearchTerms();
+		});
+		button_SearchTerms.setDisable(true);
 
 		setupLabelUI(label_Status, "Arial", 14, 580, Pos.BASELINE_LEFT, 20, 497);
 
@@ -311,11 +323,10 @@ public class ViewCuratorHome {
 
 		// Place all of the widget items into the Root Pane's list of children
 		theRootPane.getChildren().addAll(
-			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
-			label_ListHeading, text_Search, button_Search, button_ClearSearch, label_SearchError,
-			listView_Lessons, label_DetailsHeading, text_Details, label_ListHint,
-			label_ListStatus, label_Status, button_Lock,
-	        line_Separator4, button_Logout, button_Quit);
+				label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, label_ListHeading,
+				text_Search, button_Search, button_ClearSearch, label_SearchError, listView_Lessons,
+				label_DetailsHeading, text_Details, label_ListHint, label_ListStatus, label_Status,
+				button_Lock, button_SearchTerms, line_Separator4, button_Logout, button_Quit);
 	}
 
 

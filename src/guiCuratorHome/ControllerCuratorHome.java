@@ -33,10 +33,12 @@ import javafx.scene.paint.Color;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Lynn Robert Carter (Curator home page actions by Emilia Davey)
+ * @author David Nevarez
  *
  * @version 1.00		2025-08-17 Initial version (as the Role2 home page stub)
  * @version 2.00		2026-11-10 TP3 Aspect 1: the Curator Home Page, replacing the Role2 stub
  * @version 2.01		2026-11-13 TP3 Aspect 2: performLock() opens the Curator Lock page
+ * @version 2.02        2026-11-15 TP3 Aspect 5: Added Curator search-term management navigation
  */
 
 public class ControllerCuratorHome {
@@ -173,6 +175,7 @@ public class ControllerCuratorHome {
 		// row is selected
 		ViewCuratorHome.button_Lock.setDisable(
 				row < 0 || row >= ViewCuratorHome.listedLessonIds.size());
+		ViewCuratorHome.button_SearchTerms.setDisable(row < 0 || row >= ViewCuratorHome.listedLessonIds.size());
 		if (row < 0 || row >= ViewCuratorHome.listedLessonIds.size()) {
 			ViewCuratorHome.text_Details.setText(NO_SELECTION);
 			return;
@@ -214,6 +217,24 @@ public class ControllerCuratorHome {
 				ViewCuratorHome.theUser, ViewCuratorHome.listedLessonIds.get(row));
 	}
 
+	/**********
+	 * <p> Method: performSearchTerms() </p>
+	 *
+	 * <p> Description: Opens the search-term management page for the
+	 * selected lesson (TP3 Aspect 5, E2). The search-term Model
+	 * performs its own Curator authorization checks. </p>
+	 */
+	protected static void performSearchTerms() {
+
+		int row = ViewCuratorHome.listView_Lessons.getSelectionModel().getSelectedIndex();
+
+		if (row < 0 || row >= ViewCuratorHome.listedLessonIds.size()) {
+			return;
+		}
+
+		guiCuratorSearchTerms.ViewCuratorSearchTerms.displayCuratorSearchTerms(ViewCuratorHome.theStage,
+				ViewCuratorHome.theUser, ViewCuratorHome.listedLessonIds.get(row));
+	}
 
 	/**********
 	 * <p> Method: showStatus(String message, boolean good) </p>
@@ -259,6 +280,7 @@ public class ControllerCuratorHome {
 		ViewCuratorHome.listView_Lessons.setItems(FXCollections.observableArrayList(rows));
 		ViewCuratorHome.text_Details.setText(NO_SELECTION);		// nothing is selected yet
 		ViewCuratorHome.button_Lock.setDisable(true);			// so there is nothing to lock
+		ViewCuratorHome.button_SearchTerms.setDisable(true);
 
 		int n = list.size();
 		String count = "Showing " + n + ((what == null) ? " " : " " + what + " ")

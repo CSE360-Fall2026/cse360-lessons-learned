@@ -4,9 +4,9 @@ import java.sql.SQLException;
 
 import database.Database;
 import entityClasses.User;
-import javafx.scene.paint.Color;
-import inputValidation.UserNameRecognizer;
 import inputValidation.PasswordRecognizer;
+import inputValidation.UserNameRecognizer;
+import javafx.scene.paint.Color;
 
 /*******
  * <p> Title: ControllerNewAccount Class. </p>
@@ -26,10 +26,12 @@ import inputValidation.PasswordRecognizer;
  * 
  * @author Lynn Robert Carter
  * @author Virgil Jones &amp; Team Fall 2026
+ * @author David Nevarez
  * 
  * @version 1.00		2025-08-17 Initial version
  * @version 2.00		2026-09-16 Updated to implement username and password validation with dynamic updates
  * @version 2.01		2026-11-10 TP3 Aspect 1: a Role2 invitation creates a Curator account
+ * @version 2.02        2026-11-15 TP3 Aspect 9: Added Viewer account creation
  *  
  */
 
@@ -162,6 +164,14 @@ public class ControllerNewAccount {
 				// is accepted as well, the same way "Contributor" is accepted for Role1 above.
 				roleCode = 3;
 				user = new User(username, password, "", "", "", "", "", false, false, true);
+			} else if (ViewNewAccount.theRole.compareTo("Role3") == 0
+					|| ViewNewAccount.theRole.compareTo("Viewer") == 0) {
+
+			// TP3 Aspect 9: Role3 is the Viewer role (US-V-01).
+			roleCode = 4;
+
+			user = new User(username, password, "", "", "", "", "", false, false, false, true);
+
 			} else {
 				System.out.println(
 						"**** Trying to create a New Account for a role that does not exist!");
@@ -202,6 +212,7 @@ public class ControllerNewAccount {
 			ViewNewAccount.label_PasswordsDoNotMatch.setText(
 					"The two passwords must match. Please try again!");
 		}
+
 	}
 
 	
