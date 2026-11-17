@@ -48,6 +48,9 @@ import inputValidation.LessonRecognizer;
  *
  * @version 1.00		2026-10-14 Initial version for TP2 (edit form from the HW2 Role1 page)
  * @version 1.01		2026-11-16 TP3 Aspect 7: root cause, recommendation, and AI Coach panel
+ * @version 1.02		2026-11-17 Emilia Davey, TP3 Aspect 7: the Writing Help button and its hint
+ * 							(Writing Help window); a shorter Tags caption, so it no longer
+ * 							overlaps the length counter and Category
  *
  */
 
@@ -139,16 +142,29 @@ public class ViewUpdateLesson {
 	protected static Button button_Coach = new Button("Get AI Coaching");
 	/** Shows when an AI suggestion has been applied or was used earlier. */
 	protected static Label label_AiAppliedBadge = new Label();
+	/** Opens the Writing Help window: brainstorming with follow-up questions and a search of
+	 * the Contributor's own lessons for examples, without leaving this page.  Source: TP3
+	 * Aspect 7, US-P-E1-01 and US-P-E1-03. */
+	protected static Button button_WritingHelp = new Button("Writing Help...");
+	/** Says what the Writing Help window offers.  Source: TP3 Aspect 7, US-P-E1-01. */
+	protected static Label label_WritingHelpHint = new Label("Brainstorm with AI, or find "
+			+ "examples in your own lessons.");
 	/** Shows a failure that is not about one field, such as "Lesson not found." */
 	protected static Label label_Status = new Label();
 
 	/** Visibly separate review card for AI coaching suggestions (never auto-overwrites draft). */
 	protected static VBox vbox_CoachPanel = new VBox(10);
+	/** The heading of the AI coaching panel.  Source: TP3 Aspect 7, US-P-E1-02. */
 	protected static Label label_CoachTitle = new Label("AI Writing Coach Suggestions");
+	/** What the coach is doing, or why it is unavailable (US-AI-D2-02). */
 	protected static Label label_CoachStatus = new Label();
+	/** The coaching reply, kept separate from the draft until applied (US-P-E1-02). */
 	protected static TextArea text_CoachFeedback = new TextArea();
+	/** Adds the coaching reply to the Description, unless it is locked (US-P-E1-02). */
 	protected static Button button_ApplyDescription = new Button("Apply to Description");
+	/** Adds the coaching reply to the Recommendation (US-P-E1-02). */
 	protected static Button button_ApplyRecommendation = new Button("Apply to Recommendation");
+	/** Closes the coaching panel without changing the draft (US-P-E1-01 V sentence). */
 	protected static Button button_DismissCoach = new Button("Dismiss");
 
 	/** Separator between GUI Areas 2 and 3. */
@@ -262,6 +278,9 @@ public class ViewUpdateLesson {
 		setupLabelUI(label_TagsCaption, "Arial", 12, 255, Pos.BASELINE_LEFT, 20, 420);
 		setupCounterUI(label_TagsCounter, 280, 420);
 		setupTextFieldUI(text_Tags, 360, 20, 437);
+		// The caption is kept short so it ends before the length counter at x = 280, even with
+		// "(locked)" added; how to separate tags is shown inside the empty field instead
+		text_Tags.setPromptText("Separate tags with commas, e.g. deploy, rollback");
 		setupErrorLabelUI(label_TagsError, 360, 20, 465);
 
 		setupLabelUI(label_CategoryCaption, "Arial", 12, 180, Pos.BASELINE_LEFT, 400, 420);
@@ -282,6 +301,10 @@ public class ViewUpdateLesson {
 		button_Coach.setOnAction((_) -> {ControllerUpdateLesson.performCoach(); });
 		setupHintLabelUI(label_AiAppliedBadge, 180, 600, 304);
 		label_AiAppliedBadge.setTextFill(Color.web("#2e7d32"));
+		// TP3 Aspect 7: under the AI-assisted badge, which can take two lines
+		setupButtonUI(button_WritingHelp, "Dialog", 15, 180, Pos.CENTER, 600, 350);
+		button_WritingHelp.setOnAction((_) -> {ControllerUpdateLesson.performWritingHelp(); });
+		setupHintLabelUI(label_WritingHelpHint, 180, 600, 386);
 
 		setupErrorLabelUI(label_Status, 560, 20, 488);
 
@@ -349,7 +372,8 @@ public class ViewUpdateLesson {
 			label_RecommendationCaption, text_Recommendation, label_RecommendationError,
 			label_TagsCaption, label_TagsCounter, text_Tags,
 			label_TagsError, label_CategoryCaption, combobox_Category, label_CategoryError,
-			button_SaveChanges, label_SaveHint, button_Coach, label_AiAppliedBadge, label_Status,
+			button_SaveChanges, label_SaveHint, button_Coach, label_AiAppliedBadge, button_WritingHelp, label_WritingHelpHint,
+			label_Status,
 	        line_Separator4, button_Return, button_Logout, button_Quit, vbox_CoachPanel);
 	}
 
@@ -360,6 +384,17 @@ public class ViewUpdateLesson {
 
 	 */
 
+	/**********
+	 * Private local method to initialize the standard fields for a label
+	 *
+	 * @param l		The Label object to be initialized
+	 * @param ff		The font to be used
+	 * @param f		The size of the font to be used
+	 * @param w		The width of the Label
+	 * @param p		The alignment (e.g. left, centered, or right)
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupLabelUI(Label l, String ff, double f, double w, Pos p, double x,
 			double y){
 		l.setFont(Font.font(ff, f));
@@ -369,6 +404,13 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
+	/**********
+	 * Private local method to initialize the standard fields for a gray, right-aligned length counter
+	 *
+	 * @param l		The Label object to be initialized
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupCounterUI(Label l, double x, double y){
 		l.setFont(Font.font("Arial", 12));
 		l.setTextFill(Color.GRAY);
@@ -379,6 +421,14 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
+	/**********
+	 * Private local method to initialize the standard fields for a small gray hint label
+	 *
+	 * @param l		The Label object to be initialized
+	 * @param w		The width of the Label
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupHintLabelUI(Label l, double w, double x, double y){
 		l.setFont(Font.font("Arial", 12));
 		l.setTextFill(Color.GRAY);
@@ -389,6 +439,14 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
+	/**********
+	 * Private local method to initialize the standard fields for a red error label under a field
+	 *
+	 * @param l		The Label object to be initialized
+	 * @param w		The width of the Label
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupErrorLabelUI(Label l, double w, double x, double y){
 		l.setFont(Font.font("Arial", 12));
 		l.setTextFill(Color.RED);
@@ -399,6 +457,17 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
+	/**********
+	 * Private local method to initialize the standard fields for a button
+	 *
+	 * @param b		The Button object to be initialized
+	 * @param ff		The font to be used
+	 * @param f		The size of the font to be used
+	 * @param w		The width of the Button
+	 * @param p		The alignment (e.g. left, centered, or right)
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupButtonUI(Button b, String ff, double f, double w, Pos p, double x,
 			double y){
 		b.setFont(Font.font(ff, f));
@@ -408,6 +477,14 @@ public class ViewUpdateLesson {
 		b.setLayoutY(y);
 	}
 
+	/**********
+	 * Private local method to initialize the standard fields for a text field
+	 *
+	 * @param t		The TextField object to be initialized
+	 * @param w		The width of the TextField
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupTextFieldUI(TextField t, double w, double x, double y){
 		t.setFont(Font.font("Arial", 13));
 		t.setMinWidth(w);
@@ -416,6 +493,16 @@ public class ViewUpdateLesson {
 		t.setLayoutY(y);
 	}
 
+	/**********
+	 * Private local method to initialize the standard fields for a ComboBox
+	 *
+	 * @param c		The ComboBox object to be initialized
+	 * @param ff		The font to be used
+	 * @param f		The size of the font to be used
+	 * @param w		The width of the ComboBox
+	 * @param x		The location from the left edge (x axis)
+	 * @param y		The location from the top (y axis)
+	 */
 	private static void setupComboBoxUI(ComboBox <String> c, String ff, double f, double w,
 			double x, double y){
 		c.setStyle("-fx-font: " + f + " " + ff + ";");

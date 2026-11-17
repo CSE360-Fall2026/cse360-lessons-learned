@@ -29,8 +29,20 @@ import guiUpdateLesson.ModelUpdateLesson;
  */
 public class ContributorAiToolsTests {
 
+	/** The in-memory database the tests use as FoundationsMain.database. */
 	private Database db;
 
+	/**
+	 * Default constructor; JUnit creates one instance for each test.
+	 */
+	public ContributorAiToolsTests() {
+	}
+
+	/**
+	 * Creates a fresh in-memory database before each test and makes it the application database.
+	 *
+	 * @throws SQLException if the database cannot be created
+	 */
 	@BeforeEach
 	public void setUp() throws SQLException {
 		// Create a fresh in-memory database before each test
@@ -39,11 +51,18 @@ public class ContributorAiToolsTests {
 		FoundationsMain.database = db;
 	}
 
+	/**
+	 * Closes the test database after each test.
+	 */
 	@AfterEach
 	public void tearDown() {
 		if (db != null) db.closeConnection();
 	}
 
+	/**
+	 * A lesson created with AI-assisted text keeps the AI-assistance indicator, the root cause,
+	 * and the recommendation (US-P-E1-02).
+	 */
 	@Test
 	public void testCreateWithAiApplied() {
 		LessonResult result = ModelCreateLesson.createLesson(
@@ -63,6 +82,9 @@ public class ContributorAiToolsTests {
 		assertEquals("Always test rollback steps first.", saved.getRecommendation());
 	}
 
+	/**
+	 * A lesson written without AI is saved without the AI-assistance indicator (US-P-E1-02).
+	 */
 	@Test
 	public void testCreateWithoutAiApplied() {
 		LessonResult result = ModelCreateLesson.createLesson(
@@ -80,6 +102,10 @@ public class ContributorAiToolsTests {
 		assertFalse(saved.isAiAssisted());
 	}
 
+	/**
+	 * A root cause over 2000 characters is refused, and the result names that field
+	 * (US-P-E1-02 V sentence).
+	 */
 	@Test
 	public void testRejectsOverLimitRootCause() {
 		String tooLong = "a".repeat(2001);
@@ -97,6 +123,10 @@ public class ContributorAiToolsTests {
 		assertEquals(LessonsLearned.FIELD_ROOT_CAUSE, result.getFailedField());
 	}
 
+	/**
+	 * An update with AI-assisted text keeps the indicator, and an update that would change a locked
+	 * description is refused for that field (US-P-E1-02: a lock is never overridden).
+	 */
 	@Test
 	public void testUpdateWithAiAndLockProtection() {
 		LessonResult created = ModelCreateLesson.createLesson(
@@ -121,6 +151,10 @@ public class ContributorAiToolsTests {
 		assertEquals(LessonsLearned.FIELD_DESCRIPTION, blocked.getFailedField());
 	}
 
+	/**
+	 * The example search finds only the Contributor's own lessons, not another Contributor's with
+	 * the same words (US-P-E1-03).
+	 */
 	@Test
 	public void testExampleSearchOnlyShowsOwnLessons() {
 		ModelCreateLesson.createLesson("virgil", "H2 Guide",

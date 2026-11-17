@@ -73,11 +73,23 @@ public class ModelCuratorSummary {
 	 * openLesson, the lesson. </p>
 	 */
 	public static final class Result {
+		/** True if the action worked. */
 		private final boolean success;
+		/** The message to show. */
 		private final String message;
+		/** The summary to show, or null. */
 		private final LessonSummary summary;
+		/** The lesson that was opened, or null. */
 		private final LessonsLearned lesson;
 
+		/**
+		 * Creates a result.
+		 *
+		 * @param success	true if the action worked
+		 * @param message	the message to show
+		 * @param summary	the summary to show, or null
+		 * @param lesson	the lesson that was opened, or null
+		 */
 		private Result(boolean success, String message, LessonSummary summary,
 				LessonsLearned lesson) {
 			this.success = success;
@@ -86,13 +98,29 @@ public class ModelCuratorSummary {
 			this.lesson = lesson;
 		}
 
-		/** @return true if the action worked */
+		/**
+		 * Did the action work?
+		 *
+		 * @return true if the action worked
+		 */
 		public boolean isSuccess() { return success; }
-		/** @return the message to show; empty if there is nothing to say */
+		/**
+		 * The message to show.
+		 *
+		 * @return the message; empty if there is nothing to say
+		 */
 		public String getMessage() { return message; }
-		/** @return the summary to show, or null */
+		/**
+		 * The summary to show: a preview, a saved summary, or a refreshed preview.
+		 *
+		 * @return the summary, or null
+		 */
 		public LessonSummary getSummary() { return summary; }
-		/** @return the lesson that was opened, or null */
+		/**
+		 * The lesson that openLesson opened.
+		 *
+		 * @return the lesson, or null
+		 */
 		public LessonsLearned getLesson() { return lesson; }
 	}
 

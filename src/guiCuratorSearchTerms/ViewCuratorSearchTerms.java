@@ -6,7 +6,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
@@ -30,6 +29,8 @@ import javafx.stage.Stage;
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 5
+ * @version 1.01 2026-11-17 Emilia Davey: the consent checkbox is replaced by a note; consent
+ *          now uses the shared AI notice (US-AI-D2-01)
  */
 public class ViewCuratorSearchTerms {
 
@@ -73,9 +74,10 @@ public class ViewCuratorSearchTerms {
 	/** Displays search-term validation errors. */
 	protected static Label label_ValidationError = new Label();
 
-    /** Requires explicit consent before requesting AI suggestions. */
-    protected static CheckBox checkbox_AiConsent =
-            new CheckBox("I agree to send the lesson text to the AI provider.");
+    /** Says that Generate sends the lesson text to the AI provider, after the shared AI
+     * notice (US-AI-D2-01), so the Curator knows before pressing it. */
+    protected static Label label_AiNote = new Label("Generate sends this lesson's text to "
+            + "an external AI provider, after you accept the AI notice.");
 
     /** Requests suggested search terms. */
     protected static Button button_Generate =
@@ -123,7 +125,6 @@ public class ViewCuratorSearchTerms {
         text_Suggestions.clear();
         text_ApprovedTerms.clear();
 		button_UseSuggestions.setDisable(true);
-        checkbox_AiConsent.setSelected(false);
         label_Status.setText("");
         button_Generate.setDisable(false);
         button_Save.setDisable(true);
@@ -199,6 +200,9 @@ public class ViewCuratorSearchTerms {
 
 		label_ValidationError.setTextFill(javafx.scene.paint.Color.RED);
 
+		label_AiNote.setTextFill(javafx.scene.paint.Color.GRAY);
+		label_AiNote.setWrapText(true);
+
         // The Model enforces the 500-character total limit.
 		button_Generate.setOnAction(_ -> ControllerCuratorSearchTerms.performGenerate());
 
@@ -221,7 +225,7 @@ public class ViewCuratorSearchTerms {
 				label_UserDetails, headerSeparator,
                 label_LessonTitle,
                 label_CurrentTerms,
-                checkbox_AiConsent,
+                label_AiNote,
                 button_Generate,
                 suggestionsHeading,
                 text_Suggestions,

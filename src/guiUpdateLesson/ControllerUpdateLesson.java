@@ -6,6 +6,8 @@ import java.util.List;
 import database.SharedAiService;
 import entityClasses.LessonsLearned;
 import guiTools.LessonResult;
+import guiWritingHelp.DraftTarget;
+import guiWritingHelp.ViewWritingHelp;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -32,6 +34,9 @@ import javafx.scene.paint.Color;
  *
  * @version 1.00		2026-10-14 Initial version for TP2
  * @version 1.01		2026-11-16 TP3 Aspect 7: AI coaching workflow and aiAssisted tracking
+ * @version 1.02		2026-11-17 Emilia Davey, TP3 Aspect 7: per-user AI consent; performWritingHelp
+ * 							and the draft hookup for the Writing Help window, which refuses locked
+ * 							fields; a shorter Tags caption, so it no longer overlaps the counter
  */
 
 public class ControllerUpdateLesson {
@@ -179,7 +184,10 @@ public class ControllerUpdateLesson {
 					"Enter a title and description first before requesting AI coaching.");
 			return;
 		}
-		if (!aiService.requestConsentIfNeeded()) {
+		// The user name is read here, on the JavaFX thread, for the consent check and the
+		// request, so the worker thread never reads the page's user after it changed
+		final String userName = ViewUpdateLesson.theUser.getUserName();
+		if (!aiService.requestConsentIfNeeded(userName)) {
 			ViewUpdateLesson.label_Status.setText(SharedAiService.CONSENT_DECLINED_MESSAGE);
 			return;
 		}
@@ -203,7 +211,7 @@ public class ControllerUpdateLesson {
 
 		Thread worker = new Thread(() -> {
 			try {
-				String feedback = aiService.requestCoaching(title, combinedDraft.toString(),
+				String feedback = aiService.requestCoaching(userName, title, combinedDraft.toString(),
 						COACH_TEXT_MAX);
 				Platform.runLater(() -> {
 					ViewUpdateLesson.label_CoachStatus.setText(
@@ -225,6 +233,13 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * <p> Method: applyToDescription() </p>
+	 *
+	 * <p> Description: TP3 Aspect 7.  Adds the coaching reply to the end of the Description,
+	 * marks the draft as AI-assisted, and re-checks the field.  Nothing happens if the Description
+	 * is locked, so a Curator's lock is never bypassed (US-P-E1-02). </p>
+	 */
 	protected static void applyToDescription() {
 		if (theOriginal != null && theOriginal.isFieldLocked(LessonsLearned.FIELD_DESCRIPTION))
 			return;
@@ -239,6 +254,13 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * <p> Method: applyToRecommendation() </p>
+	 *
+	 * <p> Description: TP3 Aspect 7.  Adds the coaching reply to the end of the Recommendation,
+	 * marks the draft as AI-assisted, and re-checks the field.  Nothing happens if the whole lesson
+	 * is locked (US-P-E1-02). </p>
+	 */
 	protected static void applyToRecommendation() {
 		if (theOriginal != null && theOriginal.isLockedEntire()) return;
 		String suggestion = ViewUpdateLesson.text_CoachFeedback.getText().trim();
@@ -252,6 +274,12 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * <p> Method: dismissCoach() </p>
+	 *
+	 * <p> Description: Hides the coaching panel without changing the draft (US-P-E1-01 V
+	 * sentence). </p>
+	 */
 	protected static void dismissCoach() {
 		ViewUpdateLesson.vbox_CoachPanel.setVisible(false);
 	}
@@ -287,15 +315,30 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * <p> Method: performReturn() </p>
+	 *
+	 * <p> Description: Returns to the Lesson Details page without saving the changes. </p>
+	 */
 	protected static void performReturn() {
 		guiLessonDetails.ViewLessonDetails.displayLessonDetails(ViewUpdateLesson.theStage,
 				ViewUpdateLesson.theUser, ViewUpdateLesson.theLessonId);
 	}
 
+	/**********
+	 * <p> Method: performLogout() </p>
+	 *
+	 * <p> Description: Logs out without saving the changes and returns to the login page. </p>
+	 */
 	protected static void performLogout() {
 		guiUserLogin.ViewUserLogin.displayUserLogin(ViewUpdateLesson.theStage);
 	}
 
+	/**********
+	 * <p> Method: performQuit() </p>
+	 *
+	 * <p> Description: Ends the application without saving the changes. </p>
+	 */
 	protected static void performQuit() {
 		System.exit(0);
 	}
@@ -307,6 +350,50 @@ public class ControllerUpdateLesson {
 
 	 */
 
+	/**********
+	 * <p> Method: performWritingHelp() </p>
+	 *
+	 * <p> Description: TP3 Aspect 7.  Opens the Writing Help window over this page, so the
+	 * Contributor can brainstorm or look at their own lessons as examples without losing the
+	 * draft (US-P-E1-01, US-P-E1-03).  Text the Contributor adds from the window goes through
+	 * writingHelpTarget, which refuses a locked field, so a Curator's lock is never bypassed
+	 * (US-P-E1-02). </p>
+	 */
+	protected static void performWritingHelp() {
+		ViewWritingHelp.displayWritingHelp(ViewUpdateLesson.theStage, ViewUpdateLesson.theUser,
+				writingHelpTarget);
+	}
+
+	/** The draft as the Writing Help window sees it.  The locks follow the coaching panel: the
+	 * Description has its own lock, and the Recommendation is locked only with the whole
+	 * lesson. */
+	private static final DraftTarget writingHelpTarget = new DraftTarget() {
+		public String getText(String field) {
+			return LessonsLearned.FIELD_DESCRIPTION.equals(field)
+					? ViewUpdateLesson.text_Description.getText()
+					: ViewUpdateLesson.text_Recommendation.getText();
+		}
+		public boolean isLocked(String field) {
+			if (theOriginal == null) return true;
+			return LessonsLearned.FIELD_DESCRIPTION.equals(field)
+					? theOriginal.isFieldLocked(LessonsLearned.FIELD_DESCRIPTION)
+					: theOriginal.isLockedEntire();
+		}
+		public void setTextFromAi(String field, String text) {
+			if (LessonsLearned.FIELD_DESCRIPTION.equals(field))
+				ViewUpdateLesson.text_Description.setText(text);
+			else
+				ViewUpdateLesson.text_Recommendation.setText(text);
+			markAiAssisted();
+			checkField(field);
+		}
+	};
+
+
+	/**********
+	 * Records that AI-assisted text was added to the draft, shows the badge, and updates the
+	 * form, so a successful save keeps the AI-assistance indicator (US-P-E1-02).
+	 */
 	private static void markAiAssisted() {
 		aiAssistedUsed = true;
 		ViewUpdateLesson.label_AiAppliedBadge.setText("AI-assisted suggestion applied");
@@ -314,6 +401,16 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * Fills every field of the form.
+	 *
+	 * @param title				the title
+	 * @param description		the description
+	 * @param tags				the tags
+	 * @param category			the category
+	 * @param rootCause			the root cause, or null
+	 * @param recommendation	the recommendation, or null
+	 */
 	private static void fillForm(String title, String description, String tags,
 			String category, String rootCause, String recommendation) {
 		ViewUpdateLesson.text_Title.setText(title);
@@ -325,6 +422,16 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * Disables each locked field and adds "(locked)" to its caption (Epic E6).  The root cause and
+	 * recommendation are locked only with the whole lesson.
+	 *
+	 * @param title			true if the title is locked
+	 * @param description	true if the description is locked
+	 * @param tags			true if the tags are locked
+	 * @param category		true if the category is locked
+	 * @param entireLocked	true if the whole lesson is locked
+	 */
 	private static void setLocked(boolean title, boolean description, boolean tags,
 			boolean category, boolean entireLocked) {
 		ViewUpdateLesson.text_Title.setDisable(title);
@@ -344,13 +451,19 @@ public class ControllerUpdateLesson {
 				"Recommendation (optional, what to do next time, up to 2000 chars)"
 				+ (entireLocked ? "   (locked)" : ""));
 		ViewUpdateLesson.label_TagsCaption.setText(
-				"Tags (optional, comma-separated, up to 30 chars each)"
+				"Tags (optional, max 30 chars each)"
 				+ (tags ? "   (locked)" : ""));
 		ViewUpdateLesson.label_CategoryCaption.setText(
 				"Category (required)" + (category ? "   (locked)" : ""));
 	}
 
 
+	/**********
+	 * The current value of one form field.  The category prompt counts as no category.
+	 *
+	 * @param field	one of the LessonsLearned.FIELD_ names
+	 * @return the value in the form
+	 */
 	private static String valueOf(String field) {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return ViewUpdateLesson.text_Title.getText();
@@ -366,6 +479,12 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * The saved value of one field, from the lesson as it was opened.
+	 *
+	 * @param field	one of the LessonsLearned.FIELD_ names
+	 * @return the saved value
+	 */
 	private static String storedValueOf(String field) {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return theOriginal.getTitle();
@@ -378,6 +497,12 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * The error label under one field; the page status label for any other name.
+	 *
+	 * @param field	one of the LessonsLearned.FIELD_ names
+	 * @return the label that shows that field's error
+	 */
 	private static Label errorLabelFor(String field) {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return ViewUpdateLesson.label_TitleError;
@@ -392,6 +517,9 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * Clears every field's error message.
+	 */
 	private static void clearErrors() {
 		ViewUpdateLesson.label_TitleError.setText("");
 		ViewUpdateLesson.label_DescriptionError.setText("");
@@ -402,6 +530,13 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * Shows a field's length as "n / max", in red once it is over the limit.
+	 *
+	 * @param counter	the counter label
+	 * @param text		the field's text
+	 * @param max		the field's limit
+	 */
 	private static void updateCounter(Label counter, String text, int max) {
 		int length = (text == null) ? 0 : text.length();
 		counter.setText(length + " / " + max);
@@ -409,6 +544,11 @@ public class ControllerUpdateLesson {
 	}
 
 
+	/**********
+	 * The logged-in user's name.
+	 *
+	 * @return the user name
+	 */
 	private static String currentUser() {
 		return ViewUpdateLesson.theUser.getUserName();
 	}

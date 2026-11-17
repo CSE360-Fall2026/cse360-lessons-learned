@@ -2,6 +2,7 @@
 package guiCuratorSearchTerms;
 
 import database.Database;
+import database.SharedAiService;
 import entityClasses.User;
 import guiCuratorSearchTerms.ModelCuratorSearchTerms.Draft;
 import guiCuratorSearchTerms.ModelCuratorSearchTerms.Review;
@@ -24,6 +25,9 @@ import javafx.scene.paint.Color;
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 5
+ * @version 1.01 2026-11-17 Emilia Davey: Generate asks for consent through the shared
+ *          SharedAiService policy (US-AI-D2-01) and gets real suggestions from it,
+ *          instead of a separate checkbox and no provider
  */
 public class ControllerCuratorSearchTerms {
 
@@ -31,9 +35,20 @@ public class ControllerCuratorSearchTerms {
     private static final Database database =
             applicationMain.FoundationsMain.database;
 
-    /** The search-term Model. A provider must be configured for AI generation. */
+    /** The shared AI service: one consent policy and one provider for every AI tool
+     * (US-AI-D2-01). */
+    private static final SharedAiService aiService = new SharedAiService();
+
+    /** The Curator who pressed Generate, captured on the JavaFX thread, so the request on
+     * the worker thread is made for that Curator even if the page changes meanwhile. */
+    private static volatile String requestingUserName = null;
+
+    /** The search-term Model.  Its provider asks the shared AI service for search terms
+     * for the Curator who pressed Generate (US-C-E2-01). */
     private static final ModelCuratorSearchTerms model =
-            new ModelCuratorSearchTerms(database, null);
+            new ModelCuratorSearchTerms(database,
+                    (title, description, tags) -> aiService.requestLessonSearchTerms(
+                            requestingUserName, title, description, tags));
 
     /** The lesson snapshot currently being reviewed. */
     private static Draft currentDraft;
@@ -117,12 +132,15 @@ public class ControllerCuratorSearchTerms {
             return;
         }
 
-        if (!ViewCuratorSearchTerms.checkbox_AiConsent.isSelected()) {
-            showStatus(
-                    "AI consent is required before generating suggestions.",
-                    false);
+        // One consent policy for every AI tool: the shared notice is shown unless this
+        // Curator already accepted it in this run (US-AI-D2-01).  Declining sends nothing.
+        final User actor = ViewCuratorSearchTerms.theUser;
+        if (actor == null
+                || !aiService.requestConsentIfNeeded(actor.getUserName())) {
+            showStatus(SharedAiService.CONSENT_DECLINED_MESSAGE, false);
             return;
         }
+        requestingUserName = actor.getUserName();
 
         generating = true;
 
@@ -132,13 +150,12 @@ public class ControllerCuratorSearchTerms {
         showStatus("Generating search-term suggestions...", true);
 
         final Draft requestedDraft = currentDraft;
-        final User actor = ViewCuratorSearchTerms.theUser;
         final long requestedSession = sessionVersion;
 
         Thread worker = new Thread(() -> {
 
-            Review result = model.requestSuggestion(
-                    actor, requestedDraft, true);
+            Review result = model.requestSuggestion(actor, requestedDraft,
+                    SharedAiService.hasUserConsented(actor.getUserName()));
 
             Platform.runLater(() -> {
 

@@ -3,6 +3,8 @@ package guiCreateLesson;
 import database.SharedAiService;
 import entityClasses.LessonsLearned;
 import guiTools.LessonResult;
+import guiWritingHelp.DraftTarget;
+import guiWritingHelp.ViewWritingHelp;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -37,6 +39,8 @@ import javafx.scene.paint.Color;
  *
  * @version 1.00		2026-10-14 Initial version for TP2
  * @version 1.01		2026-11-16 TP3 Aspect 7: AI coaching workflow and aiAssisted tracking
+ * @version 1.02		2026-11-17 Emilia Davey, TP3 Aspect 7: per-user AI consent; performWritingHelp
+ * 							and the draft hookup for the Writing Help window
  */
 
 public class ControllerCreateLesson {
@@ -143,7 +147,10 @@ public class ControllerCreateLesson {
 					"Enter a title and description first before requesting AI coaching.");
 			return;
 		}
-		if (!aiService.requestConsentIfNeeded()) {
+		// The user name is read here, on the JavaFX thread, for the consent check and the
+		// request, so the worker thread never reads the page's user after it changed
+		final String userName = ViewCreateLesson.theUser.getUserName();
+		if (!aiService.requestConsentIfNeeded(userName)) {
 			ViewCreateLesson.label_Status.setText(SharedAiService.CONSENT_DECLINED_MESSAGE);
 			return;
 		}
@@ -165,7 +172,7 @@ public class ControllerCreateLesson {
 
 		Thread worker = new Thread(() -> {
 			try {
-				String feedback = aiService.requestCoaching(title, combinedDraft.toString(),
+				String feedback = aiService.requestCoaching(userName, title, combinedDraft.toString(),
 						COACH_TEXT_MAX);
 				Platform.runLater(() -> {
 					ViewCreateLesson.label_CoachStatus.setText(
@@ -303,6 +310,44 @@ public class ControllerCreateLesson {
 
 	 */
 
+	/**********
+	 * <p> Method: performWritingHelp() </p>
+	 *
+	 * <p> Description: TP3 Aspect 7.  Opens the Writing Help window over this page, so the
+	 * Contributor can brainstorm or look at their own lessons as examples without losing the
+	 * draft (US-P-E1-01, US-P-E1-03).  Text the Contributor adds from the window goes through
+	 * writingHelpTarget, so it is checked and marked as AI-assisted like coaching text. </p>
+	 */
+	protected static void performWritingHelp() {
+		ViewWritingHelp.displayWritingHelp(ViewCreateLesson.theStage, ViewCreateLesson.theUser,
+				writingHelpTarget);
+	}
+
+	/** The draft as the Writing Help window sees it.  Nothing is locked while creating. */
+	private static final DraftTarget writingHelpTarget = new DraftTarget() {
+		public String getText(String field) {
+			return LessonsLearned.FIELD_DESCRIPTION.equals(field)
+					? ViewCreateLesson.text_Description.getText()
+					: ViewCreateLesson.text_Recommendation.getText();
+		}
+		public boolean isLocked(String field) {
+			return false;
+		}
+		public void setTextFromAi(String field, String text) {
+			if (LessonsLearned.FIELD_DESCRIPTION.equals(field))
+				ViewCreateLesson.text_Description.setText(text);
+			else
+				ViewCreateLesson.text_Recommendation.setText(text);
+			markAiAssisted();
+			checkField(field);
+		}
+	};
+
+
+	/**********
+	 * Records that AI-assisted text was added to the draft and shows the badge, so a successful
+	 * save keeps the AI-assistance indicator (US-P-E1-02).
+	 */
 	private static void markAiAssisted() {
 		aiAssistedUsed = true;
 		ViewCreateLesson.label_AiAppliedBadge.setText("AI-assisted suggestion applied");

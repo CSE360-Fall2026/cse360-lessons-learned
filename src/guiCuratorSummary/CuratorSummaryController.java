@@ -80,9 +80,13 @@ public class CuratorSummaryController {
     public static final String VISIBILITY_NOT_SAVED =
             "The visibility could not be saved. Please try again.";
 
+    /** The application database every read and write goes through. */
     private final Database database;
+    /** The preview waiting for confirmation, or null if there is none. */
     private LessonSummary pendingPreview;
+    /** The distinct source lessons of the pending preview. */
     private Set<Integer> previewedSourceIds;
+    /** The target lesson of the pending preview; -1 if there is none. */
     private int previewedTargetLessonId;
 
     /**
