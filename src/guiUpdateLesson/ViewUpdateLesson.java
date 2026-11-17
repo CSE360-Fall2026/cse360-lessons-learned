@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,7 +12,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -41,8 +44,10 @@ import inputValidation.LessonRecognizer;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
+ * @author Virgil Jones
  *
  * @version 1.00		2026-10-14 Initial version for TP2 (edit form from the HW2 Role1 page)
+ * @version 1.01		2026-11-16 TP3 Aspect 7: root cause, recommendation, and AI Coach panel
  *
  */
 
@@ -94,6 +99,20 @@ public class ViewUpdateLesson {
 	/** Description error, beneath the field (US-U1-V). */
 	protected static Label label_DescriptionError = new Label();
 
+	/** Root cause caption (TP3 Aspect 7 / AICoaching.pdf). */
+	protected static Label label_RootCauseCaption = new Label();
+	/** The root cause input (optional). */
+	protected static TextField text_RootCause = new TextField();
+	/** Root cause error, beneath the field. */
+	protected static Label label_RootCauseError = new Label();
+
+	/** Recommendation caption (TP3 Aspect 7 / AICoaching.pdf). */
+	protected static Label label_RecommendationCaption = new Label();
+	/** The recommendation input (optional). */
+	protected static TextField text_Recommendation = new TextField();
+	/** Recommendation error, beneath the field. */
+	protected static Label label_RecommendationError = new Label();
+
 	/** Tags caption with its rule; "(locked)" is appended when they are locked. */
 	protected static Label label_TagsCaption = new Label();
 	/** Live tags length. */
@@ -116,8 +135,21 @@ public class ViewUpdateLesson {
 	/** Explains why Save Changes may be disabled. */
 	protected static Label label_SaveHint = new Label(
 			"Save Changes becomes available after you change a field and every field is valid.");
+	/** Requests optional AI coaching feedback (TP3 Aspect 7). */
+	protected static Button button_Coach = new Button("Get AI Coaching");
+	/** Shows when an AI suggestion has been applied or was used earlier. */
+	protected static Label label_AiAppliedBadge = new Label();
 	/** Shows a failure that is not about one field, such as "Lesson not found." */
 	protected static Label label_Status = new Label();
+
+	/** Visibly separate review card for AI coaching suggestions (never auto-overwrites draft). */
+	protected static VBox vbox_CoachPanel = new VBox(10);
+	protected static Label label_CoachTitle = new Label("AI Writing Coach Suggestions");
+	protected static Label label_CoachStatus = new Label();
+	protected static TextArea text_CoachFeedback = new TextArea();
+	protected static Button button_ApplyDescription = new Button("Apply to Description");
+	protected static Button button_ApplyRecommendation = new Button("Apply to Recommendation");
+	protected static Button button_DismissCoach = new Button("Dismiss");
 
 	/** Separator between GUI Areas 2 and 3. */
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
@@ -200,54 +232,102 @@ public class ViewUpdateLesson {
 		setupLabelUI(label_UserDetails, "Arial", 20, width, Pos.BASELINE_LEFT, 20, 55);
 
 		// GUI Area 2: the form (same positions as the Create Lesson Page)
-		setupLabelUI(label_FormHeading, "Arial", 18, 140, Pos.BASELINE_LEFT, 20, 103);
+		setupLabelUI(label_FormHeading, "Arial", 18, 140, Pos.BASELINE_LEFT, 20, 100);
 		label_FormHeading.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-		setupHintLabelUI(label_LockNote, 420, 160, 106);
+		setupHintLabelUI(label_LockNote, 420, 160, 103);
 		label_LockNote.setTextFill(Color.web("#b26a00"));
 
-		setupLabelUI(label_TitleCaption, "Arial", 13, 440, Pos.BASELINE_LEFT, 20, 135);
-		setupCounterUI(label_TitleCounter, 480, 135);
-		setupTextFieldUI(text_Title, 560, 20, 153);
-		setupErrorLabelUI(label_TitleError, 560, 20, 184);
+		setupLabelUI(label_TitleCaption, "Arial", 12, 440, Pos.BASELINE_LEFT, 20, 126);
+		setupCounterUI(label_TitleCounter, 480, 126);
+		setupTextFieldUI(text_Title, 560, 20, 143);
+		setupErrorLabelUI(label_TitleError, 560, 20, 171);
 
-		setupLabelUI(label_DescriptionCaption, "Arial", 13, 440, Pos.BASELINE_LEFT, 20, 204);
-		setupCounterUI(label_DescriptionCounter, 480, 204);
-		text_Description.setFont(Font.font("Arial", 14));
+		setupLabelUI(label_DescriptionCaption, "Arial", 12, 440, Pos.BASELINE_LEFT, 20, 187);
+		setupCounterUI(label_DescriptionCounter, 480, 187);
+		text_Description.setFont(Font.font("Arial", 13));
 		text_Description.setLayoutX(20);
-		text_Description.setLayoutY(222);
-		text_Description.setPrefSize(560, 120);
+		text_Description.setLayoutY(204);
+		text_Description.setPrefSize(560, 76);
 		text_Description.setWrapText(true);
-		setupErrorLabelUI(label_DescriptionError, 560, 20, 345);
+		setupErrorLabelUI(label_DescriptionError, 560, 20, 282);
 
-		setupLabelUI(label_TagsCaption, "Arial", 13, 360, Pos.BASELINE_LEFT, 20, 368);
-		setupCounterUI(label_TagsCounter, 280, 386);
-		setupTextFieldUI(text_Tags, 360, 20, 404);
-		setupErrorLabelUI(label_TagsError, 360, 20, 435);
+		setupLabelUI(label_RootCauseCaption, "Arial", 12, 560, Pos.BASELINE_LEFT, 20, 298);
+		setupTextFieldUI(text_RootCause, 560, 20, 315);
+		setupErrorLabelUI(label_RootCauseError, 560, 20, 343);
 
-		setupLabelUI(label_CategoryCaption, "Arial", 13, 180, Pos.BASELINE_LEFT, 400, 386);
+		setupLabelUI(label_RecommendationCaption, "Arial", 12, 560, Pos.BASELINE_LEFT, 20, 359);
+		setupTextFieldUI(text_Recommendation, 560, 20, 376);
+		setupErrorLabelUI(label_RecommendationError, 560, 20, 404);
+
+		setupLabelUI(label_TagsCaption, "Arial", 12, 255, Pos.BASELINE_LEFT, 20, 420);
+		setupCounterUI(label_TagsCounter, 280, 420);
+		setupTextFieldUI(text_Tags, 360, 20, 437);
+		setupErrorLabelUI(label_TagsError, 360, 20, 465);
+
+		setupLabelUI(label_CategoryCaption, "Arial", 12, 180, Pos.BASELINE_LEFT, 400, 420);
 		List<String> categories = new ArrayList<String>();
 		categories.add("<Select one>");
 		for (String c : LessonRecognizer.VALID_CATEGORIES) categories.add(c);
 		combobox_Category.setItems(FXCollections.observableArrayList(categories));
-		setupComboBoxUI(combobox_Category, "Dialog", 14, 180, 400, 404);
-		setupErrorLabelUI(label_CategoryError, 180, 400, 435);
+		setupComboBoxUI(combobox_Category, "Dialog", 13, 180, 400, 437);
+		setupErrorLabelUI(label_CategoryError, 180, 400, 465);
 
-		setupButtonUI(button_SaveChanges, "Dialog", 16, 180, Pos.CENTER, 600, 153);
+		setupButtonUI(button_SaveChanges, "Dialog", 16, 180, Pos.CENTER, 600, 143);
 		button_SaveChanges.setStyle("-fx-base: #1e5aa8; -fx-text-fill: white;");
 		button_SaveChanges.setOnAction((_) -> {ControllerUpdateLesson.performSave(); });
-		setupHintLabelUI(label_SaveHint, 180, 600, 200);
+		setupHintLabelUI(label_SaveHint, 180, 600, 186);
 
-		setupErrorLabelUI(label_Status, 560, 20, 470);
+		setupButtonUI(button_Coach, "Dialog", 15, 180, Pos.CENTER, 600, 260);
+		button_Coach.setStyle("-fx-base: #6f7f54; -fx-text-fill: white;");
+		button_Coach.setOnAction((_) -> {ControllerUpdateLesson.performCoach(); });
+		setupHintLabelUI(label_AiAppliedBadge, 180, 600, 304);
+		label_AiAppliedBadge.setTextFill(Color.web("#2e7d32"));
+
+		setupErrorLabelUI(label_Status, 560, 20, 488);
+
+		// AI Coach review card (hidden until requested)
+		vbox_CoachPanel.setLayoutX(60);
+		vbox_CoachPanel.setLayoutY(120);
+		vbox_CoachPanel.setPrefWidth(680);
+		vbox_CoachPanel.setPadding(new Insets(18, 20, 18, 20));
+		vbox_CoachPanel.setStyle("-fx-background-color: white; -fx-border-color: #6f7f54; "
+				+ "-fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
+		label_CoachTitle.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+		label_CoachStatus.setFont(Font.font("Arial", 13));
+		label_CoachStatus.setTextFill(Color.GRAY);
+		text_CoachFeedback.setFont(Font.font("Arial", 13));
+		text_CoachFeedback.setEditable(false);
+		text_CoachFeedback.setWrapText(true);
+		text_CoachFeedback.setPrefHeight(180);
+
+		button_ApplyDescription.setStyle("-fx-base: #1e5aa8; -fx-text-fill: white;");
+		button_ApplyDescription.setOnAction((_) -> {ControllerUpdateLesson.applyToDescription(); });
+		button_ApplyRecommendation.setStyle("-fx-base: #6f7f54; -fx-text-fill: white;");
+		button_ApplyRecommendation.setOnAction((_) -> {ControllerUpdateLesson.applyToRecommendation(); });
+		button_DismissCoach.setOnAction((_) -> {ControllerUpdateLesson.dismissCoach(); });
+
+		HBox coachButtons = new HBox(10, button_ApplyDescription, button_ApplyRecommendation,
+				button_DismissCoach);
+		coachButtons.setAlignment(Pos.CENTER_RIGHT);
+		vbox_CoachPanel.getChildren().addAll(label_CoachTitle, label_CoachStatus,
+				text_CoachFeedback, coachButtons);
+		vbox_CoachPanel.setVisible(false);
 
 		// Live feedback, as on the Create Lesson Page
 		text_Title.textProperty().addListener((_, _, _) -> {ControllerUpdateLesson.updateFormState(); });
 		text_Description.textProperty().addListener((_, _, _) -> {ControllerUpdateLesson.updateFormState(); });
+		text_RootCause.textProperty().addListener((_, _, _) -> {ControllerUpdateLesson.updateFormState(); });
+		text_Recommendation.textProperty().addListener((_, _, _) -> {ControllerUpdateLesson.updateFormState(); });
 		text_Tags.textProperty().addListener((_, _, _) -> {ControllerUpdateLesson.updateFormState(); });
 		combobox_Category.valueProperty().addListener((_, _, _) -> {ControllerUpdateLesson.updateFormState(); });
 		text_Title.focusedProperty().addListener((_, _, focused) ->
 				{ if (!focused) ControllerUpdateLesson.checkField("title"); });
 		text_Description.focusedProperty().addListener((_, _, focused) ->
 				{ if (!focused) ControllerUpdateLesson.checkField("description"); });
+		text_RootCause.focusedProperty().addListener((_, _, focused) ->
+				{ if (!focused) ControllerUpdateLesson.checkField("rootCause"); });
+		text_Recommendation.focusedProperty().addListener((_, _, focused) ->
+				{ if (!focused) ControllerUpdateLesson.checkField("recommendation"); });
 		text_Tags.focusedProperty().addListener((_, _, focused) ->
 				{ if (!focused) ControllerUpdateLesson.checkField("tags"); });
 		combobox_Category.focusedProperty().addListener((_, _, focused) ->
@@ -265,10 +345,12 @@ public class ViewUpdateLesson {
 			label_PageTitle, label_UserDetails, line_Separator1, label_FormHeading, label_LockNote,
 			label_TitleCaption, label_TitleCounter, text_Title, label_TitleError,
 			label_DescriptionCaption, label_DescriptionCounter, text_Description,
-			label_DescriptionError, label_TagsCaption, label_TagsCounter, text_Tags,
+			label_DescriptionError, label_RootCauseCaption, text_RootCause, label_RootCauseError,
+			label_RecommendationCaption, text_Recommendation, label_RecommendationError,
+			label_TagsCaption, label_TagsCounter, text_Tags,
 			label_TagsError, label_CategoryCaption, combobox_Category, label_CategoryError,
-			button_SaveChanges, label_SaveHint, label_Status,
-	        line_Separator4, button_Return, button_Logout, button_Quit);
+			button_SaveChanges, label_SaveHint, button_Coach, label_AiAppliedBadge, label_Status,
+	        line_Separator4, button_Return, button_Logout, button_Quit, vbox_CoachPanel);
 	}
 
 
@@ -278,17 +360,6 @@ public class ViewUpdateLesson {
 
 	 */
 
-	/**********
-	 * Private local method to initialize the standard fields for a label
-	 *
-	 * @param l		The Label object to be initialized
-	 * @param ff	The font to be used
-	 * @param f		The size of the font to be used
-	 * @param w		The width of the Label
-	 * @param p		The alignment (e.g. left, centered, or right)
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupLabelUI(Label l, String ff, double f, double w, Pos p, double x,
 			double y){
 		l.setFont(Font.font(ff, f));
@@ -298,15 +369,6 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
-
-	/**********
-	 * Private local method to initialize a live character counter: small, gray, and
-	 * right-aligned in a 100-pixel box ending at the right edge of its field
-	 *
-	 * @param l		The Label object to be initialized
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupCounterUI(Label l, double x, double y){
 		l.setFont(Font.font("Arial", 12));
 		l.setTextFill(Color.GRAY);
@@ -317,15 +379,6 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
-
-	/**********
-	 * Private local method to initialize a hint: small, gray, and wrapped
-	 *
-	 * @param l		The Label object to be initialized
-	 * @param w		The width of the Label
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupHintLabelUI(Label l, double w, double x, double y){
 		l.setFont(Font.font("Arial", 12));
 		l.setTextFill(Color.GRAY);
@@ -336,16 +389,6 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
-
-	/**********
-	 * Private local method to initialize an error label: small, red, and wrapped, so a longer
-	 * message drops to a second line instead of running off the page
-	 *
-	 * @param l		The Label object to be initialized
-	 * @param w		The width of the Label
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupErrorLabelUI(Label l, double w, double x, double y){
 		l.setFont(Font.font("Arial", 12));
 		l.setTextFill(Color.RED);
@@ -356,18 +399,6 @@ public class ViewUpdateLesson {
 		l.setLayoutY(y);
 	}
 
-
-	/**********
-	 * Private local method to initialize the standard fields for a button
-	 *
-	 * @param b		The Button object to be initialized
-	 * @param ff	The font to be used
-	 * @param f		The size of the font to be used
-	 * @param w		The width of the Button
-	 * @param p		The alignment (e.g. left, centered, or right)
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupButtonUI(Button b, String ff, double f, double w, Pos p, double x,
 			double y){
 		b.setFont(Font.font(ff, f));
@@ -377,35 +408,14 @@ public class ViewUpdateLesson {
 		b.setLayoutY(y);
 	}
 
-
-	/**********
-	 * Private local method to initialize the standard fields for a text field
-	 *
-	 * @param t		The TextField object to be initialized
-	 * @param w		The width of the TextField
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupTextFieldUI(TextField t, double w, double x, double y){
-		t.setFont(Font.font("Arial", 14));
+		t.setFont(Font.font("Arial", 13));
 		t.setMinWidth(w);
 		t.setMaxWidth(w);
 		t.setLayoutX(x);
 		t.setLayoutY(y);
 	}
 
-
-	/**********
-	 * Private local method to initialize the standard fields for a ComboBox.  The width is
-	 * capped as well as set, otherwise the ComboBox grows past its column.
-	 *
-	 * @param c		The ComboBox object to be initialized
-	 * @param ff	The font to be used
-	 * @param f		The size of the font to be used
-	 * @param w		The width of the ComboBox
-	 * @param x		The location from the left edge (x axis)
-	 * @param y		The location from the top (y axis)
-	 */
 	private static void setupComboBoxUI(ComboBox <String> c, String ff, double f, double w,
 			double x, double y){
 		c.setStyle("-fx-font: " + f + " " + ff + ";");

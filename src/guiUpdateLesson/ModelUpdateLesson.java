@@ -21,8 +21,10 @@ import guiTools.LessonResult;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
+ * @author Virgil Jones
  *
  * @version 1.00		2026-10-14 Initial version for TP2 (update from HW2's ModelRole1Home)
+ * @version 1.01		2026-11-16 TP3 Aspect 7: support rootCause, recommendation, and aiAssisted
  */
 
 public class ModelUpdateLesson {
@@ -53,21 +55,13 @@ public class ModelUpdateLesson {
 		if (lesson == null) return LessonResult.failed(LessonAccess.NOT_FOUND, "");	// US-R3-V
 		return LessonResult.passed("", lessonId, lesson);
 	}
-
-
+	
 	/**********
 	 * <p> Method: LessonResult updateLesson(String requestingUser, int lessonId, String title,
 	 * 		String description, String tags, String category) </p>
 	 *
-	 * <p> Description: UPDATE.  Implements US-U1 and US-U1-V.  Order of checks:
-	 * <br> 1. The lesson exists and belongs to requestingUser (US-R3-V).
-	 * <br> 2. No locked field is CHANGED.  Submitting a locked field's stored value unchanged is
-	 * allowed, because the form always submits every field even when only one was edited.  The
-	 * lock check comes before validation on purpose, so a locked field is refused for being
-	 * locked even if the new value was also invalid (Test Case "Update Lesson - Rejected Because
-	 * Field Is Locked").
-	 * <br> 3. Every unlocked field passes its rule, as typed and again after trimming.
-	 * <br> 4. One UPDATE statement saves everything, or nothing is saved.</p>
+	 * <p> Description: UPDATE (US-U1, US-U1-V).  Delegates to the full overload keeping the
+	 * lesson's stored rootCause, recommendation, and aiAssisted flag unchanged. </p>
 	 *
 	 * @param requestingUser	the logged-in Contributor's username
 	 * @param lessonId			the lesson to change
@@ -80,6 +74,39 @@ public class ModelUpdateLesson {
 	 */
 	public static LessonResult updateLesson(String requestingUser, int lessonId, String title,
 			String description, String tags, String category) {
+		LessonsLearned existing = LessonAccess.findOwnedLesson(requestingUser, lessonId);
+		String existingRootCause = (existing == null) ? "" : existing.getRootCause();
+		String existingRecommendation = (existing == null) ? "" : existing.getRecommendation();
+		boolean existingAiAssisted = (existing != null) && existing.isAiAssisted();
+		return updateLesson(requestingUser, lessonId, title, description, tags, category,
+				existingRootCause, existingRecommendation, existingAiAssisted);
+	}
+
+
+	/**********
+	 * <p> Method: LessonResult updateLesson(String requestingUser, int lessonId, String title,
+	 * 		String description, String tags, String category, String rootCause,
+	 * 		String recommendation, boolean aiAssisted) </p>
+	 *
+	 * <p> Description: UPDATE (US-U1, US-U1-V, TP3 Aspect 7 / Epic E1).  Checks ownership and
+	 * Curator locks, validates unlocked core fields plus rootCause and recommendation as typed
+	 * and after trimming, and persists everything in one update. </p>
+	 *
+	 * @param requestingUser	the logged-in Contributor's username
+	 * @param lessonId			the lesson to change
+	 * @param title				the new title, exactly as typed
+	 * @param description		the new description, exactly as typed
+	 * @param tags				the new tags, exactly as typed
+	 * @param category			the new category
+	 * @param rootCause			the new root cause, exactly as typed
+	 * @param recommendation	the new recommendation, exactly as typed
+	 * @param aiAssisted		true if AI coaching was applied during this edit (or earlier)
+	 * @return					on success "Lesson updated"; otherwise the specific message and the
+	 * 							field that caused it
+	 */
+	public static LessonResult updateLesson(String requestingUser, int lessonId, String title,
+			String description, String tags, String category, String rootCause,
+			String recommendation, boolean aiAssisted) {
 
 		LessonsLearned lesson = LessonAccess.findOwnedLesson(requestingUser, lessonId);
 		if (lesson == null) return LessonResult.failed(LessonAccess.NOT_FOUND, "");	// US-R3-V
@@ -88,6 +115,8 @@ public class ModelUpdateLesson {
 		String newDescription = (description == null) ? "" : description.trim();
 		String newTags = (tags == null) ? "" : tags.trim();
 		String newCategory = (category == null) ? "" : category;
+		String newRootCause = (rootCause == null) ? "" : rootCause.trim();
+		String newRecommendation = (recommendation == null) ? "" : recommendation.trim();
 
 		// Step 2 (US-U1-V): a locked field may not be changed; checked before validation
 		if (lesson.isFieldLocked(LessonsLearned.FIELD_TITLE)
@@ -103,12 +132,21 @@ public class ModelUpdateLesson {
 		if (lesson.isFieldLocked(LessonsLearned.FIELD_CATEGORY)
 				&& !newCategory.equals(lesson.getCategory()))
 			return LessonResult.failed(LessonAccess.FIELD_LOCKED, LessonsLearned.FIELD_CATEGORY);
+		if (lesson.isLockedEntire() && !newRootCause.equals(lesson.getRootCause()))
+			return LessonResult.failed(LessonAccess.FIELD_LOCKED, LessonsLearned.FIELD_ROOT_CAUSE);
+		if (lesson.isLockedEntire() && !newRecommendation.equals(lesson.getRecommendation()))
+			return LessonResult.failed(LessonAccess.FIELD_LOCKED,
+					LessonsLearned.FIELD_RECOMMENDATION);
 
-		// Step 3a (US-U1-V): validate each unlocked field as typed.  A locked field was just
-		// proven unchanged, so it holds the stored value, which was valid when it was saved.
-		String[][] submitted = { { LessonsLearned.FIELD_TITLE, title },
+		// Step 3a (US-U1-V): validate each unlocked field as typed
+		String[][] submitted = {
+				{ LessonsLearned.FIELD_TITLE, title },
 				{ LessonsLearned.FIELD_DESCRIPTION, description },
-				{ LessonsLearned.FIELD_TAGS, tags }, { LessonsLearned.FIELD_CATEGORY, category } };
+				{ LessonsLearned.FIELD_TAGS, tags },
+				{ LessonsLearned.FIELD_CATEGORY, category },
+				{ LessonsLearned.FIELD_ROOT_CAUSE, rootCause == null ? "" : rootCause },
+				{ LessonsLearned.FIELD_RECOMMENDATION, recommendation == null ? "" : recommendation }
+		};
 		for (String[] pair : submitted) {
 			if (lesson.isFieldLocked(pair[0])) continue;
 			String error = LessonsLearned.validateField(pair[0], pair[1]);
@@ -120,6 +158,9 @@ public class ModelUpdateLesson {
 		lesson.setDescription(newDescription);
 		lesson.setTags(newTags);
 		lesson.setCategory(newCategory);
+		lesson.setRootCause(newRootCause);
+		lesson.setRecommendation(newRecommendation);
+		lesson.setAiAssisted(lesson.isAiAssisted() || aiAssisted);
 		String field = lesson.findInvalidField();
 		if (!field.isEmpty()) return LessonResult.failed(lesson.validate(), field);
 

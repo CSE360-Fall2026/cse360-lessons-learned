@@ -1,7 +1,9 @@
 package guiCreateLesson;
 
+import database.SharedAiService;
 import entityClasses.LessonsLearned;
 import guiTools.LessonResult;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
@@ -31,18 +33,26 @@ import javafx.scene.paint.Color;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
+ * @author Virgil Jones
  *
  * @version 1.00		2026-10-14 Initial version for TP2
+ * @version 1.01		2026-11-16 TP3 Aspect 7: AI coaching workflow and aiAssisted tracking
  */
 
 public class ControllerCreateLesson {
-
 	/** Maximum title length shown by the counter (the rule itself is in LessonRecognizer). */
 	private static final int TITLE_MAX = 100;
 	/** Maximum description length shown by the counter. */
 	private static final int DESCRIPTION_MAX = 5000;
 	/** Maximum length of the whole tags field shown by the counter. */
 	private static final int TAGS_MAX = 200;
+	/** Maximum length for AI coached text fields (rootCause / recommendation). */
+	private static final int COACH_TEXT_MAX = 2000;
+
+	/** Shared AI service instance (Aspect 8). */
+	private static final SharedAiService aiService = new SharedAiService();
+	/** Tracks whether the Contributor applied an AI coaching suggestion on this draft. */
+	private static boolean aiAssistedUsed = false;
 
 	/**
 	 * Default constructor is not used.
@@ -54,14 +64,20 @@ public class ControllerCreateLesson {
 	/**********
 	 * <p> Method: resetForm() </p>
 	 *
-	 * <p> Description: Clears every field, error, and message, and selects the "&lt;Select
-	 * one&gt;" category prompt, so each visit starts with a blank form. </p>
+	 * <p> Description: Clears every field, error, and message, and selects the "<Select
+	 * one>" category prompt, so each visit starts with a blank form. </p>
 	 */
 	protected static void resetForm() {
 		ViewCreateLesson.text_Title.clear();
 		ViewCreateLesson.text_Description.clear();
+		ViewCreateLesson.text_RootCause.clear();
+		ViewCreateLesson.text_Recommendation.clear();
 		ViewCreateLesson.text_Tags.clear();
 		ViewCreateLesson.combobox_Category.getSelectionModel().select(0);
+		aiAssistedUsed = false;
+		ViewCreateLesson.label_AiAppliedBadge.setText("");
+		ViewCreateLesson.vbox_CoachPanel.setVisible(false);
+		ViewCreateLesson.button_Coach.setDisable(false);
 		clearErrors();
 		ViewCreateLesson.label_Status.setText("");
 		updateFormState();
@@ -86,7 +102,8 @@ public class ControllerCreateLesson {
 
 		boolean allValid = true;
 		for (String field : new String[] { LessonsLearned.FIELD_TITLE,
-				LessonsLearned.FIELD_DESCRIPTION, LessonsLearned.FIELD_TAGS,
+				LessonsLearned.FIELD_DESCRIPTION, LessonsLearned.FIELD_ROOT_CAUSE,
+				LessonsLearned.FIELD_RECOMMENDATION, LessonsLearned.FIELD_TAGS,
 				LessonsLearned.FIELD_CATEGORY }) {
 			boolean valid = LessonsLearned.validateField(field, valueOf(field)).isEmpty();
 			if (valid) errorLabelFor(field).setText("");		// the user just fixed it
@@ -104,11 +121,115 @@ public class ControllerCreateLesson {
 	 * beneath it, or clears the error if the field is now valid (US-C1-V; GitHub's "error
 	 * messages displayed as soon as the user changes focus" in User Experience.pdf). </p>
 	 *
-	 * @param field one of LessonsLearned.FIELD_TITLE, FIELD_DESCRIPTION, FIELD_TAGS, or
-	 * 		FIELD_CATEGORY
+	 * @param field one of LessonsLearned.FIELD_TITLE, FIELD_DESCRIPTION, FIELD_ROOT_CAUSE,
+	 * 		FIELD_RECOMMENDATION, FIELD_TAGS, or FIELD_CATEGORY
 	 */
 	protected static void checkField(String field) {
 		errorLabelFor(field).setText(LessonsLearned.validateField(field, valueOf(field)));
+	}
+
+
+	/**********
+	 * <p> Method: performCoach() </p>
+	 *
+	 * <p> Description: Requests optional AI writing feedback through SharedAiService after
+	 * confirming one-time user consent (TP3 Aspect 7 / Epic E1). </p>
+	 */
+	protected static void performCoach() {
+		String title = ViewCreateLesson.text_Title.getText().trim();
+		String description = ViewCreateLesson.text_Description.getText().trim();
+		if (title.isEmpty() || description.isEmpty()) {
+			ViewCreateLesson.label_Status.setText(
+					"Enter a title and description first before requesting AI coaching.");
+			return;
+		}
+		if (!aiService.requestConsentIfNeeded()) {
+			ViewCreateLesson.label_Status.setText(SharedAiService.CONSENT_DECLINED_MESSAGE);
+			return;
+		}
+
+		ViewCreateLesson.label_Status.setText("");
+		ViewCreateLesson.button_Coach.setDisable(true);
+		ViewCreateLesson.label_CoachStatus.setText("Analyzing your draft...");
+		ViewCreateLesson.text_CoachFeedback.setText("");
+		ViewCreateLesson.button_ApplyDescription.setDisable(true);
+		ViewCreateLesson.button_ApplyRecommendation.setDisable(true);
+		ViewCreateLesson.vbox_CoachPanel.setVisible(true);
+		ViewCreateLesson.vbox_CoachPanel.toFront();
+
+		StringBuilder combinedDraft = new StringBuilder(description);
+		String rc = ViewCreateLesson.text_RootCause.getText().trim();
+		String rec = ViewCreateLesson.text_Recommendation.getText().trim();
+		if (!rc.isEmpty()) combinedDraft.append("\nRoot cause: ").append(rc);
+		if (!rec.isEmpty()) combinedDraft.append("\nRecommendation: ").append(rec);
+
+		Thread worker = new Thread(() -> {
+			try {
+				String feedback = aiService.requestCoaching(title, combinedDraft.toString(),
+						COACH_TEXT_MAX);
+				Platform.runLater(() -> {
+					ViewCreateLesson.label_CoachStatus.setText(
+							"Review suggestions below. Choose Apply to use them or Dismiss:");
+					ViewCreateLesson.text_CoachFeedback.setText(feedback);
+					ViewCreateLesson.button_ApplyDescription.setDisable(false);
+					ViewCreateLesson.button_ApplyRecommendation.setDisable(false);
+					ViewCreateLesson.button_Coach.setDisable(false);
+				});
+			} catch (Exception ex) {
+				Platform.runLater(() -> {
+					ViewCreateLesson.label_CoachStatus.setText(SharedAiService.UNAVAILABLE_MESSAGE);
+					ViewCreateLesson.button_Coach.setDisable(false);
+				});
+			}
+		});
+		worker.setDaemon(true);
+		worker.start();
+	}
+
+
+	/**********
+	 * <p> Method: applyToDescription() </p>
+	 *
+	 * <p> Description: Explicitly applies the AI suggestion to Description and marks the lesson
+	 * as AI-assisted. </p>
+	 */
+	protected static void applyToDescription() {
+		String suggestion = ViewCreateLesson.text_CoachFeedback.getText().trim();
+		if (suggestion.isEmpty()) return;
+		String current = ViewCreateLesson.text_Description.getText().trim();
+		String updated = current.isEmpty() ? suggestion : current + "\n\n" + suggestion;
+		ViewCreateLesson.text_Description.setText(updated);
+		markAiAssisted();
+		dismissCoach();
+		checkField(LessonsLearned.FIELD_DESCRIPTION);
+	}
+
+
+	/**********
+	 * <p> Method: applyToRecommendation() </p>
+	 *
+	 * <p> Description: Explicitly applies the AI suggestion to Recommendation and marks the
+	 * lesson as AI-assisted. </p>
+	 */
+	protected static void applyToRecommendation() {
+		String suggestion = ViewCreateLesson.text_CoachFeedback.getText().trim();
+		if (suggestion.isEmpty()) return;
+		String current = ViewCreateLesson.text_Recommendation.getText().trim();
+		String updated = current.isEmpty() ? suggestion : current + " " + suggestion;
+		ViewCreateLesson.text_Recommendation.setText(updated);
+		markAiAssisted();
+		dismissCoach();
+		checkField(LessonsLearned.FIELD_RECOMMENDATION);
+	}
+
+
+	/**********
+	 * <p> Method: dismissCoach() </p>
+	 *
+	 * <p> Description: Closes the AI Coach panel without modifying the user's draft. </p>
+	 */
+	protected static void dismissCoach() {
+		ViewCreateLesson.vbox_CoachPanel.setVisible(false);
 	}
 
 
@@ -128,7 +249,10 @@ public class ControllerCreateLesson {
 				ViewCreateLesson.text_Title.getText(),
 				ViewCreateLesson.text_Description.getText(),
 				ViewCreateLesson.text_Tags.getText(),
-				valueOf(LessonsLearned.FIELD_CATEGORY));
+				valueOf(LessonsLearned.FIELD_CATEGORY),
+				ViewCreateLesson.text_RootCause.getText(),
+				ViewCreateLesson.text_Recommendation.getText(),
+				aiAssistedUsed);
 
 		if (!result.isSuccess()) {
 			if (result.getFailedField().isEmpty())
@@ -179,13 +303,19 @@ public class ControllerCreateLesson {
 
 	 */
 
+	private static void markAiAssisted() {
+		aiAssistedUsed = true;
+		ViewCreateLesson.label_AiAppliedBadge.setText("AI-assisted suggestion applied");
+	}
+
+
 	/**********
 	 * <p> Method: valueOf(String field) </p>
 	 *
-	 * <p> Description: The current value of one form field.  The "&lt;Select one&gt;" prompt in
+	 * <p> Description: The current value of one form field.  The "<Select one>" prompt in
 	 * the category list is not a category, so it is reported as an empty choice. </p>
 	 *
-	 * @param field one of the four core field names
+	 * @param field one of the form field names
 	 *
 	 * @return the field's current text
 	 */
@@ -193,6 +323,9 @@ public class ControllerCreateLesson {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return ViewCreateLesson.text_Title.getText();
 			case LessonsLearned.FIELD_DESCRIPTION: return ViewCreateLesson.text_Description.getText();
+			case LessonsLearned.FIELD_ROOT_CAUSE: return ViewCreateLesson.text_RootCause.getText();
+			case LessonsLearned.FIELD_RECOMMENDATION:
+				return ViewCreateLesson.text_Recommendation.getText();
 			case LessonsLearned.FIELD_TAGS: return ViewCreateLesson.text_Tags.getText();
 			default:
 				String category = ViewCreateLesson.combobox_Category.getValue();
@@ -216,6 +349,9 @@ public class ControllerCreateLesson {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return ViewCreateLesson.label_TitleError;
 			case LessonsLearned.FIELD_DESCRIPTION: return ViewCreateLesson.label_DescriptionError;
+			case LessonsLearned.FIELD_ROOT_CAUSE: return ViewCreateLesson.label_RootCauseError;
+			case LessonsLearned.FIELD_RECOMMENDATION:
+				return ViewCreateLesson.label_RecommendationError;
 			case LessonsLearned.FIELD_TAGS: return ViewCreateLesson.label_TagsError;
 			case LessonsLearned.FIELD_CATEGORY: return ViewCreateLesson.label_CategoryError;
 			default: return ViewCreateLesson.label_Status;
@@ -226,11 +362,13 @@ public class ControllerCreateLesson {
 	/**********
 	 * <p> Method: clearErrors() </p>
 	 *
-	 * <p> Description: Clears the four field error labels. </p>
+	 * <p> Description: Clears the field error labels. </p>
 	 */
 	private static void clearErrors() {
 		ViewCreateLesson.label_TitleError.setText("");
 		ViewCreateLesson.label_DescriptionError.setText("");
+		ViewCreateLesson.label_RootCauseError.setText("");
+		ViewCreateLesson.label_RecommendationError.setText("");
 		ViewCreateLesson.label_TagsError.setText("");
 		ViewCreateLesson.label_CategoryError.setText("");
 	}
@@ -250,4 +388,5 @@ public class ControllerCreateLesson {
 		counter.setText(length + " / " + max);
 		counter.setTextFill(length > max ? Color.RED : Color.GRAY);
 	}
+
 }
