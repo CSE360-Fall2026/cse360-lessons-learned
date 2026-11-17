@@ -80,4 +80,25 @@ public class ModelContributorHome {
 				.filterByTitleContains(searchText);									// US-R2
 		return LessonResult.passedList("Search complete", matches);
 	}
+	
+	/**********
+	 * <p> Method: LessonResult searchMyLessonsByKeyword(String requestingUser, String keywords) </p>
+	 *
+	 * <p> Description: READ (subset).  Implements TP3 Aspect 7 (US-P-E1-03): searches ONLY the
+	 * logged-in Contributor's own lessons across title, description, and tags by keyword so the
+	 * Contributor can view past lessons as examples without seeing other contributors' lessons. </p>
+	 *
+	 * @param requestingUser	the logged-in Contributor's username
+	 * @param keywords			one or more keywords separated by spaces or commas
+	 * @return					on success the matching subset of this Contributor's lessons;
+	 * 							otherwise the specific search-text error
+	 */
+	public static LessonResult searchMyLessonsByKeyword(String requestingUser, String keywords) {
+		String error = LessonRecognizer.checkForValidSearchText(keywords);
+		if (!error.isEmpty()) return LessonResult.failed(error, "searchText");
+
+		LessonsLearnedList matches = LessonsLearnedList.loadByOwner(requestingUser)
+				.filterByKeywords(keywords);
+		return LessonResult.passedList("Keyword example search complete", matches);
+	}
 }

@@ -96,9 +96,12 @@ public class ViewContributorHome {
 	protected static Button button_ClearSearch = new Button("Clear");
 	/** Shows a search-text error beneath the search box (US-R2-V; InputValidation.pdf). */
 	protected static Label label_SearchError = new Label();
+	/** Searches the Contributor's own lessons by keyword as examples (TP3 Aspect 7 / US-P-E1-03). */
+	protected static Button button_SearchKeywords = new Button("Example Search");
 	/** The Contributor's lessons, one row each.  Source: US-R1, "a list of all the lessons
 	 * learned I have added," and V1, "I can use that list to specify which lesson learned to
 	 * examine more closely." */
+	
 	protected static ListView<String> listView_Lessons = new ListView<String>();
 	/** Tells the user how to open a lesson.  Rationale: validation-as-guidance, User
 	 * Experience.pdf; the user is told what to do before having to guess. */
@@ -242,15 +245,18 @@ public class ViewContributorHome {
 		setupLabelUI(label_ListHeading, "Arial", 18, 300, Pos.BASELINE_LEFT, 20, 105);
 		label_ListHeading.setFont(Font.font("Arial", FontWeight.BOLD, 18));
 
-		setupTextFieldUI(text_Search, 400, 20, 138);
-		text_Search.setPromptText("Search my lessons by title");
+		setupTextFieldUI(text_Search, 300, 20, 138);
+		text_Search.setPromptText("Search my lessons by title or keywords");
 		text_Search.setOnAction((_) -> {ControllerContributorHome.performSearch(); });
 
-		setupButtonUI(button_Search, "Dialog", 14, 80, Pos.CENTER, 430, 138);
+		setupButtonUI(button_Search, "Dialog", 14, 75, Pos.CENTER, 330, 138);
 		button_Search.setOnAction((_) -> {ControllerContributorHome.performSearch(); });
 
-		setupButtonUI(button_ClearSearch, "Dialog", 14, 80, Pos.CENTER, 520, 138);
-		button_ClearSearch.setOnAction((_) -> {ControllerContributorHome.performClearSearch(); });
+		setupButtonUI(button_SearchKeywords, "Dialog", 14, 115, Pos.CENTER, 415, 138);
+		button_SearchKeywords.setOnAction((_) -> {ControllerContributorHome.performKeywordSearch(); });
+
+		setupButtonUI(button_ClearSearch, "Dialog", 14, 60, Pos.CENTER, 540, 138);
+		button_ClearSearch.setOnAction((_) -> {ControllerContributorHome.performClearSearch(); });;
 
 		setupErrorLabelUI(label_SearchError, 580, 20, 170);
 

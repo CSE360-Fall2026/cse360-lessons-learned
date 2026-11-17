@@ -118,6 +118,24 @@ public class ControllerContributorHome {
 		}
 		refreshLessonList(result.getList(), "matching");						// US-R2
 	}
+	
+	/**********
+	 * <p> Method: performKeywordSearch() </p>
+	 *
+	 * <p> Description: Searches only the logged-in Contributor's own lessons across title,
+	 * description, and tags so they can review past examples (TP3 Aspect 7 / US-P-E1-03). </p>
+	 */
+	protected static void performKeywordSearch() {
+		ViewContributorHome.label_SearchError.setText("");
+		showStatus("", true);
+		LessonResult result = ModelContributorHome.searchMyLessonsByKeyword(currentUser(),
+				ViewContributorHome.text_Search.getText());
+		if (!result.isSuccess()) {
+			ViewContributorHome.label_SearchError.setText(result.getMessage());
+			return;
+		}
+		refreshLessonList(result.getList(), "example");
+	}
 
 
 	/**********

@@ -28,8 +28,10 @@ import guiTools.LessonResult;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
+ * @author Virgil Jones
  *
  * @version 1.00		2026-10-14 Initial version for TP2 (create from HW2's ModelRole1Home)
+ * @version 1.01		2026-11-16 TP3 Aspect 7: support rootCause, recommendation, and aiAssisted
  */
 
 public class ModelCreateLesson {
@@ -43,15 +45,14 @@ public class ModelCreateLesson {
 	public ModelCreateLesson() {
 
 	}
-
-
+	
 	/**********
 	 * <p> Method: LessonResult createLesson(String requestingUser, String title,
 	 * 		String description, String tags, String category) </p>
 	 *
-	 * <p> Description: CREATE.  Implements US-C1 and US-C1-V (see the class description for the
-	 * order of checks).  The requesting user becomes the lesson's owner, which is what later
-	 * limits the lesson to that Contributor's list (US-R4).</p>
+	 * <p> Description: CREATE (US-C1, US-C1-V).  Delegates to the full overload with empty
+	 * rootCause/recommendation and aiAssisted = false so existing callers and tests stay
+	 * compatible. </p>
 	 *
 	 * @param requestingUser	the username of the Contributor creating the lesson
 	 * @param title				the title, exactly as typed
@@ -63,10 +64,41 @@ public class ModelCreateLesson {
 	 */
 	public static LessonResult createLesson(String requestingUser, String title,
 			String description, String tags, String category) {
+		return createLesson(requestingUser, title, description, tags, category, "", "", false);
+	}
+
+
+	/**********
+	 * <p> Method: LessonResult createLesson(String requestingUser, String title,
+	 * 		String description, String tags, String category, String rootCause,
+	 * 		String recommendation, boolean aiAssisted) </p>
+	 *
+	 * <p> Description: CREATE (US-C1, US-C1-V, TP3 Aspect 7 / Epic E1).  Validates core and AI
+	 * coaching fields as typed, trims free text, validates again, and saves the lesson with the
+	 * aiAssisted flag. </p>
+	 *
+	 * @param requestingUser	the username of the Contributor creating the lesson
+	 * @param title				the title, exactly as typed
+	 * @param description		the description, exactly as typed
+	 * @param tags				comma-separated tags, exactly as typed (may be empty)
+	 * @param category			one of LessonRecognizer.VALID_CATEGORIES
+	 * @param rootCause			optional root cause text (may be empty)
+	 * @param recommendation	optional recommendation text (may be empty)
+	 * @param aiAssisted		true if the Contributor applied an AI coaching suggestion
+	 * @return					on success the new lesson, its id, and "Lesson created"; otherwise
+	 * 							the specific error message and the field that caused it
+	 */
+	public static LessonResult createLesson(String requestingUser, String title,
+			String description, String tags, String category, String rootCause,
+			String recommendation, boolean aiAssisted) {
 
 		// Stage 1 (US-C1-V): validate every field as typed, so lengths are measured as typed
 		LessonsLearned lesson = new LessonsLearned(requestingUser, title, description, tags,
 				category);
+		lesson.setRootCause(rootCause == null ? "" : rootCause);
+		lesson.setRecommendation(recommendation == null ? "" : recommendation);
+		lesson.setAiAssisted(aiAssisted);
+
 		String field = lesson.findInvalidField();
 		if (!field.isEmpty())
 			return LessonResult.failed(lesson.validate(), field);

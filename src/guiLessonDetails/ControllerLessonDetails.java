@@ -201,8 +201,9 @@ public class ControllerLessonDetails {
 	 * @param lesson the lesson to show, with its experience entries loaded
 	 */
 	private static void showLesson(LessonsLearned lesson) {
+		String aiTag = lesson.isAiAssisted() ? "   [AI-assisted]" : "";
 		ViewLessonDetails.label_LessonTitle.setText(lesson.getTitle()
-				+ lockMark(lesson, LessonsLearned.FIELD_TITLE));
+				+ lockMark(lesson, LessonsLearned.FIELD_TITLE) + aiTag);
 		ViewLessonDetails.label_Category.setText("Category: " + lesson.getCategory()
 				+ lockMark(lesson, LessonsLearned.FIELD_CATEGORY));
 		String tags = lesson.getTags().isEmpty() ? "(none)" : lesson.getTags();
@@ -210,7 +211,14 @@ public class ControllerLessonDetails {
 				+ lockMark(lesson, LessonsLearned.FIELD_TAGS));
 		ViewLessonDetails.label_DescriptionCaption.setText("Description"
 				+ lockMark(lesson, LessonsLearned.FIELD_DESCRIPTION));
-		ViewLessonDetails.text_Description.setText(lesson.getDescription());
+
+		StringBuilder fullBody = new StringBuilder(lesson.getDescription());
+		if (!lesson.getRootCause().isEmpty())
+			fullBody.append("\n\nRoot Cause: ").append(lesson.getRootCause());
+		if (!lesson.getRecommendation().isEmpty())
+			fullBody.append("\n\nRecommendation: ").append(lesson.getRecommendation());
+		ViewLessonDetails.text_Description.setText(fullBody.toString());
+
 		ViewLessonDetails.label_Dates.setText("Created " + formatDate(lesson.getCreatedAt())
 				+ "   |   Last updated " + formatDate(lesson.getUpdatedAt()));
 		ViewLessonDetails.label_LockBanner.setText(lockBanner(lesson));
@@ -221,7 +229,7 @@ public class ControllerLessonDetails {
 		ViewLessonDetails.text_Experience.setText(formatExperience(entries));
 		// TP3 Aspect 4: read only after the Model has confirmed this is the user's own lesson
 		ViewLessonDetails.text_Summary.setText(
-				ModelLessonDetails.summaryPanelText(lesson.getId()));					// US-C-E5-02
+				ModelLessonDetails.summaryPanelText(lesson.getId()));		// US-C-E5-02
 
 		boolean everythingLocked = true;
 		for (String field : new String[] { LessonsLearned.FIELD_TITLE,

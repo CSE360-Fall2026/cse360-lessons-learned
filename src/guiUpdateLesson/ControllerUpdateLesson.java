@@ -3,8 +3,10 @@ package guiUpdateLesson;
 import java.util.ArrayList;
 import java.util.List;
 
+import database.SharedAiService;
 import entityClasses.LessonsLearned;
 import guiTools.LessonResult;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
@@ -13,7 +15,7 @@ import javafx.scene.paint.Color;
  *
  * <p> Description: The Java/FX-based Update Lesson Page.  This class provides the controller
  * actions based on the user's use of the JavaFX GUI widgets defined by the View class: filling
- * the form with the stored lesson, disabling and labelling locked fields, live guidance while
+ * the form with the stored lesson, disabling and labeling locked fields, live guidance while
  * the user edits, and saving through ModelUpdateLesson (US-U1, US-U1-V).</p>
  *
  * <p> As on the Create Lesson Page, the live checks are guidance only.  performSave() always
@@ -26,8 +28,10 @@ import javafx.scene.paint.Color;
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey
+ * @author Virgil Jones
  *
  * @version 1.00		2026-10-14 Initial version for TP2
+ * @version 1.01		2026-11-16 TP3 Aspect 7: AI coaching workflow and aiAssisted tracking
  */
 
 public class ControllerUpdateLesson {
@@ -38,6 +42,13 @@ public class ControllerUpdateLesson {
 	private static final int DESCRIPTION_MAX = 5000;
 	/** Maximum length of the whole tags field shown by the counter. */
 	private static final int TAGS_MAX = 200;
+	/** Maximum length for AI coached text fields (rootCause / recommendation). */
+	private static final int COACH_TEXT_MAX = 2000;
+
+	/** Shared AI service instance (Aspect 8). */
+	private static final SharedAiService aiService = new SharedAiService();
+	/** Tracks whether AI assistance was used on this lesson (stored or newly applied). */
+	private static boolean aiAssistedUsed = false;
 
 	/** The lesson as it was loaded, used to detect changes and to know which fields are locked.
 	 * Null when the lesson could not be loaded. */
@@ -61,26 +72,36 @@ public class ControllerUpdateLesson {
 	protected static void loadForm() {
 		clearErrors();
 		ViewUpdateLesson.label_Status.setText("");
+		ViewUpdateLesson.vbox_CoachPanel.setVisible(false);
 		LessonResult result = ModelUpdateLesson.loadLessonForEdit(currentUser(),
 				ViewUpdateLesson.theLessonId);
 		if (!result.isSuccess()) {
 			theOriginal = null;
-			fillForm("", "", "", "<Select one>");
-			setLocked(true, true, true, true);
+			aiAssistedUsed = false;
+			fillForm("", "", "", "<Select one>", "", "");
+			setLocked(true, true, true, true, true);
 			ViewUpdateLesson.label_LockNote.setText("");
+			ViewUpdateLesson.label_AiAppliedBadge.setText("");
 			ViewUpdateLesson.label_Status.setText(result.getMessage());			// US-R3-V
 			ViewUpdateLesson.button_SaveChanges.setDisable(true);
+			ViewUpdateLesson.button_Coach.setDisable(true);
 			ViewUpdateLesson.label_SaveHint.setVisible(false);
 			return;
 		}
 
 		theOriginal = result.getLesson();
+		aiAssistedUsed = theOriginal.isAiAssisted();
+		ViewUpdateLesson.label_AiAppliedBadge.setText(
+				aiAssistedUsed ? "AI-assisted lesson" : "");
 		fillForm(theOriginal.getTitle(), theOriginal.getDescription(), theOriginal.getTags(),
-				theOriginal.getCategory());
+				theOriginal.getCategory(), theOriginal.getRootCause(),
+				theOriginal.getRecommendation());
 		setLocked(theOriginal.isFieldLocked(LessonsLearned.FIELD_TITLE),
 				theOriginal.isFieldLocked(LessonsLearned.FIELD_DESCRIPTION),
 				theOriginal.isFieldLocked(LessonsLearned.FIELD_TAGS),
-				theOriginal.isFieldLocked(LessonsLearned.FIELD_CATEGORY));
+				theOriginal.isFieldLocked(LessonsLearned.FIELD_CATEGORY),
+				theOriginal.isLockedEntire());
+		ViewUpdateLesson.button_Coach.setDisable(theOriginal.isLockedEntire());
 
 		List<String> locked = new ArrayList<String>();
 		for (String field : new String[] { LessonsLearned.FIELD_TITLE,
@@ -111,9 +132,10 @@ public class ControllerUpdateLesson {
 		if (theOriginal == null) return;
 
 		boolean allValid = true;
-		boolean changed = false;
+		boolean changed = (aiAssistedUsed != theOriginal.isAiAssisted());
 		for (String field : new String[] { LessonsLearned.FIELD_TITLE,
-				LessonsLearned.FIELD_DESCRIPTION, LessonsLearned.FIELD_TAGS,
+				LessonsLearned.FIELD_DESCRIPTION, LessonsLearned.FIELD_ROOT_CAUSE,
+				LessonsLearned.FIELD_RECOMMENDATION, LessonsLearned.FIELD_TAGS,
 				LessonsLearned.FIELD_CATEGORY }) {
 			if (!valueOf(field).trim().equals(storedValueOf(field))) changed = true;
 			if (theOriginal.isFieldLocked(field)) continue;
@@ -134,11 +156,104 @@ public class ControllerUpdateLesson {
 	 * beneath it, or clears the error once the field is valid (US-U1-V).  Locked fields cannot
 	 * receive focus, so they are never checked here. </p>
 	 *
-	 * @param field one of the four core field names
+	 * @param field one of the form field names
 	 */
 	protected static void checkField(String field) {
 		if (theOriginal == null || theOriginal.isFieldLocked(field)) return;
 		errorLabelFor(field).setText(LessonsLearned.validateField(field, valueOf(field)));
+	}
+
+
+	/**********
+	 * <p> Method: performCoach() </p>
+	 *
+	 * <p> Description: Requests optional AI writing feedback through SharedAiService after
+	 * confirming one-time user consent (TP3 Aspect 7 / Epic E1). </p>
+	 */
+	protected static void performCoach() {
+		if (theOriginal == null || theOriginal.isLockedEntire()) return;
+		String title = ViewUpdateLesson.text_Title.getText().trim();
+		String description = ViewUpdateLesson.text_Description.getText().trim();
+		if (title.isEmpty() || description.isEmpty()) {
+			ViewUpdateLesson.label_Status.setText(
+					"Enter a title and description first before requesting AI coaching.");
+			return;
+		}
+		if (!aiService.requestConsentIfNeeded()) {
+			ViewUpdateLesson.label_Status.setText(SharedAiService.CONSENT_DECLINED_MESSAGE);
+			return;
+		}
+
+		ViewUpdateLesson.label_Status.setText("");
+		ViewUpdateLesson.button_Coach.setDisable(true);
+		ViewUpdateLesson.label_CoachStatus.setText("Analyzing your draft...");
+		ViewUpdateLesson.text_CoachFeedback.setText("");
+		ViewUpdateLesson.button_ApplyDescription.setDisable(true);
+		ViewUpdateLesson.button_ApplyRecommendation.setDisable(true);
+		ViewUpdateLesson.vbox_CoachPanel.setVisible(true);
+		ViewUpdateLesson.vbox_CoachPanel.toFront();
+
+		StringBuilder combinedDraft = new StringBuilder(description);
+		String rc = ViewUpdateLesson.text_RootCause.getText().trim();
+		String rec = ViewUpdateLesson.text_Recommendation.getText().trim();
+		if (!rc.isEmpty()) combinedDraft.append("\nRoot cause: ").append(rc);
+		if (!rec.isEmpty()) combinedDraft.append("\nRecommendation: ").append(rec);
+
+		boolean descLocked = theOriginal.isFieldLocked(LessonsLearned.FIELD_DESCRIPTION);
+
+		Thread worker = new Thread(() -> {
+			try {
+				String feedback = aiService.requestCoaching(title, combinedDraft.toString(),
+						COACH_TEXT_MAX);
+				Platform.runLater(() -> {
+					ViewUpdateLesson.label_CoachStatus.setText(
+							"Review suggestions below. Choose Apply to use them or Dismiss:");
+					ViewUpdateLesson.text_CoachFeedback.setText(feedback);
+					ViewUpdateLesson.button_ApplyDescription.setDisable(descLocked);
+					ViewUpdateLesson.button_ApplyRecommendation.setDisable(false);
+					ViewUpdateLesson.button_Coach.setDisable(false);
+				});
+			} catch (Exception ex) {
+				Platform.runLater(() -> {
+					ViewUpdateLesson.label_CoachStatus.setText(SharedAiService.UNAVAILABLE_MESSAGE);
+					ViewUpdateLesson.button_Coach.setDisable(false);
+				});
+			}
+		});
+		worker.setDaemon(true);
+		worker.start();
+	}
+
+
+	protected static void applyToDescription() {
+		if (theOriginal != null && theOriginal.isFieldLocked(LessonsLearned.FIELD_DESCRIPTION))
+			return;
+		String suggestion = ViewUpdateLesson.text_CoachFeedback.getText().trim();
+		if (suggestion.isEmpty()) return;
+		String current = ViewUpdateLesson.text_Description.getText().trim();
+		String updated = current.isEmpty() ? suggestion : current + "\n\n" + suggestion;
+		ViewUpdateLesson.text_Description.setText(updated);
+		markAiAssisted();
+		dismissCoach();
+		checkField(LessonsLearned.FIELD_DESCRIPTION);
+	}
+
+
+	protected static void applyToRecommendation() {
+		if (theOriginal != null && theOriginal.isLockedEntire()) return;
+		String suggestion = ViewUpdateLesson.text_CoachFeedback.getText().trim();
+		if (suggestion.isEmpty()) return;
+		String current = ViewUpdateLesson.text_Recommendation.getText().trim();
+		String updated = current.isEmpty() ? suggestion : current + " " + suggestion;
+		ViewUpdateLesson.text_Recommendation.setText(updated);
+		markAiAssisted();
+		dismissCoach();
+		checkField(LessonsLearned.FIELD_RECOMMENDATION);
+	}
+
+
+	protected static void dismissCoach() {
+		ViewUpdateLesson.vbox_CoachPanel.setVisible(false);
 	}
 
 
@@ -156,7 +271,10 @@ public class ControllerUpdateLesson {
 		LessonResult result = ModelUpdateLesson.updateLesson(currentUser(),
 				ViewUpdateLesson.theLessonId, ViewUpdateLesson.text_Title.getText(),
 				ViewUpdateLesson.text_Description.getText(), ViewUpdateLesson.text_Tags.getText(),
-				valueOf(LessonsLearned.FIELD_CATEGORY));
+				valueOf(LessonsLearned.FIELD_CATEGORY),
+				ViewUpdateLesson.text_RootCause.getText(),
+				ViewUpdateLesson.text_Recommendation.getText(),
+				aiAssistedUsed);
 		if (!result.isSuccess()) {
 			if (result.getFailedField().isEmpty())
 				ViewUpdateLesson.label_Status.setText(result.getMessage());
@@ -169,32 +287,15 @@ public class ControllerUpdateLesson {
 	}
 
 
-	/**********
-	 * <p> Method: performReturn() </p>
-	 *
-	 * <p> Description: Returns to the lesson's details without saving anything. </p>
-	 */
 	protected static void performReturn() {
 		guiLessonDetails.ViewLessonDetails.displayLessonDetails(ViewUpdateLesson.theStage,
 				ViewUpdateLesson.theUser, ViewUpdateLesson.theLessonId);
 	}
 
-
-	/**********
-	 * <p> Method: performLogout() </p>
-	 *
-	 * <p> Description: Logs out the current user and proceeds to the normal login page. </p>
-	 */
 	protected static void performLogout() {
 		guiUserLogin.ViewUserLogin.displayUserLogin(ViewUpdateLesson.theStage);
 	}
 
-
-	/**********
-	 * <p> Method: performQuit() </p>
-	 *
-	 * <p> Description: Terminates the program.  Unsaved changes are discarded. </p>
-	 */
 	protected static void performQuit() {
 		System.exit(0);
 	}
@@ -206,69 +307,57 @@ public class ControllerUpdateLesson {
 
 	 */
 
-	/**********
-	 * <p> Method: fillForm(String title, String description, String tags, String category) </p>
-	 *
-	 * <p> Description: Puts values into the four inputs. </p>
-	 *
-	 * @param title			the title to show
-	 * @param description	the description to show
-	 * @param tags			the tags to show
-	 * @param category		the category to select
-	 */
+	private static void markAiAssisted() {
+		aiAssistedUsed = true;
+		ViewUpdateLesson.label_AiAppliedBadge.setText("AI-assisted suggestion applied");
+		updateFormState();
+	}
+
+
 	private static void fillForm(String title, String description, String tags,
-			String category) {
+			String category, String rootCause, String recommendation) {
 		ViewUpdateLesson.text_Title.setText(title);
 		ViewUpdateLesson.text_Description.setText(description);
 		ViewUpdateLesson.text_Tags.setText(tags);
 		ViewUpdateLesson.combobox_Category.setValue(category);
+		ViewUpdateLesson.text_RootCause.setText(rootCause == null ? "" : rootCause);
+		ViewUpdateLesson.text_Recommendation.setText(recommendation == null ? "" : recommendation);
 	}
 
 
-	/**********
-	 * <p> Method: setLocked(boolean title, boolean description, boolean tags, boolean category)
-	 * </p>
-	 *
-	 * <p> Description: Disables the locked inputs and writes each caption, adding "(locked)" to
-	 * the locked ones (US-R3, US-U1-V). </p>
-	 *
-	 * @param title			true if the title is locked
-	 * @param description	true if the description is locked
-	 * @param tags			true if the tags are locked
-	 * @param category		true if the category is locked
-	 */
 	private static void setLocked(boolean title, boolean description, boolean tags,
-			boolean category) {
+			boolean category, boolean entireLocked) {
 		ViewUpdateLesson.text_Title.setDisable(title);
 		ViewUpdateLesson.text_Description.setDisable(description);
 		ViewUpdateLesson.text_Tags.setDisable(tags);
 		ViewUpdateLesson.combobox_Category.setDisable(category);
+		ViewUpdateLesson.text_RootCause.setDisable(entireLocked);
+		ViewUpdateLesson.text_Recommendation.setDisable(entireLocked);
 		ViewUpdateLesson.label_TitleCaption.setText(
 				"Title (required, up to 100 characters)" + (title ? "   (locked)" : ""));
 		ViewUpdateLesson.label_DescriptionCaption.setText(
 				"Description (required, 10 to 5000 characters)" + (description ? "   (locked)" : ""));
+		ViewUpdateLesson.label_RootCauseCaption.setText(
+				"Root Cause (optional, what went wrong & why, up to 2000 chars)"
+				+ (entireLocked ? "   (locked)" : ""));
+		ViewUpdateLesson.label_RecommendationCaption.setText(
+				"Recommendation (optional, what to do next time, up to 2000 chars)"
+				+ (entireLocked ? "   (locked)" : ""));
 		ViewUpdateLesson.label_TagsCaption.setText(
-				"Tags (optional, separated by commas, each up to 30 characters)"
+				"Tags (optional, comma-separated, up to 30 chars each)"
 				+ (tags ? "   (locked)" : ""));
 		ViewUpdateLesson.label_CategoryCaption.setText(
 				"Category (required)" + (category ? "   (locked)" : ""));
 	}
 
 
-	/**********
-	 * <p> Method: valueOf(String field) </p>
-	 *
-	 * <p> Description: The current value of one form field.  The "&lt;Select one&gt;" prompt is
-	 * reported as an empty choice. </p>
-	 *
-	 * @param field one of the four core field names
-	 *
-	 * @return the field's current text
-	 */
 	private static String valueOf(String field) {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return ViewUpdateLesson.text_Title.getText();
 			case LessonsLearned.FIELD_DESCRIPTION: return ViewUpdateLesson.text_Description.getText();
+			case LessonsLearned.FIELD_ROOT_CAUSE: return ViewUpdateLesson.text_RootCause.getText();
+			case LessonsLearned.FIELD_RECOMMENDATION:
+				return ViewUpdateLesson.text_Recommendation.getText();
 			case LessonsLearned.FIELD_TAGS: return ViewUpdateLesson.text_Tags.getText();
 			default:
 				String category = ViewUpdateLesson.combobox_Category.getValue();
@@ -277,39 +366,25 @@ public class ControllerUpdateLesson {
 	}
 
 
-	/**********
-	 * <p> Method: storedValueOf(String field) </p>
-	 *
-	 * <p> Description: The value of one field in the lesson as it was loaded. </p>
-	 *
-	 * @param field one of the four core field names
-	 *
-	 * @return the stored value
-	 */
 	private static String storedValueOf(String field) {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return theOriginal.getTitle();
 			case LessonsLearned.FIELD_DESCRIPTION: return theOriginal.getDescription();
+			case LessonsLearned.FIELD_ROOT_CAUSE: return theOriginal.getRootCause();
+			case LessonsLearned.FIELD_RECOMMENDATION: return theOriginal.getRecommendation();
 			case LessonsLearned.FIELD_TAGS: return theOriginal.getTags();
 			default: return theOriginal.getCategory();
 		}
 	}
 
 
-	/**********
-	 * <p> Method: errorLabelFor(String field) </p>
-	 *
-	 * <p> Description: The error label beneath one form field; any other name maps to the
-	 * general status label so its message is still shown. </p>
-	 *
-	 * @param field a field name from a LessonResult
-	 *
-	 * @return the label that shows that field's error
-	 */
 	private static Label errorLabelFor(String field) {
 		switch (field) {
 			case LessonsLearned.FIELD_TITLE: return ViewUpdateLesson.label_TitleError;
 			case LessonsLearned.FIELD_DESCRIPTION: return ViewUpdateLesson.label_DescriptionError;
+			case LessonsLearned.FIELD_ROOT_CAUSE: return ViewUpdateLesson.label_RootCauseError;
+			case LessonsLearned.FIELD_RECOMMENDATION:
+				return ViewUpdateLesson.label_RecommendationError;
 			case LessonsLearned.FIELD_TAGS: return ViewUpdateLesson.label_TagsError;
 			case LessonsLearned.FIELD_CATEGORY: return ViewUpdateLesson.label_CategoryError;
 			default: return ViewUpdateLesson.label_Status;
@@ -317,28 +392,16 @@ public class ControllerUpdateLesson {
 	}
 
 
-	/**********
-	 * <p> Method: clearErrors() </p>
-	 *
-	 * <p> Description: Clears the four field error labels. </p>
-	 */
 	private static void clearErrors() {
 		ViewUpdateLesson.label_TitleError.setText("");
 		ViewUpdateLesson.label_DescriptionError.setText("");
+		ViewUpdateLesson.label_RootCauseError.setText("");
+		ViewUpdateLesson.label_RecommendationError.setText("");
 		ViewUpdateLesson.label_TagsError.setText("");
 		ViewUpdateLesson.label_CategoryError.setText("");
 	}
 
 
-	/**********
-	 * <p> Method: updateCounter(Label counter, String text, int max) </p>
-	 *
-	 * <p> Description: Shows "length / max", in red once the limit is exceeded. </p>
-	 *
-	 * @param counter	the counter label to update
-	 * @param text		the field's current text
-	 * @param max		the field's maximum length
-	 */
 	private static void updateCounter(Label counter, String text, int max) {
 		int length = (text == null) ? 0 : text.length();
 		counter.setText(length + " / " + max);
@@ -346,13 +409,6 @@ public class ControllerUpdateLesson {
 	}
 
 
-	/**********
-	 * <p> Method: currentUser() </p>
-	 *
-	 * <p> Description: The username of whoever is logged in (US-R4). </p>
-	 *
-	 * @return the logged-in user's username
-	 */
 	private static String currentUser() {
 		return ViewUpdateLesson.theUser.getUserName();
 	}
