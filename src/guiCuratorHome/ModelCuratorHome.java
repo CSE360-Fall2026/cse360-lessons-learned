@@ -48,6 +48,8 @@ import inputValidation.LessonRecognizer;
  *
  * @version 1.00		2026-11-10 Initial version for TP3 Aspect 1, written to pass
  * 							CuratorHomeTests
+ * @version 1.01		2026-11-18 TP3 Aspect 6: detailsText() shows the "Edited by curator" note
+ * 							and the original text of a refined lesson
  */
 
 public class ModelCuratorHome {
@@ -218,7 +220,13 @@ public class ModelCuratorHome {
 	 * owner, category, tags, what is locked, the description, and the experience entries,
 	 * oldest first, each with its hours and, when there are any, its team members' shares. </p>
 	 *
-	 * <p> Tested by CuratorHomeTests CH-33. </p>
+	 * <p> For a lesson a Curator has refined (TP3 Aspect 6), the "Edited by curator" note
+	 * follows the locks (US-C-E3-07), and the contributor's original title and description end
+	 * the text, so a Curator can always see what was changed (US-C-E3-01: "the original text and
+	 * the editing attribution remain available to the authorized system workflow").  A lesson
+	 * that was never refined shows exactly what it did before. </p>
+	 *
+	 * <p> Tested by CuratorHomeTests CH-33 and RefinePageTests RP-10. </p>
 	 *
 	 * @param lesson	the lesson to show, with its experience entries already loaded (as
 	 * 					returned by viewLesson()); may be null
@@ -234,7 +242,10 @@ public class ModelCuratorHome {
 		// Tags are optional, so an empty line is replaced by words that say so
 		String tags = (lesson.getTags() == null) ? "" : lesson.getTags().trim();
 		text.append("Tags: ").append(tags.isEmpty() ? "(none)" : tags).append("\n");
-		text.append("Locked: ").append(lockSummary(lesson)).append("\n\n");
+		text.append("Locked: ").append(lockSummary(lesson)).append("\n");
+		String note = guiTools.CurationNote.text(lesson);
+		if (!note.isEmpty()) text.append(note).append("\n");
+		text.append("\n");
 		text.append("Description:\n").append(lesson.getDescription()).append("\n\n");
 
 		List<ExperienceEntry> entries = lesson.getExperienceEntries();
@@ -246,6 +257,11 @@ public class ModelCuratorHome {
 			for (MemberEffort share : entry.getMemberEfforts())
 				shares.add(share.getMemberName() + " " + formatHours(share.getHours()) + " h");
 			if (!shares.isEmpty()) text.append("\n   Team: ").append(String.join(", ", shares));
+		}
+		if (!note.isEmpty()) {
+			text.append("\n\nOriginal text, before any curator edits:\n")
+				.append("Title: ").append(lesson.getOriginalTitle()).append("\n")
+				.append("Description:\n").append(lesson.getOriginalDescription());
 		}
 		return text.toString();
 	}

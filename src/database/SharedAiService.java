@@ -41,6 +41,8 @@ import javafx.scene.control.ButtonType;
  * @version 1.01 2026-11-17 Emilia Davey: consent is remembered per user instead of once per run;
  *          every request takes the acting user's name; brainstorming, takeaway, and lesson
  *          search-term requests for E1 and E2; an injectable AiBackend for testing
+ * @version 1.02 2026-11-18 Emilia Davey: requestRefinement for the Curator's Refine with AI
+ *          page (E3)
  */
 public class SharedAiService {
 
@@ -60,6 +62,10 @@ public class SharedAiService {
             + "or sensitive data.  If you choose Cancel, nothing is sent and you can keep "
             + "working without AI.  Your answer is remembered until the application closes.";
 
+    /** The longest title a lesson may have (LessonRecognizer). */
+    private static final int TITLE_MAX = 100;
+    /** The longest description a lesson may have (LessonRecognizer). */
+    private static final int DESCRIPTION_MAX = 5000;
     /** The most search-term characters a lesson may hold (LessonRecognizer). */
     private static final int SEARCH_TERMS_TOTAL_MAX = 500;
     /** The most characters one search term may have (LessonRecognizer). */
@@ -123,6 +129,16 @@ public class SharedAiService {
          * @throws Exception if the request fails
          */
         List<String> takeaways(List<BrainstormService.ChatMessage> history) throws Exception;
+        /**
+         * Asks for a rewrite of a lesson's title or description.
+         *
+         * @param field "title" or "description"
+         * @param text the stored text of that field
+         * @param goal the Curator's goal; may be empty
+         * @return the raw rewritten text
+         * @throws Exception if the request fails
+         */
+        String refine(String field, String text, String goal) throws Exception;
     }
 
     /** The default backend: Groq through BrainstormService. */
@@ -144,6 +160,9 @@ public class SharedAiService {
         public List<String> takeaways(List<BrainstormService.ChatMessage> history)
                 throws Exception {
             return BrainstormService.extractTakeaways(history);
+        }
+        public String refine(String field, String text, String goal) throws Exception {
+            return BrainstormService.refineLessonText(field, text, goal);
         }
     };
 
@@ -380,6 +399,38 @@ public class SharedAiService {
         }
         if (clean.isEmpty()) throw new IllegalStateException(UNAVAILABLE_MESSAGE);
         return clean;
+    }
+
+    /**
+     * Asks for a rewrite of one field of a lesson, which the Curator reviews, edits, and saves
+     * or discards (TP3 Aspect 6, US-C-E3-03, US-C-E3-08).  The reply is cleaned: surrounding
+     * quotes are removed, a title is made one line, and a reply that is empty, too long for the
+     * field, or contains control characters counts as a failure, so it is never shown.
+     *
+     * @param userName the acting Curator, who must have accepted the notice
+     * @param field "title" or "description"
+     * @param text the stored text of that field
+     * @param goal the Curator's goal, such as "shorter"; may be empty
+     * @return the cleaned suggestion
+     * @throws IllegalStateException with CONSENT_DECLINED_MESSAGE or UNAVAILABLE_MESSAGE
+     */
+    public String requestRefinement(String userName, String field, String text, String goal) {
+        checkReady(userName);
+        boolean title = "title".equals(field);
+        try {
+            String raw = backend.refine(field, text, goal == null ? "" : goal);
+            String clean = (raw == null) ? null : raw.trim();
+            // Models often wrap a rewrite in quotes even when asked not to
+            if (clean != null && clean.length() > 1 && clean.startsWith("\"")
+                    && clean.endsWith("\"")) {
+                clean = clean.substring(1, clean.length() - 1);
+            }
+            // A title is one line in the lesson form
+            if (title && clean != null) clean = clean.replaceAll("\\s+", " ");
+            return cleanAiSuggestion(clean, title ? TITLE_MAX : DESCRIPTION_MAX);
+        } catch (Exception e) {
+            throw new IllegalStateException(UNAVAILABLE_MESSAGE);
+        }
     }
 
     /**

@@ -35,6 +35,7 @@ import javafx.scene.paint.Color;
  *
  * @version 1.00		2026-10-14 Initial version for TP2
  * @version 1.01		2026-11-16 TP3 Aspect 4: fills the merged effort summary panel
+ * @version 1.02		2026-11-18 TP3 Aspect 6: the "Edited by curator" note ends the description
  */
 
 public class ControllerLessonDetails {
@@ -217,6 +218,9 @@ public class ControllerLessonDetails {
 			fullBody.append("\n\nRoot Cause: ").append(lesson.getRootCause());
 		if (!lesson.getRecommendation().isEmpty())
 			fullBody.append("\n\nRecommendation: ").append(lesson.getRecommendation());
+		// TP3 Aspect 6: the Contributor can tell that a Curator refined the wording (US-C-E3-07)
+		String curated = guiTools.CurationNote.text(lesson);
+		if (!curated.isEmpty()) fullBody.append("\n\n(").append(curated).append(")");
 		ViewLessonDetails.text_Description.setText(fullBody.toString());
 
 		ViewLessonDetails.label_Dates.setText("Created " + formatDate(lesson.getCreatedAt())

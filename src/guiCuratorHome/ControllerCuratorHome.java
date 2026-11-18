@@ -39,6 +39,7 @@ import javafx.scene.paint.Color;
  * @version 2.00		2026-11-10 TP3 Aspect 1: the Curator Home Page, replacing the Role2 stub
  * @version 2.01		2026-11-13 TP3 Aspect 2: performLock() opens the Curator Lock page
  * @version 2.02        2026-11-15 TP3 Aspect 5: Added Curator search-term management navigation
+ * @version 2.04		2026-11-18 TP3 Aspect 6: performRefine() opens the Refine with AI page
  * @version 2.03		2026-11-16 TP3 Aspects 3 and 4: performSummary() opens the Merge Statistics
  * 							page
  */
@@ -180,6 +181,8 @@ public class ControllerCuratorHome {
 		ViewCuratorHome.button_SearchTerms.setDisable(row < 0 || row >= ViewCuratorHome.listedLessonIds.size());
 		ViewCuratorHome.button_Summary.setDisable(
 				row < 0 || row >= ViewCuratorHome.listedLessonIds.size());
+		ViewCuratorHome.button_Refine.setDisable(
+				row < 0 || row >= ViewCuratorHome.listedLessonIds.size());
 		if (row < 0 || row >= ViewCuratorHome.listedLessonIds.size()) {
 			ViewCuratorHome.text_Details.setText(NO_SELECTION);
 			return;
@@ -257,6 +260,22 @@ public class ControllerCuratorHome {
 	}
 
 	/**********
+	 * <p> Method: performRefine() </p>
+	 *
+	 * <p> Description: Opens the Refine with AI page for the selected lesson (TP3 Aspect 6;
+	 * US-C-E3-02).  Nothing happens if no row is selected.  The page itself checks the Curator
+	 * role and that the lesson still exists. </p>
+	 */
+	protected static void performRefine() {
+		int row = ViewCuratorHome.listView_Lessons.getSelectionModel().getSelectedIndex();
+		// The button is disabled without a selection; this check keeps the action safe even if
+		// it is ever reached another way
+		if (row < 0 || row >= ViewCuratorHome.listedLessonIds.size()) return;
+		guiCuratorRefine.ViewCuratorRefine.displayCuratorRefine(ViewCuratorHome.theStage,
+				ViewCuratorHome.theUser, ViewCuratorHome.listedLessonIds.get(row));
+	}
+
+	/**********
 	 * <p> Method: showStatus(String message, boolean good) </p>
 	 *
 	 * <p> Description: Shows a status message beneath the list: green for good news, red for a
@@ -302,6 +321,7 @@ public class ControllerCuratorHome {
 		ViewCuratorHome.button_Lock.setDisable(true);			// so there is nothing to lock
 		ViewCuratorHome.button_SearchTerms.setDisable(true);
 		ViewCuratorHome.button_Summary.setDisable(true);
+		ViewCuratorHome.button_Refine.setDisable(true);
 
 		int n = list.size();
 		String count = "Showing " + n + ((what == null) ? " " : " " + what + " ")

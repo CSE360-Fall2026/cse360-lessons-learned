@@ -30,6 +30,7 @@ import java.util.List;
  * @author Ariana Adrian
  * @author Virgil Jones and Team
  *
+ * @version 2.04 2026-11-18 Emilia Davey: refineLessonText for Epic E3
  * @version 2.03 2026-11-17 Emilia Davey: suggestLessonSearchTerms for Epic E2; Javadoc for every
  *          field and method
  * @version 2.02 2026-11-16 integrated into TP3 database package with config.properties key loading
@@ -160,6 +161,35 @@ private BrainstormService() {
 						+ "commas. Return ONLY a JSON array of strings, no prose, no markdown fences. "
 						+ "Example: [\"rollback\", \"deployment failure\", \"release checklist\"]");
 		return parseJsonStringArray(extractAssistantMessage(postToGroq(requestBody)));
+	}
+
+/**
+ * Rewrites the title or the description of a lesson learned so others can understand it better
+ * (TP3 Aspect 6, Epic E3, US-C-E3-03).  The Curator reviews and edits the answer before anything
+ * is saved; SharedAiService cleans it first.
+ *
+ * @param field "title" or "description"
+ * @param text the stored text of that field
+ * @param goal the Curator's goal, such as "shorter"; empty for "clearer"
+ * @return the rewritten text
+ * @throws Exception if the request fails or the provider reports an error
+ */
+	public static String refineLessonText(String field, String text, String goal) throws Exception {
+		boolean title = "title".equals(field);
+		String wanted = (goal == null || goal.isBlank()) ? "clearer and easier to understand"
+				: goal.trim();
+		List<ChatMessage> msgs = new ArrayList<>();
+		msgs.add(new ChatMessage("user", "Goal: " + wanted + "\n\n" + (title ? "Title" : "Description")
+				+ " to rewrite:\n" + text));
+		String requestBody = buildRequestBody(msgs,
+				"You help a curator edit a lessons-learned record so that other people can understand "
+						+ "and reuse it. Rewrite the text you are given to meet the goal. Keep every "
+						+ "fact; do not invent names, numbers, causes, or results. "
+						+ (title ? "It is a title: one line, at most 100 characters, no period at the end. "
+								: "It is a description: plain sentences, at most 5000 characters, no "
+										+ "markdown or bullet symbols. ")
+						+ "Return ONLY the rewritten text, with no quotes, labels, or explanation.");
+		return extractAssistantMessage(postToGroq(requestBody)).trim();
 	}
 
 /**

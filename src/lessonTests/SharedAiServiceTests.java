@@ -85,6 +85,11 @@ public class SharedAiServiceTests {
         public List<String> takeaways(List<BrainstormService.ChatMessage> h) throws Exception {
             call(); return list;
         }
+        /** The field, text, and goal of the last refinement request. */
+        String lastRefine = "";
+        public String refine(String f, String t, String g) throws Exception {
+            call(); lastRefine = f + "|" + t + "|" + g; return reply;
+        }
     }
 
     /** The simulated provider of the current test. */
@@ -357,5 +362,69 @@ public class SharedAiServiceTests {
 
         fake.list = Arrays.asList(" ");
         assertThrows(IllegalStateException.class, () -> s.requestTakeaways(USER, history, 500));
+    }
+
+    /**
+     * A refinement request sends nothing until this Curator accepted the notice; another
+     * user's acceptance does not count (US-C-E3-03, US-AI-D2-01).
+     */
+    @Test
+    public void testRefinementNeedsThisUsersConsent() {
+        SharedAiService s = new SharedAiService(fake);
+        SharedAiService.setUserConsented(OTHER, true);
+        IllegalStateException declined = assertThrows(IllegalStateException.class,
+                () -> s.requestRefinement(USER, "title", "Fixed CI", ""));
+        assertEquals(SharedAiService.CONSENT_DECLINED_MESSAGE, declined.getMessage());
+        assertEquals(0, fake.requests, "Nothing may be sent without this user's consent");
+    }
+
+    /**
+     * A refinement is cleaned for its field: surrounding quotes go, a title becomes one line,
+     * a description keeps its line breaks, and the field, text, and goal reach the provider
+     * (US-C-E3-03).
+     */
+    @Test
+    public void testRefinementIsCleanedForItsField() {
+        SharedAiService.setUserConsented(USER, true);
+        SharedAiService s = new SharedAiService(fake);
+        fake.reply = "  \"Fixed the flaky\n  CI pipeline\"  ";
+        assertEquals("Fixed the flaky CI pipeline", s.requestRefinement(USER, "title", "Fixed CI", "clearer"));
+        assertEquals("title|Fixed CI|clearer", fake.lastRefine);
+
+        fake.reply = "First line.\nSecond line.";
+        assertEquals("First line.\nSecond line.", s.requestRefinement(USER, "description", "D", null));
+        assertEquals("description|D|", fake.lastRefine, "A missing goal is sent as empty");
+    }
+
+    /**
+     * A reply that does not fit the field, an empty reply, a failure, or a missing key all give
+     * the one unavailable message, which never shows the provider's error or the key
+     * (US-C-E3-08, US-AI-D2-02).
+     */
+    @Test
+    public void testRefinementProblemsGiveTheUnavailableMessage() {
+        SharedAiService.setUserConsented(USER, true);
+        SharedAiService s = new SharedAiService(fake);
+        fake.reply = "T".repeat(101);
+        assertEquals(SharedAiService.UNAVAILABLE_MESSAGE, assertThrows(IllegalStateException.class,
+                () -> s.requestRefinement(USER, "title", "x", "")).getMessage());
+        fake.reply = "D".repeat(5000);
+        assertEquals(5000, s.requestRefinement(USER, "description", "x", "").length());
+        fake.reply = "  \"\"  ";
+        assertThrows(IllegalStateException.class, () -> s.requestRefinement(USER, "title", "x", ""));
+        fake.reply = null;
+        assertThrows(IllegalStateException.class, () -> s.requestRefinement(USER, "title", "x", ""));
+
+        fake.fail = true;
+        IllegalStateException failed = assertThrows(IllegalStateException.class,
+                () -> s.requestRefinement(USER, "description", "x", ""));
+        assertEquals(SharedAiService.UNAVAILABLE_MESSAGE, failed.getMessage());
+        assertFalse(failed.getMessage().contains("SECRET"));
+
+        fake.fail = false;
+        fake.configured = false;
+        int before = fake.requests;
+        assertThrows(IllegalStateException.class, () -> s.requestRefinement(USER, "title", "x", ""));
+        assertEquals(before, fake.requests, "Nothing is sent without a key");
     }
 }

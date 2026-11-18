@@ -58,6 +58,9 @@ import javafx.stage.Stage;
  * @version 2.00		2026-11-10 TP3 Aspect 1: the Curator Home Page, replacing the Role2 stub
  * @version 2.01		2026-11-13 TP3 Aspect 2: the Lock / Unlock button for the selected lesson
  * @version 2.02		2026-11-15 TP3 Aspect 5: Added Manage Search Terms to the Curator Home Page
+ * @version 2.04		2026-11-18 TP3 Aspect 6: the Refine with AI button; the details box is 32
+ * 							pixels shorter so the four Curator buttons fit above the status line,
+ * 							and they use font 13 so "Manage Search Terms..." fits inside the margin
  * @version 2.03		2026-11-16 TP3 Aspects 3 and 4: the Merge Statistics button for the selected
  * 							lesson
  *
@@ -124,6 +127,9 @@ public class ViewCuratorHome {
 	/** Opens the Merge Statistics page with the selected lesson as the target.  Source: TP3
 	 * Aspects 3 and 4 (US-C-E4-01: "a target lesson"; US-C-E5-01). */
 	protected static Button button_Summary = new Button("Merge Statistics...");
+	/** Opens the Refine with AI page for the selected lesson.  Source: TP3 Aspect 6
+	 * (US-C-E3-02: "open refinement from the Curator home page"). */
+	protected static Button button_Refine = new Button("Refine with AI...");
 	/** Tells the user how to read a lesson.  Rationale: validation-as-guidance, User
 	 * Experience.pdf; the user is told what to do before having to guess. */
 	protected static Label label_ListHint =
@@ -290,7 +296,8 @@ public class ViewCuratorHome {
 
 		text_Details.setLayoutX(415);
 		text_Details.setLayoutY(192);
-		text_Details.setPrefSize(365, 260);
+		// 32 pixels shorter than the list, so the Curator buttons fit beneath it (Aspect 6)
+		text_Details.setPrefSize(365, 228);
 		text_Details.setFont(Font.font("Arial", 13));
 		text_Details.setWrapText(true);
 		// Read-only: the box can be scrolled and copied from, but never typed into
@@ -302,24 +309,29 @@ public class ViewCuratorHome {
 		label_ListHint.setTextFill(Color.GRAY);
 		setupLabelUI(label_ListStatus, "Arial", 12, 380, Pos.BASELINE_LEFT, 20, 475);
 
-		// TP3 Aspect 5: Two Curator actions share the details area.
-		setupButtonUI(button_Lock, "Dialog", 14, 175, Pos.CENTER, 415, 460);
+		// The four Curator actions, in two rows under the details box.  Font 13 lets the longest,
+		// "Manage Search Terms...", fit its 180 pixels, so no button passes the right margin.
+		setupButtonUI(button_Lock, "Dialog", 13, 175, Pos.CENTER, 415, 428);
 		button_Lock.setOnAction((_) -> {
 			ControllerCuratorHome.performLock();
 		});
 		button_Lock.setDisable(true);
 
-		setupButtonUI(button_SearchTerms, "Dialog", 14, 180, Pos.CENTER, 600, 460);
+		setupButtonUI(button_SearchTerms, "Dialog", 13, 180, Pos.CENTER, 600, 428);
 		button_SearchTerms.setOnAction((_) -> {
 			ControllerCuratorHome.performSearchTerms();
 		});
 		button_SearchTerms.setDisable(true);
 
-		// TP3 Aspects 3 and 4: under the Search Terms button, in the space above the separator;
-		// the status line beside it ends at x = 600, so the two never overlap
-		setupButtonUI(button_Summary, "Dialog", 14, 180, Pos.CENTER, 600, 492);
+		// TP3 Aspects 3 and 4 and 6: the second row of Curator buttons ends above y = 490, so
+		// the status line beneath them, which runs to x = 600, never lies over them
+		setupButtonUI(button_Summary, "Dialog", 13, 180, Pos.CENTER, 600, 460);
 		button_Summary.setOnAction((_) -> {ControllerCuratorHome.performSummary(); });
 		button_Summary.setDisable(true);
+
+		setupButtonUI(button_Refine, "Dialog", 13, 175, Pos.CENTER, 415, 460);
+		button_Refine.setOnAction((_) -> {ControllerCuratorHome.performRefine(); });
+		button_Refine.setDisable(true);
 
 		setupLabelUI(label_Status, "Arial", 14, 580, Pos.BASELINE_LEFT, 20, 497);
 
@@ -337,7 +349,7 @@ public class ViewCuratorHome {
 				label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1, label_ListHeading,
 				text_Search, button_Search, button_ClearSearch, label_SearchError, listView_Lessons,
 				label_DetailsHeading, text_Details, label_ListHint, label_ListStatus, label_Status,
-				button_Lock, button_SearchTerms, button_Summary, line_Separator4, button_Logout, button_Quit);
+				button_Lock, button_SearchTerms, button_Summary, button_Refine, line_Separator4, button_Logout, button_Quit);
 	}
 
 

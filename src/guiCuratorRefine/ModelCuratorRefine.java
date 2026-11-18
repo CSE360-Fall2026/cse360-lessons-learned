@@ -26,7 +26,16 @@ import guiTools.LessonResult;
  * reviews, role revocation, untrusted responses, failures, and locked fields.
  * The later TP3 page can keep its unsaved text when a Review reports an error.
  *
+ * The Refine with AI page (ViewCuratorRefine, ControllerCuratorRefine) uses this Model with
+ * sharedProvider(), so the page's AI requests go through the team's shared AI service and its
+ * per-user notice. sharedProvider() is tested by RefinePageTests RP-01 to RP-07.
+ *
  * @author Daniel Martinez Julio
+ * @author Emilia Davey (sharedProvider, for the Refine with AI page)
+ *
+ * @version 1.00 2026-11-13 Daniel Martinez Julio: HW3/TP3-1 prototype
+ * @version 1.01 2026-11-18 Emilia Davey: sharedProvider() connects the Model to SharedAiService;
+ *          comments for the private fields and helpers
  */
 public final class ModelCuratorRefine {
     /** Refusal shown before exposing lesson data to an unauthorized actor. */
@@ -60,6 +69,22 @@ public final class ModelCuratorRefine {
     }
 
     /**
+     * The production provider: asks the team's shared AI service to rewrite the field for this
+     * Curator. The service sends nothing unless this Curator accepted the AI notice, cleans the
+     * reply for the field, and turns every failure into one message without details, which
+     * requestSuggestion() reports as UNAVAILABLE (US-C-E3-03, US-C-E3-08: "AI configuration and
+     * consent are supplied by the team's shared service rather than a second, independent E3
+     * service"). Tested by RP-01 to RP-07.
+     * @param ai the shared AI service
+     * @param userName the logged-in Curator, whose consent the service checks
+     * @return a provider for this Model's constructor
+     */
+    public static SuggestionProvider sharedProvider(SharedAiService ai, String userName) {
+        Objects.requireNonNull(ai);
+        return (field, original, goal) -> ai.requestRefinement(userName, field, original, goal);
+    }
+
+    /**
      * Result of opening/requesting, including the original for side-by-side review.
      * A failure may retain an authorized draft for manual refinement; an authorization
      * failure never returns lesson text.
@@ -73,9 +98,13 @@ public final class ModelCuratorRefine {
     public record Review(boolean success, String message, String failedField,
             RefinementDraft draft, String original, String suggestion) { }
 
+    /** The application database, or a test database. */
     private final Database database;
+    /** D2's response cleaner, reused for every suggestion. */
     private final SharedAiService cleaner;
+    /** Where suggestions come from; null when no AI service is connected. */
     private final SuggestionProvider provider;
+    /** The source of save timestamps. */
     private final Clock clock;
 
     /**
@@ -219,22 +248,45 @@ public final class ModelCuratorRefine {
                 + Instant.ofEpochMilli(lesson.getCuratedAt()) + ".";
     }
 
+    /**
+     * Whether the actor is a Curator, by both the session and the stored role (RF-02, RF-28).
+     * @param actor logged-in user, or null
+     * @return true for a current Curator
+     */
     private boolean authorized(User actor) {
         // Keep D1's shared session rule and additionally recheck the stored role.
         // Reading global current-user fields would overwrite someone else's session state.
         return CuratorAccess.isCurator(actor) && database.hasCuratorRole(actor.getUserName());
     }
 
+    /**
+     * The result of a failed AI request, rechecking the role first (RF-18 to RF-24, RF-42).
+     * @param actor logged-in user
+     * @param draft the review being kept
+     * @return UNAVAILABLE with the review, or NOT_CURATOR without it
+     */
     private Review providerFailure(User actor, RefinementDraft draft) {
         // Role revocation also takes priority when a slow provider throws instead of
         // returning. Only a still-authorized caller receives the retained review (RF-42).
         return authorized(actor) ? refused(UNAVAILABLE, "", draft) : refused(NOT_CURATOR, "", null);
     }
 
+    /**
+     * Whether a field can be refined: the title or the description (RF-07).
+     * @param field field name
+     * @return true for title or description
+     */
     private static boolean supported(String field) {
         return LessonsLearned.FIELD_TITLE.equals(field) || LessonsLearned.FIELD_DESCRIPTION.equals(field);
     }
 
+    /**
+     * A refusal with no original or suggestion.
+     * @param message the safe message
+     * @param field the field the message is about, or empty
+     * @param draft the review to keep, or null
+     * @return the failed Review
+     */
     private static Review refused(String message, String field, RefinementDraft draft) {
         return new Review(false, message, field, draft, "", "");
     }

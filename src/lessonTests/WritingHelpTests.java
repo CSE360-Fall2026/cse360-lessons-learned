@@ -104,6 +104,9 @@ public class WritingHelpTests {
 		public List<String> takeaways(List<BrainstormService.ChatMessage> h) throws Exception {
 			call(); return list;
 		}
+		public String refine(String f, String t, String g) throws Exception {
+			call(); return reply;
+		}
 	}
 
 	/**********
