@@ -68,8 +68,7 @@ public class ControllerCreateLesson {
 	/**********
 	 * <p> Method: resetForm() </p>
 	 *
-	 * <p> Description: Clears every field, error, and message, and selects the "<Select
-	 * one>" category prompt, so each visit starts with a blank form. </p>
+	 * <p> Description: Clears every field, error, and message, and selects the "&lt;Select one&gt;" category prompt, so each visit starts with a blank form. </p>
 	 */
 	protected static void resetForm() {
 		ViewCreateLesson.text_Title.clear();
@@ -357,7 +356,7 @@ public class ControllerCreateLesson {
 	/**********
 	 * <p> Method: valueOf(String field) </p>
 	 *
-	 * <p> Description: The current value of one form field.  The "<Select one>" prompt in
+	 * <p> Description: The current value of one form field.  The "&lt;Select one&gt;" prompt in
 	 * the category list is not a category, so it is reported as an empty choice. </p>
 	 *
 	 * @param field one of the form field names
