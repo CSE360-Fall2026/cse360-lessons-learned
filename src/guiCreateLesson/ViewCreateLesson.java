@@ -141,7 +141,7 @@ public class ViewCreateLesson {
 	/** Category caption.  Source: US-C1. */
 	protected static Label label_CategoryCaption = new Label("Category (required)");
 	/** The category choice.  A fixed list rather than free text, so categories stay consistent;
-	 * the first item is a "<Select one>" prompt, as in the other Foundations ComboBoxes. */
+	 * the first item is a "&lt;Select one&gt;" prompt, as in the other Foundations ComboBoxes. */
 	protected static ComboBox <String> combobox_Category = new ComboBox <String>();
 	/** Category error, beneath the field (US-C1-V). */
 	protected static Label label_CategoryError = new Label();
