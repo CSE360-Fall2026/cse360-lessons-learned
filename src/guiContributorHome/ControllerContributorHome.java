@@ -31,6 +31,9 @@ import javafx.scene.paint.Color;
  *
  * @version 1.00		2025-08-17 Initial version (as the Role1 home page)
  * @version 2.00		2026-10-14 TP2: the Contributor Home Page, split out of the HW2 Role1 page
+ * @version 2.01		2026-11-22 B-21: refreshing the list clears the selection, so a row is
+ * 							never shown selected while Open Lesson is disabled (checked by the
+ * 							B-21 integration check)
  */
 
 public class ControllerContributorHome {
@@ -243,6 +246,11 @@ public class ControllerContributorHome {
 					+ (lesson.isLocked() ? "   (locked)" : ""));
 		}
 		ViewContributorHome.listView_Lessons.setItems(FXCollections.observableArrayList(rows));
+		// setItems() selects the old row again when the new list holds the same text (for
+		// example after Return from Lesson Details), while Open Lesson is disabled below, and
+		// clicking that row again would change nothing.  Clearing the selection keeps the list
+		// and the button in step (found by the B-21 integration check).
+		ViewContributorHome.listView_Lessons.getSelectionModel().clearSelection();
 		ViewContributorHome.button_OpenLesson.setDisable(true);		// nothing is selected yet
 
 		int n = list.size();

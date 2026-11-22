@@ -30,6 +30,9 @@ import javafx.scene.paint.Color;
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9
  * @version 1.01 2026-11-16 Emilia Davey, TP3 Aspect 4: the details show a
  *          visible merged effort summary (US-V-04)
+ * @version 1.02 2026-11-22 Emilia Davey, B-21: refreshing the list clears
+ *          the selection, so a row is never shown selected while the details
+ *          say to select one (checked by the B-21 integration check)
  */
 public class ControllerViewerHome {
 
@@ -238,6 +241,12 @@ public class ControllerViewerHome {
 
         ViewViewerHome.listView_Lessons.setItems(
                 FXCollections.observableArrayList(rows));
+
+        // setItems() selects the old row again when the new list holds the same text (for
+        // example after Clear, or after Account Update), while the details box below says to
+        // select a lesson, and clicking that row again would change nothing.  Clearing the
+        // selection keeps the list and the details in step (found by the B-21 integration check).
+        ViewViewerHome.listView_Lessons.getSelectionModel().clearSelection();
 
         ViewViewerHome.text_Details.setText(NO_SELECTION);
 

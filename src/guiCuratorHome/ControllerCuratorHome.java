@@ -39,9 +39,12 @@ import javafx.scene.paint.Color;
  * @version 2.00		2026-11-10 TP3 Aspect 1: the Curator Home Page, replacing the Role2 stub
  * @version 2.01		2026-11-13 TP3 Aspect 2: performLock() opens the Curator Lock page
  * @version 2.02        2026-11-15 TP3 Aspect 5: Added Curator search-term management navigation
- * @version 2.04		2026-11-18 TP3 Aspect 6: performRefine() opens the Refine with AI page
  * @version 2.03		2026-11-16 TP3 Aspects 3 and 4: performSummary() opens the Merge Statistics
  * 							page
+ * @version 2.04		2026-11-18 TP3 Aspect 6: performRefine() opens the Refine with AI page
+ * @version 2.05		2026-11-22 B-21: refreshing the list clears the selection, so a row is
+ * 							never shown selected while its details and buttons are not (checked
+ * 							by the B-21 integration check)
  */
 
 public class ControllerCuratorHome {
@@ -317,6 +320,12 @@ public class ControllerCuratorHome {
 			rows.add(ModelCuratorHome.rowText(lesson));
 		}
 		ViewCuratorHome.listView_Lessons.setItems(FXCollections.observableArrayList(rows));
+		// setItems() selects the old row again when the new list holds the same text (for
+		// example after Return from a Curator page).  The row would then look selected while
+		// the details box says to select one and the buttons are disabled, and clicking it again
+		// would change nothing.  Clearing the selection keeps the list and the page in step
+		// (found by the B-21 integration check).
+		ViewCuratorHome.listView_Lessons.getSelectionModel().clearSelection();
 		ViewCuratorHome.text_Details.setText(NO_SELECTION);		// nothing is selected yet
 		ViewCuratorHome.button_Lock.setDisable(true);			// so there is nothing to lock
 		ViewCuratorHome.button_SearchTerms.setDisable(true);
