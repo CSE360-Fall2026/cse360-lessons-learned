@@ -26,8 +26,8 @@ import javafx.scene.control.ChoiceDialog;
  * can invoke these methods.  This is why each has been declared at "protected".  Do not change any
  * of these methods to public.</p>
  *
- * <p> Tested by M-CH6 (an invitation for the Curator role creates a Curator) and M-CH5
- * (Add/Remove Roles) in Manual Tests.pdf. </p>
+ * <p> Tested by M-CH6 (an invitation for the Curator role creates a Curator), M-CH5
+ * (Add/Remove Roles), and M-V1 (List All Users shows the Viewer role) in Manual Tests.pdf. </p>
  *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
@@ -40,6 +40,7 @@ import javafx.scene.control.ChoiceDialog;
  * @version 2.01		2026-10-16 TP2: Role1 is shown as "Contributor" in the invitation message
  * 							and the user list, and stored as "Role1" (design decision D12;
  * 							see guiTools.RoleLabels)
+ * @version 2.02		2026-11-23 TP3: List All Users also shows the Viewer role (Role3)
  */
 
 public class ControllerAdminHome {
@@ -278,11 +279,13 @@ public class ControllerAdminHome {
 				}
 
 				// Roles set up (TP2, D12: the Role1 flag is shown as Contributor; TP3 Aspect 1:
-				// the Role2 flag is shown as Curator)
+				// the Role2 flag is shown as Curator; TP3 Aspect 9: the Role3 flag is shown as
+				// Viewer, so a Viewer-only user is not listed with no roles)
 				String roles = "";
 				if (theDatabase.getCurrentAdminRole()) roles += "Admin, ";
 				if (theDatabase.getCurrentNewRole1()) roles += RoleLabels.ROLE1_LABEL + ", ";
 				if (theDatabase.getCurrentNewRole2()) roles += RoleLabels.ROLE2_LABEL + ", ";
+				if (theDatabase.getCurrentNewRole3()) roles += RoleLabels.ROLE3_LABEL + ", ";
 
 				if (roles.endsWith(", ")) {
 					roles = roles.substring(0, roles.length() - 2);

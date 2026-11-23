@@ -2230,9 +2230,9 @@ public class Database {
 	/*******
 	 * <p> Method: boolean getCurrentNewRole1() </p>
 	 *
-	 * <p> Description: Get the current user's Student role attribute.</p>
+	 * <p> Description: Get the current user's Contributor role attribute (Role1).</p>
 	 *
-	 * @return true if this user plays a Student role, else false
+	 * @return true if this user plays the Contributor role, else false
 	 *
 	 */
 	public boolean getCurrentNewRole1() { return currentNewRole1;};
@@ -2241,9 +2241,9 @@ public class Database {
 	/*******
 	 * <p> Method: boolean getCurrentNewRole2() </p>
 	 *
-	 * <p> Description: Get the current user's Reviewer role attribute.</p>
+	 * <p> Description: Get the current user's Curator role attribute (Role2).</p>
 	 *
-	 * @return true if this user plays a Reviewer role, else false
+	 * @return true if this user plays the Curator role, else false
 	 *
 	 */
 	public boolean getCurrentNewRole2() { return currentNewRole2;};
