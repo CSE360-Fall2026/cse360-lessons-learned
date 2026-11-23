@@ -39,10 +39,20 @@ import guiTools.LessonResult;
  */
 public class CuratorSearchTermsTests {
 
+    /** The in-memory database each test uses. */
     private Database database;
+    /** A user with the Curator role. */
     private User curator;
+    /** A user with only the Contributor role, who owns the test lesson. */
     private User contributor;
+    /** The id of the lesson the tests open and save search terms on. */
     private int lessonId;
+
+    /**********
+     * Default constructor.  JUnit creates an instance for each test.
+     */
+    public CuratorSearchTermsTests() {
+    }
 
     /**********
      * <p> Method: setUp() </p>
@@ -138,6 +148,8 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that an authorized Curator
      * can open a lesson for search-term review. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testCuratorCanOpenLesson() {
@@ -159,6 +171,8 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that a Contributor cannot
      * access the Curator search-term workflow. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testContributorCannotOpenLesson() {
@@ -179,6 +193,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that a Curator can manually
      * enter, approve, and save search terms. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.saveApprovedTerms(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testCuratorCanManuallySaveTerms() {
@@ -207,6 +224,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that search terms cannot
      * be saved without explicit Curator confirmation. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.saveApprovedTerms(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testSaveRequiresConfirmation() {
@@ -235,6 +255,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that a Contributor cannot
      * approve or save Curator search terms. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.saveApprovedTerms(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testContributorCannotSaveTerms() {
@@ -260,6 +283,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that an outdated review
      * cannot overwrite newer search terms. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.saveApprovedTerms(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testOutdatedDraftCannotBeSaved() {
@@ -297,6 +323,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that AI suggestions are
      * not requested unless the Curator gives consent. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.requestSuggestion(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testAiRequiresConsent() {
@@ -323,6 +352,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that the Model handles
      * a missing AI suggestion provider gracefully. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.requestSuggestion(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testUnavailableAiProvider() {
@@ -344,6 +376,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that an AI suggestion is
      * returned for review without automatically saving it. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.requestSuggestion(),
+     * ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testAiSuggestionRequiresApproval() {
@@ -374,6 +409,9 @@ public class CuratorSearchTermsTests {
      *
      * <p> Description: Verifies that a Curator can modify
      * suggested terms before approving their save. </p>
+     *
+     * <p> Validates: ModelCuratorSearchTerms.requestSuggestion(),
+     * ModelCuratorSearchTerms.saveApprovedTerms(), ModelCuratorSearchTerms.openLesson(). </p>
      */
     @Test
     public void testCuratorCanEditAiSuggestion() {

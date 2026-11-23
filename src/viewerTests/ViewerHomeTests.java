@@ -29,6 +29,12 @@ import guiViewerHome.ModelViewerHome;
 public class ViewerHomeTests {
 
     /**********
+     * Default constructor.  JUnit creates an instance for each test.
+     */
+    public ViewerHomeTests() {
+    }
+
+    /**********
      * <p> Method: createLesson(String title, String description,
      * String tags) </p>
      *
@@ -56,6 +62,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that keyword searches
      * can match lesson titles. </p>
+     *
+     * <p> Validates: LessonsLearnedList.filterByKeywords(). </p>
      */
     @Test
     public void testSearchMatchesTitle() {
@@ -80,6 +88,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that searches also match
      * lesson descriptions. </p>
+     *
+     * <p> Validates: LessonsLearnedList.filterByKeywords(). </p>
      */
     @Test
     public void testSearchMatchesDescription() {
@@ -102,6 +112,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that lesson tags are
      * included in keyword searches. </p>
+     *
+     * <p> Validates: LessonsLearnedList.filterByKeywords(). </p>
      */
     @Test
     public void testSearchMatchesTags() {
@@ -124,6 +136,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that capitalization
      * does not affect keyword matching. </p>
+     *
+     * <p> Validates: LessonsLearnedList.filterByKeywords(). </p>
      */
     @Test
     public void testSearchIsCaseInsensitive() {
@@ -146,6 +160,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that all entered keywords
      * must match the lesson's searchable fields. </p>
+     *
+     * <p> Validates: LessonsLearnedList.filterByKeywords(). </p>
      */
     @Test
     public void testSearchRequiresAllKeywords() {
@@ -172,6 +188,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that a user without
      * the Viewer role cannot access the Viewer lesson list. </p>
+     *
+     * <p> Validates: ModelViewerHome.viewAllLessons(). </p>
      */
     @Test
     public void testNonViewerCannotListLessons() {
@@ -191,6 +209,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that a user without
      * Viewer access cannot use Viewer search operations. </p>
+     *
+     * <p> Validates: ModelViewerHome.searchAllLessons(). </p>
      */
     @Test
     public void testNonViewerCannotSearchLessons() {
@@ -211,6 +231,8 @@ public class ViewerHomeTests {
      *
      * <p> Description: Verifies that unauthorized
      * users cannot retrieve lessons through the Viewer Model. </p>
+     *
+     * <p> Validates: ModelViewerHome.viewLesson(). </p>
      */
     @Test
     public void testNonViewerCannotReadLesson() {

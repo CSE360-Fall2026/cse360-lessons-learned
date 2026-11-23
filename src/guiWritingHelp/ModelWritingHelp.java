@@ -31,6 +31,9 @@ import inputValidation.LessonRecognizer;
  * only, and opening an example checks again that the lesson is theirs.  No AI is used.</li>
  * </ul>
  *
+ * <p> Tested by lessonTests.WritingHelpTests WH-01 to WH-11 (JUnit), and on screen by M-WH2 to
+ * M-WH5 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

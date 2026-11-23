@@ -158,6 +158,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> the Actual line lists the titles returned (sorted).
 	 * PASS means both lessons, and only those, are in the list. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.viewMyLessons(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -185,6 +187,8 @@ public class ReadLessonTests {
 	 * <p> <b>Steps:</b> ask for the list of a brand-new Contributor. </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the result is an empty list, not null. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.viewMyLessons(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -209,6 +213,8 @@ public class ReadLessonTests {
 	 * <p> <b>Steps:</b> ask for the list of "" and of a username that has never existed. </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means both requests return an empty list. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.viewMyLessons(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -253,6 +259,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means exactly one lesson, "Deploy pipeline fix",
 	 * is returned. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -280,6 +288,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the two "Sprint ..." lessons are returned
 	 * and "Deploy pipeline fix" is not. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -307,6 +317,8 @@ public class ReadLessonTests {
 	 * description but in no title. </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the search succeeds with 0 lessons. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -339,6 +351,8 @@ public class ReadLessonTests {
 	 * <p> <b>Steps:</b> with one lesson stored, search for "". </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means success with 0 lessons. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -366,6 +380,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the search runs (success) and finds 0
 	 * lessons. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -393,6 +409,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the search is refused with "Search text is
 	 * too long." for the search field, and no list is returned. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -420,6 +438,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the invalid-character message is returned
 	 * for the search field. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -454,6 +474,8 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> the Actual line shows the title, description, tags,
 	 * category, and experience entries of the opened lesson.  PASS means every part matches
 	 * what was stored. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.viewLesson(). </p>
 	 */
 	@Test
 	@Order(11)
@@ -494,6 +516,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means only the title reports locked and the other
 	 * three fields remain editable. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.viewLesson(). </p>
 	 */
 	@Test
 	@Order(12)
@@ -530,6 +554,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the opened lesson has the selected id and
 	 * the title "Second lesson", not the other lesson. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.viewMyLessons(), ModelLessonDetails.viewLesson(). </p>
 	 */
 	@Test
 	@Order(13)
@@ -576,6 +602,8 @@ public class ReadLessonTests {
 	 * methods (the delete path is covered by the US-D1 tests). </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means all three succeed. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.viewLesson(). </p>
 	 */
 	@Test
 	@Order(14)
@@ -606,6 +634,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means all four are refused with "Lesson not
 	 * found." and nothing throws an exception. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.viewLesson(), ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(15)
@@ -639,6 +669,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means B is refused and no lesson content is
 	 * returned. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.viewLesson(). </p>
 	 */
 	@Test
 	@Order(16)
@@ -671,6 +703,8 @@ public class ReadLessonTests {
 	 * <p> <b>How to read the output:</b> PASS means all three are refused with "Lesson not
 	 * found." and A's lesson still exists with its original title and no experience
 	 * entries. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(), ModelLessonDetails.viewLesson(). </p>
 	 */
 	@Test
 	@Order(17)
@@ -716,6 +750,8 @@ public class ReadLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means A sees only A's two titles and B sees only
 	 * B's one title. </p>
+	 *
+	 * <p> Validates: ModelContributorHome.viewMyLessons(). </p>
 	 */
 	@Test
 	@Order(18)
@@ -747,6 +783,8 @@ public class ReadLessonTests {
 	 * for "Deploy". </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means A gets only "Deploy checklist". </p>
+	 *
+	 * <p> Validates: ModelContributorHome.searchMyLessons(). </p>
 	 */
 	@Test
 	@Order(19)

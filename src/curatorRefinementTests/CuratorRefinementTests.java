@@ -47,21 +47,41 @@ import guiUpdateLesson.ModelUpdateLesson;
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class CuratorRefinementTests {
+    /** The real H2 database (run in a disposable user.home by Test-Aspect6.ps1). */
     private static final Database DB = FoundationsMain.database;
+    /** A unique suffix, so this run's accounts never collide with existing ones. */
     private static final String TOKEN = Long.toUnsignedString(System.nanoTime());
+    /** The Contributor who owns each test lesson. */
     private static final String OWNER = "rfOwner" + TOKEN;
+    /** The Curator who refines the lessons. */
     private static final User CURATOR = user("rfCurator" + TOKEN, false, false, true);
+    /** A second Curator, for attribution and second-refinement cases. */
     private static final User OTHER = user("rfOther" + TOKEN, false, false, true);
+    /** The title of each new test lesson. */
     private static final String TITLE = "Deployment recovery";
+    /** The description of each new test lesson. */
     private static final String DESCRIPTION = "Restart the worker after restoring configuration.";
+    /** The simulated AI suggestion returned by the default test provider. */
     private static final String SUGGESTION = "Restart the worker after restoring the validated configuration.";
+    /** The fixed save time, in epoch milliseconds, recorded as curatedAt. */
     private static final long SAVE_TIME = 1_800_000_000_000L;
+    /** A clock fixed at SAVE_TIME, so attribution times can be checked exactly. */
     private static final Clock CLOCK = Clock.fixed(Instant.ofEpochMilli(SAVE_TIME), ZoneOffset.UTC);
+    /** The id of the lesson created for the current test. */
     private int lessonId;
+    /** The Model under test, with the default simulated provider. */
     private ModelCuratorRefine model;
+    /** The Curator's snapshot of the current test lesson. */
     private RefinementDraft draft;
 
-    /** Connects/registers only test accounts; failures propagate to JUnit. */
+    /** Default constructor.  JUnit creates an instance for each test. */
+    public CuratorRefinementTests() { }
+
+    /**
+     * Connects/registers only test accounts; failures propagate to JUnit.
+     *
+     * @throws SQLException if the database cannot be opened
+     */
     @BeforeAll static void connect() throws SQLException {
         DB.connectToDatabase();
         DB.register(CURATOR);
@@ -91,6 +111,11 @@ public class CuratorRefinementTests {
     /** Direct database cleanup also works when the lesson remains locked. */
     @AfterEach void cleanup() { DB.deleteLesson(lessonId); }
 
+    /**
+     * RF-01: Open a stored lesson without mutating it.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(), RefinementDraft.matches(). </p>
+     */
     @Test @DisplayName("RF-01 Open a stored lesson without mutating it")
     void rf01_openSnapshot() {
         String before = state();
@@ -102,6 +127,12 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-02: Null, Contributor, Admin, no-role, and unregistered actors are refused.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(), ModelCuratorRefine.requestSuggestion(),
+     * ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-02 Null, Contributor, Admin, no-role, and unregistered actors are refused")
     void rf02_roleBoundary() {
         List<User> refused = Arrays.asList(null, user(OWNER, false, true, false),
@@ -120,11 +151,21 @@ public class CuratorRefinementTests {
         }
     }
 
+    /**
+     * RF-03: Missing lessons are safely refused for an authorized Curator.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(). </p>
+     */
     @Test @DisplayName("RF-03 Missing lessons are safely refused for an authorized Curator")
     void rf03_missingLesson() {
         assertEquals(LessonAccess.NOT_FOUND, model.openLesson(CURATOR, -1).message());
     }
 
+    /**
+     * RF-04: No consent means no provider call and no save.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-04 No consent means no provider call and no save")
     void rf04_consentBeforeTransmission() {
         AtomicInteger calls = new AtomicInteger();
@@ -136,6 +177,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-05: Title request sends only the chosen field and shows its original.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-05 Title request sends only the chosen field and shows its original")
     void rf05_titleRequest() {
         AtomicReference<String> input = new AtomicReference<>();
@@ -147,6 +193,11 @@ public class CuratorRefinementTests {
         assertEquals("Clear recovery steps", result.suggestion());
     }
 
+    /**
+     * RF-06: Description suggestion is cleaned, displayed, and never automatically applied.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-06 Description suggestion is cleaned, displayed, and never automatically applied")
     void rf06_descriptionRequest() {
         String before = state();
@@ -158,6 +209,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-07: Unknown, null, and non-E3 fields never call the provider.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-07 Unknown, null, and non-E3 fields never call the provider")
     void rf07_selectedFieldBoundary() {
         AtomicInteger calls = new AtomicInteger();
@@ -167,6 +223,11 @@ public class CuratorRefinementTests {
         assertEquals(0, calls.get());
     }
 
+    /**
+     * RF-08: Optional goals are trimmed and supplied to the provider.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-08 Optional goals are trimmed and supplied to the provider")
     void rf08_optionalGoal() {
         AtomicReference<String> goal = new AtomicReference<>();
@@ -177,6 +238,11 @@ public class CuratorRefinementTests {
         assertEquals("", goal.get());
     }
 
+    /**
+     * RF-09: Save title and first originals with attribution in one write.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-09 Save title and first originals with attribution in one write")
     void rf09_titleSave() {
         assertTrue(save(Map.of("title", "  Clear recovery steps  ")).isSuccess());
@@ -190,6 +256,11 @@ public class CuratorRefinementTests {
         assertEquals(SAVE_TIME, actual.getUpdatedAt());
     }
 
+    /**
+     * RF-10: Save description without replacing the title.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-10 Save description without replacing the title")
     void rf10_descriptionSave() {
         assertTrue(save(Map.of("description", SUGGESTION)).isSuccess());
@@ -197,6 +268,11 @@ public class CuratorRefinementTests {
         assertEquals(SUGGESTION, stored().getDescription());
     }
 
+    /**
+     * RF-11: Saved lesson exposes an edited-by-curator note and timestamp.
+     *
+     * <p> Validates: ModelCuratorRefine.curationNote(), ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-11 Saved lesson exposes an edited-by-curator note and timestamp")
     void rf11_attributionNote() {
         assertTrue(save(Map.of("title", "Recovery procedure")).isSuccess());
@@ -205,12 +281,22 @@ public class CuratorRefinementTests {
         assertTrue(note.contains(Instant.ofEpochMilli(SAVE_TIME).toString()));
     }
 
+    /**
+     * RF-12: Uncurated and absent lessons have no attribution note.
+     *
+     * <p> Validates: ModelCuratorRefine.curationNote(). </p>
+     */
     @Test @DisplayName("RF-12 Uncurated and absent lessons have no attribution note")
     void rf12_noFalseAttribution() {
         assertEquals("", ModelCuratorRefine.curationNote(stored()));
         assertEquals("", ModelCuratorRefine.curationNote(null));
     }
 
+    /**
+     * RF-13: Later Curators preserve the first originals and update attribution.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(), ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-13 Later Curators preserve the first originals and update attribution")
     void rf13_secondRefinement() {
         assertTrue(save(Map.of("title", "First refinement")).isSuccess());
@@ -224,6 +310,12 @@ public class CuratorRefinementTests {
         assertEquals(SAVE_TIME + 1000, stored().getCuratedAt());
     }
 
+    /**
+     * RF-14: Curator refines locked text while Contributor edit/delete stay denied.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(), ModelUpdateLesson.updateLesson(),
+     * ModelLessonDetails.deleteLesson(). </p>
+     */
     @Test @DisplayName("RF-14 Curator refines locked text while Contributor edit/delete stay denied")
     void rf14_locksAndContributorRegression() {
         assertTrue(DB.setLessonLocks(lessonId, List.of("entire", "title", "description", "tags", "category"), true));
@@ -237,6 +329,11 @@ public class CuratorRefinementTests {
         assertEquals("Curated locked title", stored().getTitle());
     }
 
+    /**
+     * RF-15: Concurrent Contributor change makes the review stale.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(), ModelUpdateLesson.updateLesson(). </p>
+     */
     @Test @DisplayName("RF-15 Concurrent Contributor change makes the review stale")
     void rf15_staleContributorEdit() {
         assertTrue(ModelUpdateLesson.updateLesson(OWNER, lessonId, "Contributor revision",
@@ -246,6 +343,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-16: Database independently rejects a stale snapshot.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(), Database.saveCuratorRefinement(). </p>
+     */
     @Test @DisplayName("RF-16 Database independently rejects a stale snapshot")
     void rf16_databaseCompareAndSave() {
         assertTrue(save(Map.of("title", "First saved revision")).isSuccess());
@@ -254,6 +356,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-17: Two Curators cannot silently overwrite each other's reviews.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(), ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-17 Two Curators cannot silently overwrite each other's reviews")
     void rf17_overlappingCurators() {
         RefinementDraft otherDraft = model.openLesson(OTHER, lessonId).draft();
@@ -263,21 +370,46 @@ public class CuratorRefinementTests {
         assertEquals(CURATOR.getUserName(), stored().getCuratedBy());
     }
 
+    /**
+     * RF-18: Null AI response preserves the lesson and review.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-18 Null AI response preserves the lesson and review")
     void rf18_nullResponse() { assertBadResponse(null, "description"); }
 
+    /**
+     * RF-19: Blank AI response cannot become a saved refinement.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-19 Blank AI response cannot become a saved refinement")
     void rf19_blankResponse() { assertBadResponse("   ", "description"); }
 
+    /**
+     * RF-20: Overlength AI output is rejected for the selected field.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-20 Overlength AI output is rejected for the selected field")
     void rf20_overlengthResponse() {
         assertBadResponse("T".repeat(101), "title");
         assertBadResponse("D".repeat(5001), "description");
     }
 
+    /**
+     * RF-21: AI control characters are rejected.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-21 AI control characters are rejected")
     void rf21_controlResponse() { assertBadResponse("Corrupt\u0000response", "description"); }
 
+    /**
+     * RF-22: Provider failure never exposes its exception or credential.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-22 Provider failure never exposes its exception or credential")
     void rf22_sanitizedFailure() {
         String before = state();
@@ -289,6 +421,12 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-23: Missing provider still permits a manually reviewed refinement.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(),
+     * ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-23 Missing provider still permits a manually reviewed refinement")
     void rf23_manualFallback() {
         ModelCuratorRefine manual = model(null);
@@ -297,6 +435,11 @@ public class CuratorRefinementTests {
         assertTrue(manual.saveRefinement(CURATOR, draft, Map.of("description", SUGGESTION), true).isSuccess());
     }
 
+    /**
+     * RF-24: Explicit retry uses the preserved review and still does not save.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-24 Explicit retry uses the preserved review and still does not save")
     void rf24_retry() {
         AtomicInteger calls = new AtomicInteger();
@@ -312,6 +455,12 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-25: Cancel after a suggestion leaves all text and audit data unchanged.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(),
+     * ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-25 Cancel after a suggestion leaves all text and audit data unchanged")
     void rf25_cancel() {
         String before = state();
@@ -321,6 +470,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-26: Invalid goals are refused before a provider call.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-26 Invalid goals are refused before a provider call")
     void rf26_invalidGoal() {
         AtomicInteger calls = new AtomicInteger();
@@ -330,6 +484,12 @@ public class CuratorRefinementTests {
         assertEquals(0, calls.get());
     }
 
+    /**
+     * RF-27: Displayed AI text must still pass normal final-field validation.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(),
+     * ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-27 Displayed AI text must still pass normal final-field validation")
     void rf27_suggestionIsNotTrusted() {
         Review result = model((f, o, g) -> "short").requestSuggestion(CURATOR, draft, "description", "", true);
@@ -341,6 +501,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-28: Revoked Curator role blocks AI requests despite stale session flags.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-28 Revoked Curator role blocks AI requests despite stale session flags")
     void rf28_revokeBeforeRequest() {
         AtomicInteger calls = new AtomicInteger();
@@ -353,6 +518,11 @@ public class CuratorRefinementTests {
         assertEquals(0, calls.get());
     }
 
+    /**
+     * RF-29: Revoked role blocks final save without any content/audit change.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-29 Revoked role blocks final save without any content/audit change")
     void rf29_revokeBeforeSave() {
         String before = state();
@@ -361,6 +531,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-30: Invalid second field prevents both text changes and attribution.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-30 Invalid second field prevents both text changes and attribution")
     void rf30_validateWholeChange() {
         String before = state();
@@ -370,6 +545,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-31: SQL write failure cannot leave title changed without originals/audit.
+     *
+     * <p> Validates: Database.saveCuratorRefinement(). </p>
+     */
     @Test @DisplayName("RF-31 SQL write failure cannot leave title changed without originals/audit")
     void rf31_sqlFailureIsAtomic() {
         String before = state();
@@ -379,6 +559,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-32: E3 saves preserve other aspects' data and original ownership.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(), ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-32 E3 saves preserve other aspects' data and original ownership")
     void rf32_unrelatedFields() {
         LessonsLearned seed = stored();
@@ -405,6 +590,11 @@ public class CuratorRefinementTests {
         assertTrue(actual.isStatsVisibleToContributor());
     }
 
+    /**
+     * RF-33: Unchanged text creates no false curation history.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-33 Unchanged text creates no false curation history")
     void rf33_noOp() {
         String before = state();
@@ -412,6 +602,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-34: Role removed during a provider call prevents returning lesson text.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-34 Role removed during a provider call prevents returning lesson text")
     void rf34_revokeDuringProvider() {
         Review result = model((f, o, g) -> {
@@ -423,6 +618,11 @@ public class CuratorRefinementTests {
         assertEquals("", result.suggestion());
     }
 
+    /**
+     * RF-35: Lesson changed during a provider call is reported as stale.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-35 Lesson changed during a provider call is reported as stale")
     void rf35_changeDuringProvider() {
         Review result = model((f, o, g) -> {
@@ -436,6 +636,11 @@ public class CuratorRefinementTests {
         assertEquals("", stored().getCuratedBy());
     }
 
+    /**
+     * RF-36: Database save independently rechecks the current Curator role.
+     *
+     * <p> Validates: Database.saveCuratorRefinement(). </p>
+     */
     @Test @DisplayName("RF-36 Database save independently rechecks the current Curator role")
     void rf36_databaseRoleGuard() {
         String before = state();
@@ -444,6 +649,12 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-37: Missing reviews, empty changes, null and unsupported fields are refused.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(),
+     * ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-37 Missing reviews, empty changes, null and unsupported fields are refused")
     void rf37_malformedSaveInputs() {
         String before = state();
@@ -461,6 +672,12 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-38: Curator's edited final wording, including SQL-like text, is saved literally.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(),
+     * ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-38 Curator's edited final wording, including SQL-like text, is saved literally")
     void rf38_reviewedFinalText() {
         assertTrue(model.requestSuggestion(CURATOR, draft, "description", "", true).success());
@@ -471,6 +688,11 @@ public class CuratorRefinementTests {
         assertTrue(DB.hasCuratorRole(CURATOR.getUserName()));
     }
 
+    /**
+     * RF-39: Failed storage write returns a failure, not a success confirmation.
+     *
+     * <p> Validates: ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-39 Failed storage write returns a failure, not a success confirmation")
     void rf39_modelWriteFailure() {
         String before = state();
@@ -487,6 +709,11 @@ public class CuratorRefinementTests {
         assertEquals(before, state());
     }
 
+    /**
+     * RF-40: Normal field boundaries and controls apply to the final Curator text.
+     *
+     * <p> Validates: ModelCuratorRefine.openLesson(), ModelCuratorRefine.saveRefinement(). </p>
+     */
     @Test @DisplayName("RF-40 Normal field boundaries and controls apply to the final Curator text")
     void rf40_finalValidationBoundaries() {
         for (String title : List.of(" ", "T".repeat(101), "Bad\u0000title")) {
@@ -506,6 +733,11 @@ public class CuratorRefinementTests {
         assertTrue(save(Map.of("description", "D".repeat(5000))).isSuccess());
     }
 
+    /**
+     * RF-41: Interrupted provider preserves the interrupt and leaves the lesson untouched.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-41 Interrupted provider preserves the interrupt and leaves the lesson untouched")
     void rf41_interruptedRequest() {
         String before = state();
@@ -522,6 +754,11 @@ public class CuratorRefinementTests {
         }
     }
 
+    /**
+     * RF-42: Role revoked during a failing provider call does not return a retained lesson.
+     *
+     * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
+     */
     @Test @DisplayName("RF-42 Role revoked during a failing provider call does not return a retained lesson")
     void rf42_revokeDuringProviderFailure() {
         Review result = model((f, o, g) -> {
@@ -534,20 +771,52 @@ public class CuratorRefinementTests {
         assertEquals("", result.suggestion());
     }
 
+    /**
+     * Builds a test user with the given roles and a valid password.
+     *
+     * @param name the user name
+     * @param admin whether the user is an Admin
+     * @param contributor whether the user is a Contributor
+     * @param curator whether the user is a Curator
+     * @return the user (not yet registered)
+     */
     private static User user(String name, boolean admin, boolean contributor, boolean curator) {
         return new User(name, "Example1!", "", "", "", "", "", admin, contributor, curator);
     }
 
+    /**
+     * Builds the Model under test with the given simulated provider and the fixed clock.
+     *
+     * @param provider the simulated AI provider
+     * @return the Model
+     */
     private ModelCuratorRefine model(SuggestionProvider provider) {
         return new ModelCuratorRefine(DB, provider, CLOCK);
     }
 
+    /**
+     * Saves the given field changes as CURATOR, with confirmation.
+     *
+     * @param changes the field names and their final text
+     * @return the Model's result
+     */
     private LessonResult save(Map<String, String> changes) {
         return model.saveRefinement(CURATOR, draft, changes, true);
     }
 
+    /**
+     * Reads the current test lesson back from the database.
+     *
+     * @return the stored lesson
+     */
     private LessonsLearned stored() { return DB.getLessonById(lessonId); }
 
+    /**
+     * Captures every stored field a refinement could change, so a test can show that a
+     * refused request changed nothing.
+     *
+     * @return the lesson's text, attribution, owner, and lock fields as one string
+     */
     private String state() {
         LessonsLearned lesson = stored();
         return List.of(lesson.getTitle(), lesson.getDescription(), lesson.getOriginalTitle(),
@@ -557,6 +826,12 @@ public class CuratorRefinementTests {
                 lesson.isLockedCategory()).toString();
     }
 
+    /**
+     * Checks that an unusable AI reply is refused with UNAVAILABLE and changes nothing.
+     *
+     * @param raw the provider's raw reply
+     * @param field the field the suggestion was requested for
+     */
     private void assertBadResponse(String raw, String field) {
         String before = state();
         Review result = model((f, o, g) -> raw).requestSuggestion(CURATOR, draft, field, "", true);

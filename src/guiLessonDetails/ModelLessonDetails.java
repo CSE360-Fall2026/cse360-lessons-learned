@@ -20,6 +20,11 @@ import guiTools.LessonResult;
  *
  * <p> The methods are public so the automated tests can call them without starting JavaFX.</p>
  *
+ * <p> Tested by lessonTests.ReadLessonTests and DeleteLessonTests (JUnit), including the
+ * refusal to delete a locked lesson, which curatorLockTests.CuratorLockTests also checks after
+ * a Curator's lock; on screen by the TP2 semi-automated tests M3, M4, and M7 in
+ * lessonTests.ManualGuiTests and by M-CL5 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

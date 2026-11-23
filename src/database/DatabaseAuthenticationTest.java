@@ -45,8 +45,16 @@ import entityClasses.User;
  */
 class DatabaseAuthenticationTest {
 
+    /** The application database the tests connect to. */
     private Database database;
+    /** The user names this test created, so tearDown can delete them. */
     private final List<String> testUsernames = new ArrayList<>();
+
+    /**********
+     * Default constructor.  JUnit creates an instance for each test.
+     */
+    DatabaseAuthenticationTest() {
+    }
 
     /**
      * Connects to the test database before each test.
@@ -79,6 +87,8 @@ class DatabaseAuthenticationTest {
      * the Admin role.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginAdmin(). </p>
      */
     @Test
     void testValidAdminLogin() throws Exception {
@@ -105,6 +115,8 @@ class DatabaseAuthenticationTest {
      * the one stored in the database.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginAdmin(). </p>
      */
     @Test
     void testInvalidAdminPassword() throws Exception {
@@ -135,6 +147,8 @@ class DatabaseAuthenticationTest {
      * fail because the account does not have the Admin role.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginAdmin(). </p>
      */
     @Test
     void testAdminLoginWithoutAdminRole() throws Exception {
@@ -161,6 +175,8 @@ class DatabaseAuthenticationTest {
      * an account in the database.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginAdmin(). </p>
      */
     @Test
     void testInvalidAdminUsername() throws Exception {
@@ -191,6 +207,8 @@ class DatabaseAuthenticationTest {
      * the credentials of the registered Admin account.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginAdmin(). </p>
      */
     @Test
     void testEmptyAdminCredentials() throws Exception {
@@ -223,6 +241,8 @@ class DatabaseAuthenticationTest {
     /**
      * Tests how the login method handles null usernames and passwords.
      * The system should reject these inputs without crashing.
+     *
+     * <p> Validates: Database.loginAdmin(). </p>
      */
     @Test
     void testNullAdminCredentials() {
@@ -247,6 +267,8 @@ class DatabaseAuthenticationTest {
      * should succeed because the account exists and has the Contributor role.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginRole1(). </p>
      */
     @Test
     void testValidContributorLogin() throws Exception {
@@ -273,6 +295,8 @@ class DatabaseAuthenticationTest {
      * in the database.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginRole1(). </p>
      */
     @Test
     void testInvalidContributorPassword() throws Exception {
@@ -303,6 +327,8 @@ class DatabaseAuthenticationTest {
      * have that role.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginRole1(). </p>
      */
     @Test
     void testContributorLoginWithoutContributorRole() throws Exception {
@@ -329,6 +355,8 @@ class DatabaseAuthenticationTest {
      * database.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginRole1(). </p>
      */
     @Test
     void testInvalidContributorUsername() throws Exception {
@@ -359,6 +387,8 @@ class DatabaseAuthenticationTest {
      * Contributor account.
      *
      * @throws Exception if the test account cannot be created
+     *
+     * <p> Validates: Database.loginRole1(). </p>
      */
     @Test
     void testEmptyContributorCredentials() throws Exception {
@@ -389,6 +419,8 @@ class DatabaseAuthenticationTest {
     /**
      * Tests how Contributor login handles null usernames and passwords. Both
      * attempts should fail without causing the application to crash.
+     *
+     * <p> Validates: Database.loginRole1(). </p>
      */
     @Test
     void testNullContributorCredentials() {
@@ -409,6 +441,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether the system generates a six-character invitation code and saves
      * it with the correct role in the database.
+     *
+     * <p> Validates: Database.getNumberOfInvitations(), Database.generateInvitationCode(),
+     * Database.getRoleGivenAnInvitationCode(), Database.removeInvitationAfterUse(). </p>
      */
     @Test
     void testGenerateInvitationCode() {
@@ -441,6 +476,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether an invitation code is removed from the database after use. Once
      * removed, the code should no longer have an associated role.
+     *
+     * <p> Validates: Database.generateInvitationCode(),
+     * Database.getRoleGivenAnInvitationCode(), Database.removeInvitationAfterUse(). </p>
      */
     @Test
     void testRemoveInvitationAfterUse() {
@@ -463,6 +501,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether the system generates an eight-character one-time password and
      * saves it for the correct user.
+     *
+     * <p> Validates: Database.generateOneTimePassword(), Database.isOneTimePasswordValid(),
+     * Database.clearOneTimePassword(). </p>
      */
     @Test
     void testGenerateOneTimePassword() {
@@ -487,6 +528,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether a one-time password can be used by a different user. The code
      * should only be valid for the username it was generated for.
+     *
+     * <p> Validates: Database.generateOneTimePassword(), Database.isOneTimePasswordValid(),
+     * Database.clearOneTimePassword(). </p>
      */
     @Test
     void testOneTimePasswordWithWrongUsername() {
@@ -511,6 +555,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether a one-time password becomes invalid after it is removed. The
      * code should work before removal and fail afterward.
+     *
+     * <p> Validates: Database.generateOneTimePassword(), Database.isOneTimePasswordValid(),
+     * Database.clearOneTimePassword(). </p>
      */
     @Test
     void testOneTimePasswordAfterRemoval() {
@@ -540,6 +587,9 @@ class DatabaseAuthenticationTest {
      *
      * @throws Exception if the account cannot be created or the database cannot be
      *                   queried
+     *
+     * <p> Validates: how Database.register() stores the password (disabled: a known
+     * limitation). </p>
      */
     @Test
     @Disabled("Known limitation: passwords are stored as plain text; hashing is outside TP3 scope")
@@ -582,6 +632,8 @@ class DatabaseAuthenticationTest {
      * the known limitation in the class description. </p>
      *
      * @throws Exception if the account cannot be created or queried
+     *
+     * <p> Validates: Database.updatePassword(). </p>
      */
     @Test
     @Disabled("Known limitation: passwords are stored as plain text; hashing is outside TP3 scope")
@@ -623,6 +675,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether the system rejects an incorrect one-time password. A code that
      * was not generated for the user should not be accepted.
+     *
+     * <p> Validates: Database.generateOneTimePassword(), Database.isOneTimePasswordValid(),
+     * Database.clearOneTimePassword(). </p>
      */
     @Test
     void testInvalidOneTimePassword() {
@@ -649,6 +704,9 @@ class DatabaseAuthenticationTest {
     /**
      * Tests whether the system rejects empty and null one-time passwords. Missing
      * reset codes should not be accepted.
+     *
+     * <p> Validates: Database.generateOneTimePassword(), Database.isOneTimePasswordValid(),
+     * Database.clearOneTimePassword(). </p>
      */
     @Test
     void testEmptyAndNullOneTimePasswords() {

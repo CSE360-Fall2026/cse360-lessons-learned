@@ -164,6 +164,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means an id was assigned and the row read back
 	 * holds the same title, category, tags, and owner. </p>
+	 *
+	 * <p> Validates: LessonsLearned.read(), LessonsLearned.getId(),
+	 * LessonsLearned.getOwnerUserName(), LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -197,6 +200,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means update() returned true and the new title is
 	 * stored, then delete() returned true and the lesson can no longer be read. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setTitle(), LessonsLearned.update(),
+	 * LessonsLearned.getId(), LessonsLearned.delete(), LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -229,6 +235,8 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means read gives null and delete gives
 	 * false. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setId(), LessonsLearned.read(), LessonsLearned.delete(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -266,6 +274,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the title is reported first, then the
 	 * category, and finally the lesson is valid. </p>
+	 *
+	 * <p> Validates: LessonsLearned.findInvalidField(), LessonsLearned.validate(),
+	 * LessonsLearned.setTitle(), LessonsLearned.setCategory(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -300,6 +311,8 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the exception carries "Title is required."
 	 * and 0 lessons were stored. </p>
+	 *
+	 * <p> Validates: LessonsLearned.create(), LessonsLearnedList.loadByOwner(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -337,6 +350,10 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the description-length message is in the
 	 * exception and the stored description is still the original. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setDescription(), LessonsLearned.update(),
+	 * LessonsLearned.read(), LessonsLearned.getId(), LessonsLearned.getDescription(),
+	 * LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -379,6 +396,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means setLock returned true and the stored lesson
 	 * reports the title locked, the description unlocked, and the lesson locked. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setLock(), LessonsLearned.read(), LessonsLearned.getId(),
+	 * LessonsLearned.isFieldLocked(), LessonsLearned.isLocked(), LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -410,6 +430,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means 4 of 4 fields are locked while the lock is
 	 * set, and the lesson is unlocked after clearing it. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setLock(), LessonsLearned.read(), LessonsLearned.getId(),
+	 * LessonsLearned.isFieldLocked(), LessonsLearned.isLocked(), LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -444,6 +467,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means setLock returned false and the lesson is
 	 * not locked. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setLock(), LessonsLearned.read(), LessonsLearned.getId(),
+	 * LessonsLearned.isLocked(), LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -481,6 +507,14 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means every value read back equals the value
 	 * saved. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setRootCause(), LessonsLearned.setRecommendation(),
+	 * LessonsLearned.setAiAssisted(), LessonsLearned.setSearchTerms(),
+	 * LessonsLearned.create(), LessonsLearned.read(), LessonsLearned.getId(),
+	 * LessonsLearned.getRootCause(), LessonsLearned.getRecommendation(),
+	 * LessonsLearned.isAiAssisted(), LessonsLearned.getSearchTerms(),
+	 * LessonsLearned.setCuratedBy(), LessonsLearned.updateCuratorFields(),
+	 * LessonsLearned.getCuratedBy(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -529,6 +563,9 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the root-cause message is shown and 0
 	 * lessons were stored. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setRootCause(), LessonsLearned.create(),
+	 * LessonsLearnedList.loadByOwner(). </p>
 	 */
 	@Test
 	@Order(11)
@@ -569,6 +606,10 @@ public class LessonsLearnedEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the search-terms message is shown and the
 	 * stored search terms are still empty. </p>
+	 *
+	 * <p> Validates: LessonsLearned.setSearchTerms(), LessonsLearned.updateCuratorFields(),
+	 * LessonsLearned.read(), LessonsLearned.getId(), LessonsLearned.getSearchTerms(),
+	 * LessonsLearned.create(). </p>
 	 */
 	@Test
 	@Order(12)

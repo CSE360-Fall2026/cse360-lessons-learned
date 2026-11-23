@@ -242,6 +242,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-01, positive.  Ticking Title and Tags gives exactly those two names
 	 * (scenario S1; LR-1). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(). </p>
 	 */
 	@Test
 	@DisplayName("LP-01 Title and Tags ticked give title and tags (P)")
@@ -256,6 +258,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-02, boundary.  All five boxes give all five names in the fixed order
 	 * (LR-1). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(). </p>
 	 */
 	@Test
 	@DisplayName("LP-02 All five boxes give all five names in the fixed order (P)")
@@ -271,6 +275,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-03, negative.  No box ticked gives an empty list, and the lock action
 	 * refuses an empty list with its specific message, so pressing Lock with nothing ticked
 	 * changes nothing (scenario S4; LR-1). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LP-03 No box ticked gives an empty list that the lock action refuses (N)")
@@ -295,6 +301,8 @@ public class CuratorLockPageTests {
 	 * <p> Method: void lp04_questionForOneField() </p>
 	 *
 	 * <p> Description: LP-04, positive.  One field (LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-04 The question for one field (P)")
@@ -309,6 +317,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-05, positive.  Two fields are joined with "and".  This is the exact
 	 * question in step 3 of Initial ConOps scenario S1 (LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-05 The question for two fields is the ConOps S1 question (P)")
@@ -324,6 +334,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-06, positive.  Three or more fields are listed with commas and a
 	 * final "and" (LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-06 The question for four fields (P)")
@@ -340,6 +352,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-07, positive.  The whole lesson alone reads as a sentence about the
 	 * lesson, not about a field "of" it (scenario S2; LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-07 The question for the whole lesson (P)")
@@ -354,6 +368,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-08, positive.  The whole lesson together with a field names both, the
 	 * whole lesson first (LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-08 The question for the whole lesson and a field (P)")
@@ -369,6 +385,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-09, positive.  Unlocking uses the word "Unlock" (scenario S3;
 	 * LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-09 The question for unlocking (P)")
@@ -387,6 +405,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-10, positive.  The question names each part once, in the fixed order,
 	 * however the list was built, so it always matches the "Locked: ..." message that follows
 	 * (LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-10 The question names each part once, in the fixed order (P)")
@@ -403,6 +423,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-11, negative.  With nothing to ask about there is no question: an
 	 * empty list, a missing list, and a list holding only an unknown name each give an empty
 	 * String, and none of them crashes (CWE-476; LR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-11 An empty, missing, or unknown choice gives no question (N)")
@@ -428,6 +450,9 @@ public class CuratorLockPageTests {
 	 * and Tags are ticked, the first call answers "ask" and saves nothing, the question is the
 	 * S1 question, the call after Yes saves both flags, and the Curator Home Page then shows
 	 * the lesson as locked (US-CL1; LR-3). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(),
+	 * ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-12 Scenario S1: tick, ask, Yes, saved, shown as locked (P)")
@@ -453,6 +478,9 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-13, positive.  Scenario S3 from the page's side: with the title and
 	 * category locked, ticking Category and choosing Unlock clears that one flag and leaves the
 	 * title locked (US-CL2; LR-3). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(),
+	 * ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-13 Scenario S3: unlock one field, the other stays locked (P)")
@@ -475,6 +503,9 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-17, positive.  Scenario S2 from the page's side: Entire lesson is
 	 * ticked and confirmed, and the message is "Locked: entire lesson." (US-CL1; LR-3). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(),
+	 * ModelCuratorLock.confirmationQuestion(). </p>
 	 */
 	@Test
 	@DisplayName("LP-17 Scenario S2: lock the whole lesson (P)")
@@ -504,6 +535,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-14, negative.  Scenario S4: the Curator ticks a box, is asked, and
 	 * answers No, so the page never makes the confirmed call.  Nothing is locked, and the page
 	 * has a message to say so (US-CL-V; LR-4). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LP-14 Scenario S4: answering No saves nothing (N)")
@@ -523,6 +556,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-15, negative.  Scenario S5: the lesson was deleted after the page
 	 * opened.  The first call answers "Lesson not found.", so the page shows that and never
 	 * asks "Are you sure?" about something that cannot happen (US-CL-V; LR-4). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LP-15 Scenario S5: a deleted lesson is refused before any question (N)")
@@ -541,6 +576,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-16, negative.  Scenario S5: a user who is not a Curator reaches the
 	 * lock action.  The first call refuses, nothing is asked, and nothing is saved (US-CL-V;
 	 * LR-4). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.chosenFields(), ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LP-16 Scenario S5: a non-Curator is refused before any question (N)")
@@ -566,6 +603,8 @@ public class CuratorLockPageTests {
 	 * <p> Description: LP-18, positive.  A Curator opens the page for a lesson another user
 	 * owns and receives that lesson with its stored locks, so the page can show what is locked
 	 * now (US-CL1; LR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.lessonToLock(). </p>
 	 */
 	@Test
 	@DisplayName("LP-18 The page opens for a Curator and carries the stored locks (P)")
@@ -588,6 +627,8 @@ public class CuratorLockPageTests {
 	 * refused with the lock message and receive no lesson.  The same answer is given for a
 	 * lesson that does not exist, so the refusal reveals nothing (CWE-200, CWE-476; US-CL-V;
 	 * LR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.lessonToLock(). </p>
 	 */
 	@Test
 	@DisplayName("LP-19 The page refuses a non-Curator before looking up the lesson (N)")
@@ -611,6 +652,8 @@ public class CuratorLockPageTests {
 	 *
 	 * <p> Description: LP-20, negative.  A Curator opening the page for a lesson that has been
 	 * deleted receives "Lesson not found." and no lesson (scenario S5; US-CL-V; LR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.lessonToLock(). </p>
 	 */
 	@Test
 	@DisplayName("LP-20 The page refuses a deleted lesson (N)")

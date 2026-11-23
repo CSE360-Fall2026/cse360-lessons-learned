@@ -32,6 +32,11 @@ import javafx.scene.paint.Color;
  * that can invoke these methods.  This is why each has been declared "protected".  Do not change
  * any of these methods to public.</p>
  *
+ * <p> Tested by the TP2 semi-automated test M1 in lessonTests.ManualGuiTests and by M-WH1 to
+ * M-WH3, M-WH5, and M-WH6 (Manual Tests.pdf). The Model methods these actions call are tested
+ * by lessonTests.CreateLessonTests and ContributorAiToolsTests, and the Writing Help window by
+ * WritingHelpTests (JUnit). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

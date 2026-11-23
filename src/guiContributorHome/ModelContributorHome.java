@@ -20,6 +20,10 @@ import inputValidation.LessonRecognizer;
  * <p> The methods are public, unlike the Controller's protected methods, so that the automated
  * tests can call them directly without starting JavaFX.</p>
  *
+ * <p> Tested by lessonTests.ReadLessonTests (JUnit), and through the Contributor pages by
+ * lessonTests.CreateLessonTests and DeleteLessonTests; on screen by the TP2 semi-automated
+ * test M2 in lessonTests.ManualGuiTests. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

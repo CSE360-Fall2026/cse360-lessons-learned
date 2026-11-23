@@ -115,6 +115,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that clean, valid AI suggestions within the boundary return successfully.
+     *
+     * <p> Validates: SharedAiService.cleanAiSuggestion(). </p>
      */
     @Test
     public void testValidSuggestion() {
@@ -126,6 +128,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that null AI responses are rejected.
+     *
+     * <p> Validates: SharedAiService.cleanAiSuggestion(). </p>
      */
     @Test
     public void testNullSuggestionThrowsException() {
@@ -140,6 +144,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that empty or whitespace only AI responses are rejected.
+     *
+     * <p> Validates: SharedAiService.cleanAiSuggestion(). </p>
      */
     @Test
     public void testEmptySuggestionThrowsException() {
@@ -154,6 +160,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests the upper boundary length of an allowed suggestion.
+     *
+     * <p> Validates: SharedAiService.cleanAiSuggestion(). </p>
      */
     @Test
     public void testMaxLengthBoundaryValid() {
@@ -165,6 +173,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that suggestions exceeding the maximum length boundary are rejected.
+     *
+     * <p> Validates: SharedAiService.cleanAiSuggestion(). </p>
      */
     @Test
     public void testExceedsMaxLengthThrowsException() {
@@ -180,6 +190,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that suggestions containing invalid ASCII control characters are rejected.
+     *
+     * <p> Validates: SharedAiService.cleanAiSuggestion(). </p>
      */
     @Test
     public void testControlCharacterThrowsException() {
@@ -195,6 +207,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that the session consent updates properly (US-AI-D2-01).
+     *
+     * <p> Validates: SharedAiService.hasUserConsented(), SharedAiService.setUserConsented(). </p>
      */
     @Test
     public void testConsentStateToggle() {
@@ -206,6 +220,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that coaching requests are blocked if user consent has not been granted (US-AI-D2-01).
+     *
+     * <p> Validates: SharedAiService.requestCoaching(). </p>
      */
     @Test
     public void testCoachingBlockedWithoutConsent() {
@@ -220,6 +236,8 @@ public class SharedAiServiceTests {
 
     /**
      * Tests that search term requests are blocked if user consent has not been granted (US-AI-D2-01).
+     *
+     * <p> Validates: SharedAiService.requestSearchTerms(). </p>
      */
     @Test
     public void testSearchTermsBlockedWithoutConsent() {
@@ -235,6 +253,8 @@ public class SharedAiServiceTests {
     /**
      * Tests that once consent is granted, requestConsentIfNeeded returns true immediately
      * without re-prompting (US-AI-D2-01).
+     *
+     * <p> Validates: SharedAiService.requestConsentIfNeeded(). </p>
      */
     @Test
     public void testRequestConsentIfNeededSkipsDialogWhenAlreadyConsented() {
@@ -253,6 +273,8 @@ public class SharedAiServiceTests {
      * One user's acceptance does not cover a different user who logs in later, and the same
      * user stays accepted after logging out and back in (US-AI-D2-01).  No user (null) never
      * counts as accepted.
+     *
+     * <p> Validates: SharedAiService.requestConsentIfNeeded(). </p>
      */
     @Test
     public void testConsentIsPerUser() {
@@ -269,6 +291,10 @@ public class SharedAiServiceTests {
     /**
      * A user without consent is refused for every request, and nothing reaches the provider,
      * even when another user has consented (US-AI-D2-01).
+     *
+     * <p> Validates: SharedAiService.requestCoaching(),
+     * SharedAiService.requestLessonSearchTerms(), SharedAiService.requestBrainstormReply(),
+     * SharedAiService.requestTakeaways(). </p>
      */
     @Test
     public void testNothingIsSentWithoutThisUsersConsent() {
@@ -284,6 +310,8 @@ public class SharedAiServiceTests {
 
     /**
      * With consent and a key, coaching returns the cleaned reply (US-P-E1-02).
+     *
+     * <p> Validates: SharedAiService.requestCoaching(). </p>
      */
     @Test
     public void testCoachingSucceedsWithConsent() {
@@ -298,6 +326,8 @@ public class SharedAiServiceTests {
      * A missing API key gives the unavailable message without sending anything, and a provider
      * failure gives the same message without the provider's own error text, which can contain
      * the request or the credential (US-AI-D2-02).
+     *
+     * <p> Validates: SharedAiService.requestCoaching(). </p>
      */
     @Test
     public void testMissingKeyAndFailureGiveTheUnavailableMessage() {
@@ -320,6 +350,8 @@ public class SharedAiServiceTests {
      * Lesson search terms fit the search-term rule: commas inside a term are removed, blank,
      * over-50-character, and repeated terms are dropped, and the total stays within 500
      * characters (US-C-E2-01).  If nothing usable is left, the request counts as failed.
+     *
+     * <p> Validates: SharedAiService.requestLessonSearchTerms(). </p>
      */
     @Test
     public void testLessonSearchTermsFitTheRule() {
@@ -346,6 +378,9 @@ public class SharedAiServiceTests {
     /**
      * Brainstorming returns the next question, and takeaways drop unusable items; with no
      * usable takeaway the request counts as failed (US-P-E1-01, US-AI-D2-02).
+     *
+     * <p> Validates: SharedAiService.requestBrainstormReply(),
+     * SharedAiService.requestTakeaways(). </p>
      */
     @Test
     public void testBrainstormReplyAndTakeaways() {
@@ -367,6 +402,8 @@ public class SharedAiServiceTests {
     /**
      * A refinement request sends nothing until this Curator accepted the notice; another
      * user's acceptance does not count (US-C-E3-03, US-AI-D2-01).
+     *
+     * <p> Validates: SharedAiService.requestRefinement(). </p>
      */
     @Test
     public void testRefinementNeedsThisUsersConsent() {
@@ -382,6 +419,8 @@ public class SharedAiServiceTests {
      * A refinement is cleaned for its field: surrounding quotes go, a title becomes one line,
      * a description keeps its line breaks, and the field, text, and goal reach the provider
      * (US-C-E3-03).
+     *
+     * <p> Validates: SharedAiService.requestRefinement(). </p>
      */
     @Test
     public void testRefinementIsCleanedForItsField() {
@@ -400,6 +439,8 @@ public class SharedAiServiceTests {
      * A reply that does not fit the field, an empty reply, a failure, or a missing key all give
      * the one unavailable message, which never shows the provider's error or the key
      * (US-C-E3-08, US-AI-D2-02).
+     *
+     * <p> Validates: SharedAiService.requestRefinement(). </p>
      */
     @Test
     public void testRefinementProblemsGiveTheUnavailableMessage() {

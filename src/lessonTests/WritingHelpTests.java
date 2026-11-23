@@ -171,6 +171,8 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-01: The window starts with its own opening question, so nothing has been sent and
 	 * there is no answer yet (US-P-E1-01). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.transcript(), ModelWritingHelp.answerCount(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -184,6 +186,8 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-02: An empty answer and an answer over 2000 characters are refused before anything
 	 * is sent. </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.send(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -199,6 +203,8 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-03: Without this user's consent nothing is sent and the conversation is unchanged,
 	 * even if another user has consented (US-AI-D2-01). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.send(), ModelWritingHelp.answerCount(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -215,6 +221,9 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-04: With consent, the answer and the AI's next question are added to the
 	 * conversation, each labeled (US-P-E1-01: "answer follow-up questions"). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.send(), ModelWritingHelp.transcript(),
+	 * ModelWritingHelp.answerCount(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -230,6 +239,9 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-05: If the AI fails, the message says so and the conversation is left as it was,
 	 * so the answer can be sent again (US-AI-D2-02). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.transcript(), ModelWritingHelp.send(),
+	 * ModelWritingHelp.answerCount(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -249,6 +261,8 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-06: Takeaways need at least one answer; then the AI's takeaways are returned for
 	 * the Contributor to choose from (US-P-E1-01: "choose the final content"). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.takeaways(), ModelWritingHelp.send(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -270,6 +284,8 @@ public class WritingHelpTests {
 	 * <p> WH-07: Chosen takeaways are added after the existing text: in the Description one
 	 * per line after a blank line, in the one-line Recommendation as sentences after a space.
 	 * The page is asked to set the text, which marks it as AI-assisted (US-P-E1-02). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.addToDraft(), ModelWritingHelp.appendItems(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -299,6 +315,8 @@ public class WritingHelpTests {
 	 * <p> WH-08: A locked field is refused with the lock message and left unchanged, and Add
 	 * with nothing chosen is refused (US-P-E1-02 V sentence: a locked field gives "that field's
 	 * specific message" and the draft is kept). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.addToDraft(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -319,6 +337,8 @@ public class WritingHelpTests {
 	/**********
 	 * <p> WH-09: The example search finds only the Contributor's own lessons, even when another
 	 * Contributor's lesson has the same words (US-P-E1-03). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.searchExamples(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -333,6 +353,8 @@ public class WritingHelpTests {
 
 	/**********
 	 * <p> WH-10: An empty search is explained instead of searched (US-P-E1-03 V sentence). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.searchError(), ModelWritingHelp.searchExamples(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -349,6 +371,8 @@ public class WritingHelpTests {
 	 * shows its title, category, description, root cause, and recommendation; another
 	 * Contributor's lesson, or one that does not exist, gives "Lesson not found."
 	 * (US-P-E1-03). </p>
+	 *
+	 * <p> Validates: ModelWritingHelp.exampleText(). </p>
 	 */
 	@Test
 	@Order(11)
@@ -368,6 +392,9 @@ public class WritingHelpTests {
 	 * Curator's consent nothing is sent (US-C-E2-01, US-AI-D2-01). </p>
 	 *
 	 * @throws Exception if the Curator cannot be registered
+	 *
+	 * <p> Validates: ModelCuratorSearchTerms.openLesson(),
+	 * ModelCuratorSearchTerms.requestSuggestion(). </p>
 	 */
 	@Test
 	@Order(12)

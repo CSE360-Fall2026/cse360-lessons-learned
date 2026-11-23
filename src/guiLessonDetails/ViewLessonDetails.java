@@ -43,6 +43,9 @@ import entityClasses.User;
  * <p> As in every Foundations View, this class only declares and positions the widgets.  What
  * they do lives in ControllerLessonDetails, and the data work in ModelLessonDetails.</p>
  *
+ * <p> Tested by the TP2 semi-automated tests M3, M4, and M7 in lessonTests.ManualGuiTests and
+ * by M-CL5, M-CS6, and M-RF6 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

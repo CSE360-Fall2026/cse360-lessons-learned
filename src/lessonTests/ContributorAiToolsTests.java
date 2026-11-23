@@ -62,6 +62,8 @@ public class ContributorAiToolsTests {
 	/**
 	 * A lesson created with AI-assisted text keeps the AI-assistance indicator, the root cause,
 	 * and the recommendation (US-P-E1-02).
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	public void testCreateWithAiApplied() {
@@ -84,6 +86,8 @@ public class ContributorAiToolsTests {
 
 	/**
 	 * A lesson written without AI is saved without the AI-assistance indicator (US-P-E1-02).
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	public void testCreateWithoutAiApplied() {
@@ -105,6 +109,8 @@ public class ContributorAiToolsTests {
 	/**
 	 * A root cause over 2000 characters is refused, and the result names that field
 	 * (US-P-E1-02 V sentence).
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	public void testRejectsOverLimitRootCause() {
@@ -126,6 +132,8 @@ public class ContributorAiToolsTests {
 	/**
 	 * An update with AI-assisted text keeps the indicator, and an update that would change a locked
 	 * description is refused for that field (US-P-E1-02: a lock is never overridden).
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(), ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	public void testUpdateWithAiAndLockProtection() {
@@ -154,6 +162,9 @@ public class ContributorAiToolsTests {
 	/**
 	 * The example search finds only the Contributor's own lessons, not another Contributor's with
 	 * the same words (US-P-E1-03).
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(),
+	 * ModelContributorHome.searchMyLessonsByKeyword(). </p>
 	 */
 	@Test
 	public void testExampleSearchOnlyShowsOwnLessons() {

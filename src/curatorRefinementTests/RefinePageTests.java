@@ -153,6 +153,8 @@ public class RefinePageTests {
 	 * RP-01 (N): even if the page passed "consented", the shared service sends nothing for a
 	 * Curator who has not accepted the AI notice, and the request reports the AI as
 	 * unavailable without changing the lesson (US-C-E3-03).
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
 	 */
 	@Test
 	@DisplayName("RP-01 No AI request without this Curator's acceptance of the notice (US-C-E3-03, N)")
@@ -167,6 +169,8 @@ public class RefinePageTests {
 
 	/**********
 	 * RP-02 (N): another Curator's acceptance does not count for this Curator (US-AI-D2-01).
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
 	 */
 	@Test
 	@DisplayName("RP-02 Another user's acceptance does not let this Curator's request through (US-AI-D2-01, N)")
@@ -181,6 +185,8 @@ public class RefinePageTests {
 	 * RP-03 (P): with consent, the chosen field, its stored text, and the goal reach the shared
 	 * service; the cleaned suggestion and the original come back side by side, and the stored
 	 * lesson is unchanged (US-C-E3-03, US-C-E3-04).
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
 	 */
 	@Test
 	@DisplayName("RP-03 A suggestion comes back beside the original and changes nothing (US-C-E3-03/04, P)")
@@ -198,6 +204,8 @@ public class RefinePageTests {
 
 	/**********
 	 * RP-04 (P): a title suggestion is made one line, as the lesson form needs (US-C-E3-05).
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
 	 */
 	@Test
 	@DisplayName("RP-04 A title suggestion is one line (US-C-E3-05, P)")
@@ -214,6 +222,9 @@ public class RefinePageTests {
 	 * RP-05 (N, then P): a provider failure gives the fixed message without the provider's
 	 * error or key, keeps the review so the Curator can continue, and a manual refinement can
 	 * still be saved (US-C-E3-08).
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(),
+	 * ModelCuratorRefine.saveRefinement(). </p>
 	 */
 	@Test
 	@DisplayName("RP-05 A failure keeps the review; manual wording can still be saved (US-C-E3-08, N/P)")
@@ -239,6 +250,8 @@ public class RefinePageTests {
 	 * RP-06 (N): a title suggestion longer than 100 characters is never shown; the request
 	 * reports the AI as unavailable and the lesson is unchanged (US-C-E3-08, "an unusable
 	 * response is not applied or saved").
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(). </p>
 	 */
 	@Test
 	@DisplayName("RP-06 An unusable suggestion is not shown or saved (US-C-E3-08, N)")
@@ -257,6 +270,9 @@ public class RefinePageTests {
 	 * then has the Curator's wording, the contributor's original text, and the Curator's name,
 	 * and the review snapshot taken after the save matches the stored lesson (US-C-E3-01,
 	 * US-C-E3-06).
+	 *
+	 * <p> Validates: ModelCuratorRefine.requestSuggestion(),
+	 * ModelCuratorRefine.saveRefinement(). </p>
 	 */
 	@Test
 	@DisplayName("RP-07 Suggest, edit, and save; the original and the Curator are recorded (US-C-E3-01/06, P)")
@@ -283,6 +299,8 @@ public class RefinePageTests {
 	/**********
 	 * RP-08 (P): the "Edited by curator" note names the Curator and the date and time in
 	 * English (US-C-E3-07).
+	 *
+	 * <p> Validates: CurationNote.text(). </p>
 	 */
 	@Test
 	@DisplayName("RP-08 The Edited by curator note names the Curator and the time (US-C-E3-07, P)")
@@ -297,6 +315,8 @@ public class RefinePageTests {
 	/**********
 	 * RP-09 (N): no note for a missing lesson, a lesson never refined, or incomplete
 	 * attribution, so no false "Edited by curator" note appears (US-C-E3-07 V sentence).
+	 *
+	 * <p> Validates: CurationNote.text(). </p>
 	 */
 	@Test
 	@DisplayName("RP-09 No note without a complete refinement (US-C-E3-07, N)")
@@ -315,6 +335,8 @@ public class RefinePageTests {
 	 * RP-10 (P/N): the Curator Home details show the note after the locks and the original text
 	 * at the end for a refined lesson, and are unchanged for a lesson never refined
 	 * (US-C-E3-01, US-C-E3-07).
+	 *
+	 * <p> Validates: CurationNote.text(), ModelCuratorHome.detailsText(). </p>
 	 */
 	@Test
 	@DisplayName("RP-10 Curator Home details show the note and the original text (US-C-E3-01/07, P/N)")

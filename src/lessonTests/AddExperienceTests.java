@@ -184,6 +184,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means "Experience added" was returned, one
 	 * 3.5-hour entry is stored for this lesson, and the lesson title is unchanged. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -215,6 +217,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means both entries are stored, in the order they
 	 * were added. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -251,6 +255,8 @@ public class AddExperienceTests {
 	 * <p> <b>Steps:</b> submit 0.1 hours with the 5-character description "Fixed". </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the entry is saved with 0.1 hours. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -281,6 +287,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the time/effort message is returned for the
 	 * hours field and 0 entries are stored. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -311,6 +319,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the time/effort message is returned and 0
 	 * entries are stored. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -340,6 +350,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the description message is returned for the
 	 * description field and 0 entries are stored. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -376,6 +388,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the stored entry has exactly those two
 	 * members with those hours. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -416,6 +430,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the entry is saved with 20 member
 	 * shares. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -448,6 +464,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the sum message is returned for the member
 	 * list and 0 entries are stored. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -479,6 +497,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the 20-member message is returned and 0
 	 * entries are stored. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -508,6 +528,8 @@ public class AddExperienceTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the name message is returned for the member
 	 * name field and 0 entries are stored. </p>
+	 *
+	 * <p> Validates: ModelAddExperience.addExperience(). </p>
 	 */
 	@Test
 	@Order(11)

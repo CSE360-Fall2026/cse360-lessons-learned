@@ -33,6 +33,12 @@ import javafx.scene.control.ButtonType;
  * JUnit tests pass a simulated backend to the constructor, so every path can be tested without
  * a key or a network. </p>
  *
+ * <p> Tested by lessonTests.SharedAiServiceTests (JUnit, all 19 tests: consent per user,
+ * nothing sent without it, cleaning, and failures), and through its callers by
+ * lessonTests.WritingHelpTests and curatorRefinementTests.RefinePageTests (RP-01 to RP-07).
+ * Tested by hand in M-WH1 and M-WH6 (one notice per user, no key), M-ST2, and M-RF2 (Manual
+ * Tests.pdf). </p>
+ *
  * @author Virgil Jones
  * @author Emilia Davey
  *

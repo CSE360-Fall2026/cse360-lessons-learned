@@ -123,6 +123,8 @@ public class CuratorSummaryPageTests {
 	 * <p> SP-01: A Curator opens the target lesson and gets its title and no saved summary; a
 	 * Contributor and no user are refused with the Curator message; a missing lesson gives
 	 * "Lesson not found." (US-C-E5-02, US-C-E4-01). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.openLesson(), ModelCuratorSummary.getSummary(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -145,6 +147,8 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-02: The list of lessons to choose from has every lesson for a Curator, and nothing
 	 * for anyone else (US-C-E4-01). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.sourceChoices(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -161,6 +165,8 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-03: Each row names the lesson, its owner, and how many experience records it has,
 	 * in the singular for one, so the Curator can judge what is being merged (US-C-E4-02). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.choiceRow(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -184,6 +190,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-04: Preview returns the summary and makes Confirm possible; a refusal returns the
 	 * story's message and no summary, and leaves nothing to confirm (US-C-E4-01). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.preview(), ModelCuratorSummary.getSummary(),
+	 * ModelCuratorSummary.hasPreview(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -207,6 +216,9 @@ public class CuratorSummaryPageTests {
 	 * <p> SP-05: The table labels every statistic, names the source lessons, shows hours to two
 	 * decimal places, and shows N/A for the standard deviation of one observation; a source
 	 * lesson deleted since the merge is listed as deleted (US-C-E4-02, US-C-E4-03). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.preview(), ModelCuratorSummary.tableText(),
+	 * ModelCuratorSummary.confirm(), ModelCuratorSummary.getSummary(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -240,6 +252,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-06: Confirm after a preview saves the summary with the SAVED message and leaves
 	 * nothing to confirm; Confirm without a preview is refused (US-C-E4-01). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.confirm(), ModelCuratorSummary.preview(),
+	 * ModelCuratorSummary.hasPreview(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -262,6 +277,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-07: If the data changed since the preview, Confirm saves nothing, says so, and
 	 * gives the page the refreshed preview to show; the next Confirm saves it (US-C-E4-02). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.preview(), ModelCuratorSummary.confirm(),
+	 * ModelCuratorSummary.getSummary(), ModelCuratorSummary.hasPreview(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -282,6 +300,9 @@ public class CuratorSummaryPageTests {
 
 	/**********
 	 * <p> SP-08: Cancel discards the preview and saves nothing (US-C-E4-01 V sentence). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.preview(), ModelCuratorSummary.cancel(),
+	 * ModelCuratorSummary.hasPreview(), ModelCuratorSummary.confirm(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -297,6 +318,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-09: A new Model, as made each time the page is displayed, has no preview, so a
 	 * preview from an earlier visit can never be confirmed; openLesson also discards one. </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.preview(), ModelCuratorSummary.openLesson(),
+	 * ModelCuratorSummary.hasPreview(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -318,6 +342,8 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-10: Show and Hide report what they did and return the summary as it is now; on a
 	 * lesson with no summary the refusal is returned (US-C-E5-01). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.setVisibility(), ModelCuratorSummary.getSummary(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -341,6 +367,9 @@ public class CuratorSummaryPageTests {
 	 * <p> SP-11: The saved line says whether there is a summary and who can see it, and the
 	 * confirmation question says when a summary is replaced and that it starts hidden
 	 * (US-C-E5-01, US-C-E4-02, US-C-E5-02). </p>
+	 *
+	 * <p> Validates: ModelCuratorSummary.savedLine(), ModelCuratorSummary.setVisibility(),
+	 * ModelCuratorSummary.confirmationQuestion(). </p>
 	 */
 	@Test
 	@Order(11)
@@ -372,6 +401,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-12: The exact panel text for the US-C-E4-03 example: one labeled statistic per
 	 * line, in hours, to two decimal places. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.summaryPanelText(),
+	 * ModelCuratorSummary.setVisibility(). </p>
 	 */
 	@Test
 	@Order(12)
@@ -389,6 +421,9 @@ public class CuratorSummaryPageTests {
 	 * show the same sentence, so the Contributor cannot tell a hidden one exists, and neither
 	 * shows numbers; a visible one shows its statistics, and hiding it again removes them on the
 	 * next read (US-C-E5-02). </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.summaryPanelText(),
+	 * ModelCuratorSummary.setVisibility(). </p>
 	 */
 	@Test
 	@Order(13)
@@ -412,6 +447,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-14: The Viewer's lesson details include a summary only when the Curator made it
 	 * visible, and never a hidden one (US-V-04). </p>
+	 *
+	 * <p> Validates: ModelViewerHome.visibleSummaryText(),
+	 * ModelCuratorSummary.setVisibility(). </p>
 	 */
 	@Test
 	@Order(14)
@@ -430,6 +468,9 @@ public class CuratorSummaryPageTests {
 	/**********
 	 * <p> SP-15: The numbers read "12.00", not "12,00", even on a computer whose language uses a
 	 * decimal comma (here German); the default language is restored afterwards. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.summaryPanelText(),
+	 * ModelCuratorSummary.setVisibility(), ModelCuratorSummary.tableText(). </p>
 	 */
 	@Test
 	@Order(15)

@@ -25,6 +25,11 @@ import javafx.scene.paint.Color;
  *
  * <p> Supports US-V-01, US-V-02, US-V-03, and US-V-04. </p>
  *
+ * <p> Tested by viewerTests.ViewerAttributionTests (JUnit: the curation note in the details)
+ * and by M-V2 to M-V6, M-CS7, and M-ST6 (Manual Tests.pdf). The Model methods these actions
+ * call are tested by viewerTests.ViewerHomeTests and ViewerDatabaseIntegrationTests (JUnit).
+ * </p>
+ *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9

@@ -31,6 +31,15 @@ import entityClasses.User;
  * and provides numerous special supporting methods.
  * </p>
  *
+ * <p> Tested by the JUnit tests of the features that use it:
+ * database.DatabaseAuthenticationTest (login); curatorLockTests.CuratorLockTests
+ * (setLessonLocks); curatorTests.CuratorSearchTermsTests and
+ * viewerTests.ViewerDatabaseIntegrationTests (saveCuratorSearchTerms and the Viewer's reads);
+ * curatorRefinementTests.CuratorRefinementTests (saveCuratorRefinement);
+ * curatorSummaryTests.CuratorSummaryTests (saveLessonSummary, getLessonSummary, and
+ * setStatsVisibleToContributor); and the lessonTests Contributor tests (lessons and experience
+ * records). The manual tests in Manual Tests.pdf use it on every page. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter
@@ -67,6 +76,8 @@ public class Database {
 	/** Database URL: an H2 file named FoundationDatabase in the user's home folder. */
 	static final String DB_URL = "jdbc:h2:~/FoundationDatabase";
 
+	/** The JDBC URL this object connects to: DB_URL in the application, an in-memory H2
+	 *  database in the JUnit tests (so tests never touch FoundationDatabase). */
 	private final String databaseUrl;
 
 	/** Database user name (H2 default). */
@@ -115,6 +126,15 @@ public class Database {
 	    this(DB_URL);
 	}
 
+	/*******
+	 * <p> Method: Database(String databaseUrl) </p>
+	 *
+	 * <p> Description: Creates a Database for the given JDBC URL.  The JUnit tests pass an
+	 * in-memory H2 URL, so each test gets its own empty database.</p>
+	 *
+	 * @param databaseUrl the JDBC URL to connect to; it may not be null or blank
+	 * @throws IllegalArgumentException if the URL is null or blank
+	 */
 	public Database(String databaseUrl) {
 	    if (databaseUrl == null || databaseUrl.isBlank()) {
 	        throw new IllegalArgumentException("Database URL cannot be empty.");

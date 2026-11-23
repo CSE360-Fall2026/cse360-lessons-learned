@@ -28,6 +28,12 @@ import org.junit.jupiter.api.Test;
  */
 class LessonsLearnedSearchTest {
 
+	/**********
+	 * Default constructor.  JUnit creates an instance for each test.
+	 */
+	LessonsLearnedSearchTest() {
+	}
+
 	/*****
 	 * <p>
 	 * Method: searchMatchesCuratorApprovedTerms()
@@ -38,6 +44,8 @@ class LessonsLearnedSearchTest {
 	 * search term, even when that term doesn't appear in the lesson's title,
 	 * description, or tags.
 	 * </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.add(), LessonsLearnedList.filterByKeywords(). </p>
 	 */
     @Test
     void searchMatchesCuratorApprovedTerms() {
@@ -77,6 +85,9 @@ class LessonsLearnedSearchTest {
 	 * Description: Checks that searching for a word in a lesson's title still
 	 * returns the correct lesson after the TP3 changes.
 	 * </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.add(), LessonsLearnedList.filterByKeywords(),
+	 * LessonsLearnedList.assertEquals(). </p>
 	 */
     @Test
     void searchMatchesLessonTitle() {
@@ -106,6 +117,8 @@ class LessonsLearnedSearchTest {
 	 * Description: Checks that searching for a word that doesn't match any lesson
 	 * returns an empty list instead of unrelated results.
 	 * </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.add(), LessonsLearnedList.filterByKeywords(). </p>
 	 */
     @Test
     void searchWithNoMatchesReturnsEmptyList() {

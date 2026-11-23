@@ -16,9 +16,14 @@ import guiTools.LessonResult;
  * a fixture, not a live AI result. Run through Test-Aspect6.ps1 -RunDemo to use a
  * separate disposable database. Tests cover the same model; this only demonstrates
  * the original/suggestion/review/save sequence for the team's integration review.
+ *
+ * <p> This demonstration is run by hand (Test-Aspect6.ps1 -RunDemo). The Model it demonstrates
+ * is tested by curatorRefinementTests.CuratorRefinementTests RF-01 to RF-42 (JUnit). </p>
+ *
  * @author Daniel Martinez Julio
  */
 public final class CuratorRefinementDemo {
+    /** Not used: the demonstration is run through main(). */
     private CuratorRefinementDemo() { }
 
     /**
@@ -69,6 +74,13 @@ public final class CuratorRefinementDemo {
         }
     }
 
+    /**
+     * Wraps text at about 32 characters a line, so the original and the suggestion fit side
+     * by side in the terminal.
+     *
+     * @param text the text to wrap
+     * @return the text with line breaks between words
+     */
     private static String wrap(String text) {
         StringBuilder lines = new StringBuilder();
         int length = 0;

@@ -10,6 +10,9 @@ package guiWritingHelp;
  * has locked (US-P-E1-02).  Nothing is saved until the Contributor saves the lesson on that
  * page (US-P-E1-01). </p>
  *
+ * <p> Tested by lessonTests.WritingHelpTests WH-07 and WH-08 (JUnit: takeaways added to the
+ * draft, a locked field refused), and on screen by M-WH3 and M-WH4 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

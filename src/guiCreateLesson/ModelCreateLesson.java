@@ -25,6 +25,9 @@ import guiTools.LessonResult;
  *
  * <p> The methods are public so the automated tests can call them without starting JavaFX.</p>
  *
+ * <p> Tested by lessonTests.CreateLessonTests and ContributorAiToolsTests (JUnit), and on
+ * screen by the TP2 semi-automated test M1 in lessonTests.ManualGuiTests. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

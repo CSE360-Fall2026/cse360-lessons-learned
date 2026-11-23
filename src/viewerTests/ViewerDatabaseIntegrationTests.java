@@ -36,10 +36,20 @@ import guiViewerHome.ModelViewerHome;
  */
 public class ViewerDatabaseIntegrationTests {
 
+    /** The in-memory database each test uses. */
     private Database database;
+    /** A user with only the Viewer role. */
     private User viewer;
+    /** A user with only the Contributor role, who owns the test lessons. */
     private User contributor;
+    /** A user with the Curator role, who saves search terms. */
     private User curator;
+
+    /**********
+     * Default constructor.  JUnit creates an instance for each test.
+     */
+    public ViewerDatabaseIntegrationTests() {
+    }
 
     /**********
      * <p> Method: setUp() </p>
@@ -132,6 +142,8 @@ public class ViewerDatabaseIntegrationTests {
      * retrieve lessons from multiple Contributors. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: ModelViewerHome.viewAllLessons(). </p>
      */
     @Test
     public void testViewerCanRetrieveAllLessons()
@@ -163,6 +175,8 @@ public class ViewerDatabaseIntegrationTests {
      * open a lesson saved in the database. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: ModelViewerHome.viewLesson(). </p>
      */
     @Test
     public void testViewerCanOpenSavedLesson()
@@ -191,6 +205,8 @@ public class ViewerDatabaseIntegrationTests {
      * search lessons stored in the database. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: ModelViewerHome.searchAllLessons(). </p>
      */
     @Test
     public void testViewerCanSearchSavedLessons()
@@ -224,6 +240,8 @@ public class ViewerDatabaseIntegrationTests {
      * Curator can save approved search terms. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: Database.saveCuratorSearchTerms(). </p>
      */
     @Test
     public void testCuratorCanSaveSearchTerms()
@@ -263,6 +281,8 @@ public class ViewerDatabaseIntegrationTests {
      * terms make a lesson searchable by Viewers. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: ModelViewerHome.searchAllLessons(), Database.saveCuratorSearchTerms(). </p>
      */
     @Test
     public void testViewerCanSearchCuratorTerms()
@@ -305,6 +325,8 @@ public class ViewerDatabaseIntegrationTests {
      * the Curator role cannot save approved terms. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: Database.saveCuratorSearchTerms(). </p>
      */
     @Test
     public void testNonCuratorCannotSaveSearchTerms()
@@ -344,6 +366,8 @@ public class ViewerDatabaseIntegrationTests {
      * search terms cannot overwrite a newer edit. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: Database.saveCuratorSearchTerms(). </p>
      */
     @Test
     public void testOutdatedSearchTermsCannotOverwrite()
@@ -393,6 +417,8 @@ public class ViewerDatabaseIntegrationTests {
      * cannot access all lessons through the Viewer Model. </p>
      *
      * @throws SQLException if lesson creation fails
+     *
+     * <p> Validates: ModelViewerHome.viewAllLessons(). </p>
      */
     @Test
     public void testNonViewerCannotRetrieveSavedLessons()

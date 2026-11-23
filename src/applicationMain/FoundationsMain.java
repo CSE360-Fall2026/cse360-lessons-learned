@@ -50,6 +50,11 @@ import javafx.stage.Stage;
  * JavaFX in Eclipse requires they be made available in the application's main method, even if they
  * are not needed.</p>
  *
+ * <p> Tested by running the application: every manual test in Manual Tests.pdf (M-CH1 to M-V6)
+ * starts here. The JUnit suites that use the shared FoundationsMain.database, such as
+ * curatorRefinementTests.CuratorRefinementTests and the lessonTests Contributor tests, also
+ * run through it. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * <p>@author Lynn Robert Carter</p>

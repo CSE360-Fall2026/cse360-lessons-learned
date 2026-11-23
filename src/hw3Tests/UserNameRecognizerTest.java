@@ -202,6 +202,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-01, boundary value length 0.  An empty username is rejected and the
 	 * error index is 0 (UN-R1, UN-R7). </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-01 Empty input is rejected (length 0)")
@@ -214,6 +216,8 @@ public class UserNameRecognizerTest {
 	 * <p> Method: void un02_threeCharacters() </p>
 	 *
 	 * <p> Description: UN-02, boundary value minimum - 1.  Three letters are too short. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-02 Three characters are too short (min - 1)")
@@ -226,6 +230,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-03, boundary value minimum.  Four letters is the shortest valid
 	 * username, so the result is "" and the error index is -1 (UN-R3, UN-R7). </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-03 Four characters are accepted (min)")
@@ -238,6 +244,8 @@ public class UserNameRecognizerTest {
 	 * <p> Method: void un04_fiveCharacters() </p>
 	 *
 	 * <p> Description: UN-04, boundary value minimum + 1.  Five letters are accepted. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-04 Five characters are accepted (min + 1)")
@@ -256,6 +264,8 @@ public class UserNameRecognizerTest {
 	 * <p> Method: void un05_thirtyOneCharacters() </p>
 	 *
 	 * <p> Description: UN-05, boundary value maximum - 1.  31 characters are accepted. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-05 31 characters are accepted (max - 1)")
@@ -268,6 +278,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-06, boundary value maximum.  32 characters is the longest valid
 	 * username (UN-R4). </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-06 32 characters are accepted (max)")
@@ -280,6 +292,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-07, boundary value maximum + 1.  33 characters are rejected, and the
 	 * error index points to the 33rd character, index 32 (UN-R4, UN-R7). </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-07 33 characters are rejected (max + 1)")
@@ -293,6 +307,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-08, a value well above the maximum (41).  The machine stops counting
 	 * at 33, so a much longer name gets the same message. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-08 41 characters are rejected (far over max)")
@@ -312,6 +328,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-09, negative test.  A digit cannot start a username; the error is at
 	 * index 0.  This is state 0's "anything else" transition and the state 0 exit. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-09 A digit cannot be first (index 0)")
@@ -324,6 +342,8 @@ public class UserNameRecognizerTest {
 	 * <p> Method: void un10_separatorFirst() </p>
 	 *
 	 * <p> Description: UN-10, negative test.  A separator cannot start a username. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-10 A separator cannot be first")
@@ -336,6 +356,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-11, boundary value first position.  A leading space is rejected by
 	 * the first-character rule. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-11 A space cannot be first")
@@ -357,6 +379,8 @@ public class UserNameRecognizerTest {
 	 * characters after them include an upper-case letter, a lower-case letter, and a digit.
 	 * This takes state 1's separator transition and every part of state 2's letter-or-digit
 	 * transition back to state 1. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-12 Each separator . - _ & is accepted, followed by A-Z, a-z, or 0-9")
@@ -372,6 +396,8 @@ public class UserNameRecognizerTest {
 	 * state has its own copy of these tests, so the edges are checked in all three: as the first
 	 * character (state 0, letters only), after a letter (state 1), and right after a separator
 	 * (state 2). </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-13 Range edges A Z a z 0 9 are accepted in states 0, 1, and 2")
@@ -392,6 +418,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-14, boundary value last position.  A username cannot end with a
 	 * separator; this is the state 2 exit.  The index is 5, one past the last character. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-14 A separator cannot be last (index 5)")
@@ -405,6 +433,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-15, negative test.  Two periods in a row: state 2's "anything else"
 	 * transition.  The index points to the second period. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-15 Two periods in a row are rejected (index 3)")
@@ -418,6 +448,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-16, negative test.  Two different separators in a row are also
 	 * rejected. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-16 Two different separators in a row are rejected (index 5)")
@@ -431,6 +463,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-17, boundary value.  "a-b" has only 3 characters even though one is a
 	 * separator, so it is too short. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-17 Separators count toward the length (a-b is too short)")
@@ -443,6 +477,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-18, boundary value.  A 32-character name with a separator as its
 	 * 31st character is valid. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-18 A separator just before the maximum is accepted (32 chars)")
@@ -455,6 +491,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-19, boundary value.  A 32-character name whose last character is a
 	 * separator is rejected for the separator, not for its length. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-19 32 characters ending in a separator are rejected (index 32)")
@@ -468,6 +506,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-20, negative test.  A space after four valid characters stops state 1
 	 * with characters left over, which gives the invalid-character message (UN-R5). </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-20 A space in the middle is rejected (index 4)")
@@ -480,6 +520,8 @@ public class UserNameRecognizerTest {
 	 * <p> Method: void un21_invalidLastCharacter() </p>
 	 *
 	 * <p> Description: UN-21, boundary value last position.  A trailing space is rejected. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-21 A trailing space is rejected (index 4)")
@@ -494,6 +536,8 @@ public class UserNameRecognizerTest {
 	 * <p> Description: UN-22, coverage of the reset at the start of every call.  The state
 	 * machine keeps its state in static fields, so a rejected name must not affect the next
 	 * call. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-22 A rejected name does not affect the next call")
@@ -514,6 +558,8 @@ public class UserNameRecognizerTest {
 	 * and right after a separator (state 2).  Added after the coverage run showed that no other
 	 * test sent a character just above z, or a character just outside the digit range in state
 	 * 2. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-28 Characters just outside the ranges are rejected in states 0, 1, and 2")
@@ -559,6 +605,8 @@ public class UserNameRecognizerTest {
 	 * at the @ after counting only 2 characters.  In HW3 the exit logic checked "fewer than 4"
 	 * before "characters left over", so the user was wrongly told the name is too short; B-20
 	 * moved the leftover-characters check first. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-23 Fixed D5: ab@cd gets the invalid-character message")
@@ -571,6 +619,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-24, regression test for defect D5.  The same defect with an
 	 * 8-character name, where the HW3 "at least 4 characters" message was clearly wrong. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-24 Fixed D5: ab!cdefg gets the invalid-character message")
@@ -586,6 +636,8 @@ public class UserNameRecognizerTest {
 	 * the machine when the count passes 32, and in HW3 the exit logic then reported a separator
 	 * problem instead; B-20 added a size check to state 2's exit.  This test also covers the true
 	 * branch of state 2's size check. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-25 Fixed D6: 33 chars ending in _c get the too-long message")
@@ -599,6 +651,8 @@ public class UserNameRecognizerTest {
 	 * <p> Description: UN-26, regression test for defect D4.  A null input must be treated as
 	 * empty without an exception (UN-R8, CWE-476).  In HW3 the code called input.length() first,
 	 * which threw a NullPointerException; B-20 checks for null before that call. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-26 Fixed D4: null input is treated as empty, with no exception")
@@ -623,6 +677,8 @@ public class UserNameRecognizerTest {
 	 *
 	 * <p> Description: UN-27, regression.  Tests 9 to 15 from TP1 Test Cases.pdf must still pass
 	 * or fail exactly as TP1 recorded. </p>
+	 *
+	 * <p> Validates: UserNameRecognizer.checkForValidUserName(). </p>
 	 */
 	@Test
 	@DisplayName("UN-27 TP1 Tests 9 to 15 still give the TP1 results")

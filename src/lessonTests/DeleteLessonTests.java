@@ -140,6 +140,8 @@ public class DeleteLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means "Lesson deleted" was returned, the list is
 	 * empty, and the row is gone. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -170,6 +172,8 @@ public class DeleteLessonTests {
 	 * again. </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means 1 entry before and 0 after. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -203,6 +207,8 @@ public class DeleteLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the action is refused with no message and
 	 * the lesson is still stored. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -231,6 +237,8 @@ public class DeleteLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the locked-lesson message is returned and
 	 * the lesson is still stored. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -260,6 +268,8 @@ public class DeleteLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the locked-lesson message is returned and
 	 * the lesson is still stored. </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -288,6 +298,8 @@ public class DeleteLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the first attempt is refused with the
 	 * locked message and the second returns "Lesson deleted". </p>
+	 *
+	 * <p> Validates: ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(6)

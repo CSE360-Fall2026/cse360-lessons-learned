@@ -22,6 +22,10 @@ import javafx.scene.paint.Color;
  * and persistence to ModelCuratorSearchTerms. AI requests
  * run on a background thread to avoid blocking JavaFX. </p>
  *
+ * <p> Tested by M-ST1 to M-ST6, M-WH1, and M-WH6 (Manual Tests.pdf). The Model methods these
+ * actions call are tested by curatorTests.CuratorSearchTermsTests and
+ * lessonTests.WritingHelpTests WH-12 (JUnit). </p>
+ *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 5

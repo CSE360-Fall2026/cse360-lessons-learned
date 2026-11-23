@@ -202,6 +202,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-01, boundary value length 0.  An empty password is rejected with the
 	 * empty-password message (PW-R1).  This also takes the true branch of the method's first
 	 * decision, "input is empty". </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-01 Empty input is rejected (length 0)")
@@ -215,6 +217,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-02, boundary value minimum - 1.  Seven characters with every
 	 * character class present fail only the length rule (PW-R3), so the message names only
 	 * "Long Enough". </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-02 Seven characters fail only Long Enough (min - 1)")
@@ -227,6 +231,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-03, boundary value minimum.  Eight characters with every class is the
 	 * shortest valid password and returns "" (PW-R3, PW-R6). </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-03 Eight characters are accepted (min)")
@@ -238,6 +244,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw04_nineCharacters() </p>
 	 *
 	 * <p> Description: PW-04, boundary value minimum + 1.  Nine characters are accepted. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-04 Nine characters are accepted (min + 1)")
@@ -256,6 +264,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw05_thirtyOneCharacters() </p>
 	 *
 	 * <p> Description: PW-05, boundary value maximum - 1.  31 characters are accepted. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-05 31 characters are accepted (max - 1)")
@@ -269,6 +279,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-06, boundary value maximum.  32 characters is the longest valid
 	 * password (PW-R2, PW-R6). </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-06 32 characters are accepted (max)")
@@ -282,6 +294,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-07, boundary value maximum + 1.  33 characters are rejected with the
 	 * maximum-length message (PW-R2). </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-07 33 characters are rejected (max + 1)")
@@ -296,6 +310,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-08, order of the checks.  A 33-character input that also contains an
 	 * invalid character (a space) must get the length message, which proves the length is
 	 * checked before any character rule (PW-R2). </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-08 Length is checked before characters (33 chars with a space)")
@@ -317,6 +333,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw09_missingUpperCase() </p>
 	 *
 	 * <p> Description: PW-09, negative test.  No upper-case letter. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-09 Missing upper case is named")
@@ -328,6 +346,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw10_missingLowerCase() </p>
 	 *
 	 * <p> Description: PW-10, negative test.  No lower-case letter. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-10 Missing lower case is named")
@@ -339,6 +359,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw11_missingDigit() </p>
 	 *
 	 * <p> Description: PW-11, negative test.  No digit. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-11 Missing digit is named")
@@ -351,6 +373,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw12_missingSpecial() </p>
 	 *
 	 * <p> Description: PW-12, negative test.  No special character. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-12 Missing special character is named")
@@ -365,6 +389,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-13, negative test.  Eight lower-case letters miss three conditions,
 	 * which must be listed in the fixed order Upper case, Numeric digits, Special character
 	 * (PW-R4). </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-13 Several missing conditions are listed in order")
@@ -387,6 +413,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-14, boundary values of the character ranges.  A, Z, a, z, 0, and 9
 	 * are the first and last characters of each range the code tests with &gt;= and &lt;=, and
 	 * ! and ~ are the first and last characters of the special list. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-14 Range edges A Z a z 0 9 and specials ! ~ are accepted")
@@ -401,6 +429,8 @@ public class PasswordRecognizerTest {
 	 * [ just after Z, ` just before a, { just after z, / just before 0, and : just after 9.
 	 * They must count only as special characters, so upper case, lower case, and digits are
 	 * all still missing. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-15 Characters just outside the ranges count only as specials")
@@ -416,6 +446,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-16, coverage of the special-character branch for each of the 32
 	 * allowed specials.  "Aa1aaaa" has every class except a special, so each password is valid
 	 * only if that one special character is recognized. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-16 Each of the 32 special characters is accepted")
@@ -443,6 +475,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-17, boundary value first position.  A leading space is found at index
 	 * 0. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-17 Invalid character in the first position (index 0)")
@@ -457,6 +491,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw18_invalidMiddleCharacter() </p>
 	 *
 	 * <p> Description: PW-18, negative test.  A space in the middle is found at index 4. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-18 Invalid character in the middle (index 4)")
@@ -472,6 +508,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-19, boundary value last position.  A trailing space is found at index
 	 * 8, even though the first eight characters already form a valid password. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-19 Invalid character in the last position (index 8)")
@@ -486,6 +524,8 @@ public class PasswordRecognizerTest {
 	 * <p> Method: void pw20_controlCharacter() </p>
 	 *
 	 * <p> Description: PW-20, negative test.  A tab (a control character) is rejected. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-20 A tab character is rejected (index 4)")
@@ -501,6 +541,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-21, negative test.  A non-ASCII letter (e with an acute accent) is not in any allowed
 	 * range, so it is rejected. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-21 A non-ASCII letter is rejected (index 7)")
@@ -525,6 +567,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-22, positive and negative.  After a valid password all five flags are
 	 * true; after "aaaaaaaa" only Lower and LongEnough are true.  The New Account page colors
 	 * its live checklist from these flags. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-22 The five flags describe the input just evaluated")
@@ -543,6 +587,8 @@ public class PasswordRecognizerTest {
 	 * by the length check, so the flags must show nothing satisfied.  In HW3 the code returned
 	 * before resetting them, so they still described the previous, valid password; B-20 resets
 	 * the flags before any check can return. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-23 Fixed D2: the flags are reset after an over-long input")
@@ -560,6 +606,8 @@ public class PasswordRecognizerTest {
 	 * <p> Description: PW-24, regression test for defect D1.  A null input must be treated as
 	 * empty without an exception (PW-R8, CWE-476).  In HW3 the code called input.length() first,
 	 * which threw a NullPointerException; B-20 treats null as empty before that call. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-24 Fixed D1: null input is treated as empty, with no exception")
@@ -578,6 +626,8 @@ public class PasswordRecognizerTest {
 	 * passwordErrorMessage is documented as "The error message text", so after a failed check it
 	 * must hold the returned message.  In HW3 the code never assigned it a message; B-20 sends
 	 * every error return through one method that sets it. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-25 Fixed D3: passwordErrorMessage holds the returned message")
@@ -599,6 +649,8 @@ public class PasswordRecognizerTest {
 	 *
 	 * <p> Description: PW-26, regression.  Tests 1 to 8 from TP1 Test Cases.pdf must still pass
 	 * or fail exactly as TP1 recorded. </p>
+	 *
+	 * <p> Validates: PasswordRecognizer.evaluatePassword(). </p>
 	 */
 	@Test
 	@DisplayName("PW-26 TP1 Tests 1 to 8 still give the TP1 results")

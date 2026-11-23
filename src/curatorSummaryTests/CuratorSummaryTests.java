@@ -135,6 +135,8 @@ public class CuratorSummaryTests {
 	 * <p> SU-01: The worked example in US-C-E4-03.  For observations of 2, 4, and 6 hours the
 	 * summary must be count 3, total 12, mean 4, median 4, minimum 2, maximum 6, and sample
 	 * standard deviation 2 (denominator n - 1). </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -155,6 +157,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-02: With an even number of observations the median is the mean of the two middle
 	 * values, and the order the hours arrive in does not matter: 10, 1, 3, 2 has median 2.5. </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -171,6 +175,8 @@ public class CuratorSummaryTests {
 	 * <p> SU-03: With one observation the standard deviation is shown as "N/A: fewer than two
 	 * observations" instead of a misleading number, while the other measures are still
 	 * reported (US-C-E4-03 V sentence). </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -188,6 +194,9 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-04: Values are kept at full precision but shown to two decimal places, labeled in
 	 * hours, and the count is labeled as experience records (US-C-E4-03). </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(),
+	 * ContributorLessonView.renderSummaryPanelText(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -213,6 +222,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-05: Missing, negative, and non-finite hours are left out rather than treated as
 	 * zero, and the count is the number of valid observations (US-C-E4-02). </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -230,6 +241,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-06: If there are no valid observations, the message is "No experience data to
 	 * merge." (US-C-E4-02 V sentence), whether the list is empty, null, or all invalid. </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -247,6 +260,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-07: A merge with more than MAX_ENTRIES_LIMIT (5000) records is refused with a clear
 	 * message, instead of computing statistics on only part of the data (CWE-770). </p>
+	 *
+	 * <p> Validates: TimeEffortStatisticsCalculator.computeStatistics(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -268,6 +283,9 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-08: Fewer than two distinct lessons gives "Select at least two lessons"
 	 * (US-C-E4-01 V sentence): no lessons, one lesson, and one lesson selected twice. </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.getPendingPreview(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -285,6 +303,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-09: Selecting a lesson again does not count it again: A, B, A gives the three
 	 * observations 2, 4, 6, not five (US-C-E4-02).  Ids of zero or less are ignored. </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -299,6 +319,8 @@ public class CuratorSummaryTests {
 
 	/**********
 	 * <p> SU-10: The target may also be a source (US-C-E4-02): target A with sources A and B. </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -312,6 +334,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-11: A missing target, a missing source, and sources with no experience records are
 	 * refused with their messages, and nothing is saved (US-C-E4-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(). </p>
 	 */
 	@Test
 	@Order(11)
@@ -340,6 +364,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-12: A preview computes the summary from the database but saves nothing: the target
 	 * has no saved summary and its summaryId is still -1 (US-C-E4-01). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(). </p>
 	 */
 	@Test
 	@Order(12)
@@ -358,6 +384,10 @@ public class CuratorSummaryTests {
 	 * and the summary is hidden by default (US-C-E4-01, US-C-E5-02). </p>
 	 *
 	 * @throws Exception if the second connection cannot be opened
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.confirmAndSaveSummary(),
+	 * CuratorSummaryController.getPendingPreview(). </p>
 	 */
 	@Test
 	@Order(13)
@@ -389,6 +419,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-14: Confirming without a preview is refused with "Preview summary statistics before
 	 * confirming." and nothing is saved (US-C-E4-01). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.confirmAndSaveSummary(). </p>
 	 */
 	@Test
 	@Order(14)
@@ -403,6 +435,10 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-15: Cancelling a new preview leaves the existing summary unchanged, and a later
 	 * Confirm is refused because there is no preview (US-C-E4-01 V sentence). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.clearPreview(),
+	 * CuratorSummaryController.confirmAndSaveSummary(). </p>
 	 */
 	@Test
 	@Order(15)
@@ -424,6 +460,10 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-16: If the selection changes between preview and Confirm, the preview is discarded
 	 * with "Selected lessons changed since preview. ..." and nothing is saved (US-C-E4-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.confirmAndSaveSummary(),
+	 * CuratorSummaryController.getPendingPreview(). </p>
 	 */
 	@Test
 	@Order(16)
@@ -441,6 +481,10 @@ public class CuratorSummaryTests {
 	 * <p> SU-17: If an experience record is added after the preview, Confirm refreshes the
 	 * preview and asks for a new confirmation, saving nothing; the next Confirm saves the
 	 * refreshed summary (US-C-E4-02: "refresh the preview and require a new confirmation"). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.confirmAndSaveSummary(),
+	 * CuratorSummaryController.getPendingPreview(). </p>
 	 */
 	@Test
 	@Order(17)
@@ -465,6 +509,9 @@ public class CuratorSummaryTests {
 	 * <p> SU-18: Repeating a merge replaces the summary instead of adding the same observations
 	 * to the old total: two merges of A and B still give count 3 and total 12, with a new
 	 * summary id (US-C-E4-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.confirmAndSaveSummary(). </p>
 	 */
 	@Test
 	@Order(18)
@@ -482,6 +529,9 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-19: Merging leaves the source lessons and their raw experience records unchanged
 	 * (US-C-E4-01, US-C-E4-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.confirmAndSaveSummary(). </p>
 	 */
 	@Test
 	@Order(19)
@@ -507,6 +557,8 @@ public class CuratorSummaryTests {
 	 * the database."  Each state is read back through a second connection. </p>
 	 *
 	 * @throws Exception if the second connection cannot be opened
+	 *
+	 * <p> Validates: CuratorSummaryController.updateStatisticsVisibility(). </p>
 	 */
 	@Test
 	@Order(20)
@@ -531,6 +583,9 @@ public class CuratorSummaryTests {
 	 * <p> SU-21: Alex's acceptance check 2 for US-C-E5-01: "Toggling visibility updates the
 	 * access state immediately without altering the underlying computed statistical metrics or
 	 * raw experience records." </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.updateStatisticsVisibility(),
+	 * ContributorLessonView.readSummaryForContributor(). </p>
 	 */
 	@Test
 	@Order(21)
@@ -556,6 +611,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-22: Showing or hiding is refused for a lesson that has no saved summary and for a
 	 * lesson that does not exist. </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.updateStatisticsVisibility(). </p>
 	 */
 	@Test
 	@Order(22)
@@ -574,6 +631,11 @@ public class CuratorSummaryTests {
 	 * <p> SU-23: Only a Curator can preview, confirm, read the saved summary, or change its
 	 * visibility.  A Contributor, an Admin without the Curator role, and no user are all refused
 	 * with the same message, and nothing changes (US-C-E5-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.previewMergedSummary(),
+	 * CuratorSummaryController.confirmAndSaveSummary(),
+	 * CuratorSummaryController.getSavedSummary(),
+	 * CuratorSummaryController.updateStatisticsVisibility(). </p>
 	 */
 	@Test
 	@Order(23)
@@ -599,6 +661,9 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-24: A new summary is hidden by default: the Contributor read returns nothing and
 	 * the panel text is empty (US-C-E5-02). </p>
+	 *
+	 * <p> Validates: ContributorLessonView.readSummaryForContributor(),
+	 * ContributorLessonView.renderSummaryPanelText(). </p>
 	 */
 	@Test
 	@Order(24)
@@ -613,6 +678,10 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-25: Once the Curator makes it visible, the Contributor read returns the summary and
 	 * the panel shows its statistics (US-C-E5-01, US-C-E5-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.updateStatisticsVisibility(),
+	 * ContributorLessonView.readSummaryForContributor(),
+	 * ContributorLessonView.renderSummaryPanelText(). </p>
 	 */
 	@Test
 	@Order(25)
@@ -632,6 +701,9 @@ public class CuratorSummaryTests {
 	 * <p> SU-26: Hiding a summary again removes it on the next read: the flag is read from the
 	 * database each time, so nothing cached on a page can keep showing it (US-C-E5-01 V
 	 * sentence, US-C-E5-02: "hiding again removes access on the next read"). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.updateStatisticsVisibility(),
+	 * ContributorLessonView.readSummaryForContributor(). </p>
 	 */
 	@Test
 	@Order(26)
@@ -647,6 +719,9 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-27: A lesson with no summary shows no statistics and no made-up zeros: the
 	 * Contributor read returns nothing and the panel text is empty (US-C-E5-02 V sentence). </p>
+	 *
+	 * <p> Validates: ContributorLessonView.readSummaryForContributor(),
+	 * ContributorLessonView.renderSummaryPanelText(). </p>
 	 */
 	@Test
 	@Order(27)
@@ -660,6 +735,9 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-28: Re-merging a visible summary saves a new summary, which starts hidden again
 	 * ("new summaries default to hidden", US-C-E5-02). </p>
+	 *
+	 * <p> Validates: CuratorSummaryController.updateStatisticsVisibility(),
+	 * ContributorLessonView.readSummaryForContributor(). </p>
 	 */
 	@Test
 	@Order(28)
@@ -675,6 +753,8 @@ public class CuratorSummaryTests {
 	/**********
 	 * <p> SU-29: Deleting the target lesson deletes its summary, so no orphan summary is left
 	 * (ON DELETE CASCADE). </p>
+	 *
+	 * <p> Validates: Database.deleteLesson(). </p>
 	 */
 	@Test
 	@Order(29)

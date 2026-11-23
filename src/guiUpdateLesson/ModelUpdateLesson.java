@@ -18,6 +18,11 @@ import guiTools.LessonResult;
  *
  * <p> The methods are public so the automated tests can call them without starting JavaFX.</p>
  *
+ * <p> Tested by lessonTests.UpdateLessonTests and ContributorAiToolsTests (JUnit); the refusal
+ * of a change to a field a Curator locked also by curatorLockTests.CuratorLockTests and
+ * curatorRefinementTests.CuratorRefinementTests RF-14; on screen by the TP2 semi-automated
+ * tests M4 and M5 in lessonTests.ManualGuiTests. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

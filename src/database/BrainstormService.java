@@ -20,12 +20,13 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Validated by: SharedAiServiceTests (JUnit).
- * </p>
- *
- * <p>
  * Copyright: Barrett Honors Contract Project © 2026
  * </p>
+ *
+ * <p> Tested by lessonTests.SharedAiServiceTests (JUnit) through SharedAiService, its only
+ * caller; those tests use a simulated backend, so the request to Groq itself is tested by hand
+ * with a real key in M-WH1 to M-WH3, M-ST2, and M-RF2, and without a key in M-WH6 and M-RF7
+ * (Manual Tests.pdf). </p>
  *
  * @author Ariana Adrian
  * @author Virgil Jones and Team

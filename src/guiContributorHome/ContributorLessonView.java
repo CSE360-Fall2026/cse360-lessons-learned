@@ -12,6 +12,10 @@ import entityClasses.LessonSummary;
  * hidden summary is dropped at the read boundary rather than merely not drawn (US-C-E5-02).
  * Validated by: {@code curatorSummaryTests.CuratorSummaryTests}. </p>
  *
+ * <p> Tested by curatorSummaryTests.CuratorSummaryTests SU-21 and SU-24 to SU-28 and
+ * CuratorSummaryPageTests SP-13 and SP-14 (JUnit: a hidden or missing summary is never
+ * returned), and by M-CS6 and M-CS7 (Manual Tests.pdf). </p>
+ *
  * @author Alex Meyers
  * @author Emilia Davey
  * @version 3.0  2026-11-16 Alex Meyers: visibility filter and summary text for Aspect 4

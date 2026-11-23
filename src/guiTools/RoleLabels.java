@@ -23,7 +23,9 @@ package guiTools;
  * label just before it is shown (toLabel), and a label chosen by the user is turned back into
  * the stored name just before it is given to the database (toStoredName).</p>
  *
- * <p> Tested by curatorHomeTests.CuratorHomeTests, CH-01 to CH-04 and CH-10 (JUnit). </p>
+ * <p> Tested by curatorHomeTests.CuratorHomeTests, CH-01 to CH-04 and CH-10 (JUnit), and on
+ * screen by M-CH1, M-CH5, M-V1, and M-V2 (Manual Tests.pdf): the pages show "Contributor",
+ * "Curator", and "Viewer", never "Role1", "Role2", or "Role3". </p>
  *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *

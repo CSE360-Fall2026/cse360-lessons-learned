@@ -1,32 +1,41 @@
 package inputValidation;
 
 
+/**
+ * <p> Title: FSM-translated UserNameRecognizer. </p>
+ * 
+ * <p> Description: A demonstration of the mechanical translation of Finite State Machine 
+ * diagram into an executable Java program using the UserName Recognizer. The code 
+ * detailed design is based on a while loop with a select list</p>
+ * 
+ *
+ * <p> Tested by hw3Tests.UserNameRecognizerTest UN-01 to UN-28 (JUnit). </p>
+ *
+ * <p> Copyright: Lynn Robert Carter © 2024 </p>
+ * 
+ * @author Lynn Robert Carter
+ * @author Virgil Jones &amp; Team Fall 2026
+ * 
+ * @version 1.00		2024-09-13	Initial baseline derived from the Even Recognizer
+ * @version 1.01		2024-09-17	Correction to address UNChar coding error, improper error
+ * 									message, and improve internal documentation
+ * 
+ * @version 2.00		2026-09-16	Updated username rules for TP1: alphabetic first character, updated separators (include &amp;), max-length 32 characters
+ * @version 2.01		2026-11-16	TP3 B-20: fixed HW3 defects D4 (a null input threw a
+ * 									NullPointerException), D5 (an invalid character early in the
+ * 									name was reported as "too short"), and D6 (a name over 32
+ * 									characters ending after a separator got the separator
+ * 									message); validated by hw3Tests.UserNameRecognizerTest
+ * 									UN-23 to UN-26
+ *
+ */
 public class UserNameRecognizer {
-	/**
-	 * <p> Title: FSM-translated UserNameRecognizer. </p>
-	 * 
-	 * <p> Description: A demonstration of the mechanical translation of Finite State Machine 
-	 * diagram into an executable Java program using the UserName Recognizer. The code 
-	 * detailed design is based on a while loop with a select list</p>
-	 * 
-	 * <p> Copyright: Lynn Robert Carter © 2024 </p>
-	 * 
-	 * @author Lynn Robert Carter
-	 * @author Virgil Jones & Team Fall 2026
-	 * 
-	 * @version 1.00		2024-09-13	Initial baseline derived from the Even Recognizer
-	 * @version 1.01		2024-09-17	Correction to address UNChar coding error, improper error
-	 * 									message, and improve internal documentation
-	 * 
-	 * @version 2.00		2026-09-16	Updated username rules for TP1: alphabetic first character, updated separators (include &), max-length 32 characters
-	 * @version 2.01		2026-11-16	TP3 B-20: fixed HW3 defects D4 (a null input threw a
-	 * 									NullPointerException), D5 (an invalid character early in the
-	 * 									name was reported as "too short"), and D6 (a name over 32
-	 * 									characters ending after a separator got the separator
-	 * 									message); validated by hw3Tests.UserNameRecognizerTest
-	 * 									UN-23 to UN-26
-	 *
+
+	/**********
+	 * Default constructor.  Not used: every member of this recognizer is static.
 	 */
+	public UserNameRecognizer() {
+	}
 
 	/**********************************************************************************************
 	 * 
@@ -35,21 +44,32 @@ public class UserNameRecognizer {
 	 * 
 	 */
 
-	public static String userNameRecognizerErrorMessage = "";	// The error message text
-	public static String userNameRecognizerInput = "";			// The input being processed
-	public static int userNameRecognizerIndexofError = -1;		// The index of error location
-	private static int state = 0;						// The current state value
-	private static int nextState = 0;					// The next state value
-	private static boolean finalState = false;			// Is this state a final state?
-	private static String inputLine = "";				// The input line
-	private static char currentChar;					// The current character in the line
-	private static int currentCharNdx;					// The index of the current character
-	private static boolean running;						// The flag that specifies if the FSM is 
-														// running
-	private static int userNameSize = 0;			
-	public static final int MAX_PASS_LENGTH = 32;		// Max username character length
+	/** The error message text, or "" when the user name is valid. */
+	public static String userNameRecognizerErrorMessage = "";
+	/** The input being processed. */
+	public static String userNameRecognizerInput = "";
+	/** The index of the character where the error was found, or -1. */
+	public static int userNameRecognizerIndexofError = -1;
+	/** The current state of the finite state machine. */
+	private static int state = 0;
+	/** The next state of the finite state machine. */
+	private static int nextState = 0;
+	/** Whether the current state is a final (accepting) state. */
+	private static boolean finalState = false;
+	/** The input line being recognized. */
+	private static String inputLine = "";
+	/** The current character in the line. */
+	private static char currentChar;
+	/** The index of the current character. */
+	private static int currentCharNdx;
+	/** Whether the finite state machine is still running. */
+	private static boolean running;
+	/** The number of characters accepted so far. */
+	private static int userNameSize = 0;
+	/** The maximum length of a user name, in characters. */
+	public static final int MAX_PASS_LENGTH = 32;
 
-	// Private method to display debugging data
+	/** Displays one line of the execution trace: the state, the character, and the next state. */
 	private static void displayDebuggingInfo() {
 		// Display the current state of the FSM as part of an execution trace
 		if (currentCharNdx >= inputLine.length())
@@ -63,7 +83,7 @@ public class UserNameRecognizer {
 				nextState + "     " + userNameSize);
 	}
 	
-	// Private method to move to the next character within the limits of the input line
+	/** Moves to the next character, staying within the limits of the input line. */
 	private static void moveToNextCharacter() {
 		currentCharNdx++;
 		if (currentCharNdx < inputLine.length())

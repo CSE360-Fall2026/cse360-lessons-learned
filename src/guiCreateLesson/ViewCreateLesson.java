@@ -48,6 +48,9 @@ import inputValidation.LessonRecognizer;
  * <p> As in every Foundations View, this class only declares and positions the widgets.  What
  * they do lives in ControllerCreateLesson, and the data work in ModelCreateLesson.</p>
  *
+ * <p> Tested by the TP2 semi-automated test M1 in lessonTests.ManualGuiTests and by M-WH1 to
+ * M-WH3 and M-WH6 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

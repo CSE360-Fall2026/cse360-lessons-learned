@@ -25,6 +25,12 @@ import guiViewerHome.ControllerViewerHome;
 public class ViewerAttributionTests {
 
     /**********
+     * Default constructor.  JUnit creates an instance for each test.
+     */
+    public ViewerAttributionTests() {
+    }
+
+    /**********
      * <p> Method: createLesson() </p>
      *
      * <p> Description: Creates an unsaved lesson for
@@ -69,6 +75,10 @@ public class ViewerAttributionTests {
      *
      * <p> Description: Verifies that an unrefined lesson
      * does not display Curator-edit attribution. </p>
+     *
+     * @throws Exception if the private formatting method cannot be called
+     *
+     * <p> Validates: ControllerViewerHome.formatLessonDetails(). </p>
      */
     @Test
     public void testUnrefinedLessonHasNoAttribution()
@@ -91,6 +101,10 @@ public class ViewerAttributionTests {
      *
      * <p> Description: Verifies that a refined lesson
      * displays the Curator identity and edit date. </p>
+     *
+     * @throws Exception if the private formatting method cannot be called
+     *
+     * <p> Validates: ControllerViewerHome.formatLessonDetails(). </p>
      */
     @Test
     public void testRefinedLessonShowsAttribution()
@@ -113,6 +127,10 @@ public class ViewerAttributionTests {
      *
      * <p> Description: Verifies that an incomplete
      * attribution record is not shown as a completed edit. </p>
+     *
+     * @throws Exception if the private formatting method cannot be called
+     *
+     * <p> Validates: ControllerViewerHome.formatLessonDetails(). </p>
      */
     @Test
     public void testIncompleteAttributionIsHidden()

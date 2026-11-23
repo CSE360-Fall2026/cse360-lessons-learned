@@ -22,6 +22,10 @@ import javafx.scene.paint.Color;
  * can invoke these methods.  This is why each has been declared at "protected".  Do not change any
  * of these methods to public.</p>
  * 
+ *
+ * <p> Tested by M-CH6 in Manual Tests.pdf (an account created from a Curator invitation opens
+ * the Curator Home Page). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  * 
  * @author Lynn Robert Carter

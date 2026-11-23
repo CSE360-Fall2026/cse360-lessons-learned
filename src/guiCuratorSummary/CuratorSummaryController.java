@@ -37,6 +37,11 @@ import inputValidation.TimeEffortStatisticsCalculator;
  *
  * <p> Validated by: {@code curatorSummaryTests.CuratorSummaryTests}.</p>
  *
+ * <p> Tested by curatorSummaryTests.CuratorSummaryTests SU-08 to SU-28 (JUnit: preview,
+ * confirm, cancel, changed selection or data, replacing, visibility, and the Curator check)
+ * and through the page Model by CuratorSummaryPageTests; on screen by M-CS1 to M-CS8 (Manual
+ * Tests.pdf). </p>
+ *
  * @author Alex Meyers
  * @author Emilia Davey
  * @version 2.0  2026-11-16 Alex Meyers: preview, confirm, and visibility workflow (in guiRole2)

@@ -22,6 +22,9 @@ import javafx.stage.Stage;
  *
  * <p> Description: The Java/FX-based Admin Update Page.</p>
  *
+ * <p> Tested by M-CH1 and M-V2 in Manual Tests.pdf: the role list shows "Contributor",
+ * "Curator", and "Viewer", never the stored role names. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

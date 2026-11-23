@@ -165,6 +165,9 @@ public class LessonsLearnedListEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the owner's list holds exactly those two
 	 * titles and the full list contains both of them. </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.loadAll(), LessonsLearnedList.loadByOwner(),
+	 * LessonsLearnedList.contains(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -196,6 +199,9 @@ public class LessonsLearnedListEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means each step reports the value shown and the
 	 * list ends holding only the replaced lesson. </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.add(), LessonsLearnedList.getById(),
+	 * LessonsLearnedList.replace(), LessonsLearnedList.removeById(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -232,6 +238,9 @@ public class LessonsLearnedListEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means every operation is refused as shown and the
 	 * list still holds 1 lesson. </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.add(), LessonsLearnedList.getById(),
+	 * LessonsLearnedList.replace(), LessonsLearnedList.removeById(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -272,6 +281,8 @@ public class LessonsLearnedListEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the two lessons mentioning both words are
 	 * returned, "Sprint retro notes" is not, and the original list still holds 3. </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.filterByKeywords(), LessonsLearnedList.add(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -300,6 +311,9 @@ public class LessonsLearnedListEntityTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the category subset holds the two Technical
 	 * lessons and the tag subset holds "Sprint retro notes". </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.filterByCategory(), LessonsLearnedList.filterByTag(),
+	 * LessonsLearnedList.add(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -328,6 +342,10 @@ public class LessonsLearnedListEntityTests {
 	 * has both), by the category "technical" in lower case, and by blank title text. </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means all four subsets are empty. </p>
+	 *
+	 * <p> Validates: LessonsLearnedList.filterByKeywords(),
+	 * LessonsLearnedList.filterByCategory(), LessonsLearnedList.filterByTitleContains(),
+	 * LessonsLearnedList.add(). </p>
 	 */
 	@Test
 	@Order(6)

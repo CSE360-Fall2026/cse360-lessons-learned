@@ -20,6 +20,10 @@ import javafx.scene.control.ComboBox;
  * can invoke these methods.  This is why each has been declared at "protected".  Do not change any
  * of these methods to public.</p>
  *
+ * <p> Tested by M-CH5 (adding and removing the Curator role) and M-V1 (the Viewer role) in
+ * Manual Tests.pdf. The role names it shows come from guiTools.RoleLabels, tested by
+ * curatorHomeTests.CuratorHomeTests CH-01 to CH-04 (JUnit). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

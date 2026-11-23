@@ -11,6 +11,11 @@ import entityClasses.LessonSummary;
  * Utility class responsible for validating source lessons and computing aggregated
  * time and effort statistics across merged experience records (Epic E4 / Aspect 3).
  *
+ * <p> Tested by curatorSummaryTests.CuratorSummaryTests SU-01 to SU-07 (JUnit: the statistics,
+ * the values left out, and the 5000-record limit) and, through CuratorSummaryController, SU-08
+ * to SU-10 (two distinct lessons, duplicates counted once); on screen by M-CS2 and M-CS3
+ * (Manual Tests.pdf). </p>
+ *
  * @author Alex Meyers
  * @author Emilia Davey
  * @version 3.0  2026-11-16 Alex Meyers: validation and statistics for Aspect 3

@@ -26,6 +26,9 @@ import javafx.stage.Stage;
  * The Controller delegates authorization, validation,
  * and persistence to ModelCuratorSearchTerms. </p>
  *
+ * <p> Tested by M-ST1 to M-ST6 (Manual Tests.pdf). The Model is tested by
+ * curatorTests.CuratorSearchTermsTests (JUnit). </p>
+ *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 5

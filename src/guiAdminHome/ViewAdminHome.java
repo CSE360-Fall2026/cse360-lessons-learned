@@ -39,6 +39,8 @@ import javafx.stage.Stage;
  * users. This Baeldung article provides insight into the issues:
  *           https://www.baeldung.com/java-singleton</p>
  *
+ * <p> Tested by M-CH6 and M-CH5 in Manual Tests.pdf. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

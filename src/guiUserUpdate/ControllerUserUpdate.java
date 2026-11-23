@@ -9,6 +9,9 @@ import javafx.stage.Stage;
  * <p> Description: This static class supports the actions initiated by the ViewUserUpdate
  * class.</p>
  *
+ * <p> Tested by M-CH6 (Curator) and M-V6 (Viewer) in Manual Tests.pdf: Account Update returns
+ * to the role's own home page. </p>
+ *
  * @author David Nevarez
  *
  * @version 1.01               2026-10-14 TP2: home page 2 is now the Contributor Home Page

@@ -17,6 +17,8 @@ import guiTools.RoleLabels;
  * can invoke these methods.  This is why each has been declared at "protected".  Do not change any
  * of these methods to public.</p>
  *
+ * <p> Tested by M-CH1 (choosing Curator) and M-V2 (choosing Viewer) in Manual Tests.pdf. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

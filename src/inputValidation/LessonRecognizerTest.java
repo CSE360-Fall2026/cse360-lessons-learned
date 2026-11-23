@@ -130,6 +130,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 1 to 7 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runTitleTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Title Recognizer Tests (US-C1, US-C1-V, US-U1-V) ---");
@@ -147,6 +149,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -162,6 +166,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -176,6 +182,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -190,6 +198,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Title must be 100 characters or fewer." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -204,6 +214,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Title is required." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -218,6 +230,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Title contains an invalid character at position 7." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(6)
@@ -233,6 +247,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Title is required." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTitle(). </p>
 	 */
 	@Test
 	@Order(7)
@@ -259,6 +275,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 8 to 15 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runDescriptionTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Description Recognizer Tests (US-C1, US-C1-V, US-U1-V) ---");
@@ -277,6 +295,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(8)
@@ -293,6 +313,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(9)
@@ -308,6 +330,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(10)
@@ -322,6 +346,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Description must be between 10 and 5000 characters." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(11)
@@ -337,6 +363,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Description must be between 10 and 5000 characters." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(12)
@@ -352,6 +380,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Description is required." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(13)
@@ -366,6 +396,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Description contains an invalid character at position 9." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(14)
@@ -381,6 +413,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Description is required." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidDescription(). </p>
 	 */
 	@Test
 	@Order(15)
@@ -406,6 +440,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 16 to 20 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runTagsTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Tags Recognizer Tests (US-C1, US-C1-V, US-U1-V) ---");
@@ -421,6 +457,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTags(). </p>
 	 */
 	@Test
 	@Order(16)
@@ -435,6 +473,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTags(). </p>
 	 */
 	@Test
 	@Order(17)
@@ -449,6 +489,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Tags are too long." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTags(). </p>
 	 */
 	@Test
 	@Order(18)
@@ -463,6 +505,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Tags are too long." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTags(). </p>
 	 */
 	@Test
 	@Order(19)
@@ -477,6 +521,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Tags contain an invalid character." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidTags(). </p>
 	 */
 	@Test
 	@Order(20)
@@ -501,6 +547,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 21 to 25 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runCategoryTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Category Recognizer Tests (US-C1, US-C1-V, US-U1-V) ---");
@@ -516,6 +564,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidCategory(). </p>
 	 */
 	@Test
 	@Order(21)
@@ -529,6 +579,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1, US-U1.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidCategory(). </p>
 	 */
 	@Test
 	@Order(22)
@@ -542,6 +594,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Please choose a valid category." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidCategory(). </p>
 	 */
 	@Test
 	@Order(23)
@@ -556,6 +610,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Please choose a valid category." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidCategory(). </p>
 	 */
 	@Test
 	@Order(24)
@@ -570,6 +626,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-C1-V, US-U1-V.  <b>Expected:</b> the input is rejected with
 	 * exactly the message "Please choose a valid category." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidCategory(). </p>
 	 */
 	@Test
 	@Order(25)
@@ -593,6 +651,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 26 to 30 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runSearchTextTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Search/Filter Text Recognizer Tests (US-R2, US-R2-V) ---");
@@ -608,6 +668,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-R2.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchText(). </p>
 	 */
 	@Test
 	@Order(26)
@@ -623,6 +685,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-R2.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchText(). </p>
 	 */
 	@Test
 	@Order(27)
@@ -637,6 +701,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-R2.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchText(). </p>
 	 */
 	@Test
 	@Order(28)
@@ -651,6 +717,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-R2-V.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Search text is too long." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchText(). </p>
 	 */
 	@Test
 	@Order(29)
@@ -665,6 +733,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-R2-V.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Search text contains an invalid character." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchText(). </p>
 	 */
 	@Test
 	@Order(30)
@@ -693,6 +763,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 31 to 38 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runExperienceValueTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Experience Value Recognizer Tests (US-U2, US-U2-V, E7) ---");
@@ -711,6 +783,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2, E7.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(31)
@@ -724,6 +798,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2, E7.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(32)
@@ -738,6 +814,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2, E7.  <b>Expected:</b> the input is accepted, so the
 	 * recognizer returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(33)
@@ -752,6 +830,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V, E7.  <b>Expected:</b> the input is rejected with exactly
 	 * the message "Time/effort must be a positive number." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(34)
@@ -766,6 +846,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V, E7.  <b>Expected:</b> the input is rejected with exactly
 	 * the message "Time/effort must be a positive number." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(35)
@@ -780,6 +862,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V, E7.  <b>Expected:</b> the input is rejected with exactly
 	 * the message "Time/effort must be a positive number." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(36)
@@ -794,6 +878,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V, E7.  <b>Expected:</b> the input is rejected with exactly
 	 * the message "Time/effort must be a positive number." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(37)
@@ -808,6 +894,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V, E7.  <b>Expected:</b> the input is rejected with exactly
 	 * the message "Time/effort must be a positive number." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceValue(). </p>
 	 */
 	@Test
 	@Order(38)
@@ -832,6 +920,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 39 to 45 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runExperienceDescriptionTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Experience Description Recognizer Tests (US-U2, US-U2-V) ---");
@@ -849,6 +939,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(39)
@@ -865,6 +957,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(40)
@@ -880,6 +974,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(41)
@@ -895,6 +991,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Please describe what was done." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(42)
@@ -910,6 +1008,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Please describe what was done." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(43)
@@ -924,6 +1024,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Please describe what was done." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(44)
@@ -938,6 +1040,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> US-U2-V.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Please describe what was done." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidExperienceDescription(). </p>
 	 */
 	@Test
 	@Order(45)
@@ -962,6 +1066,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 46 to 49 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runMemberNameTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Team Member Name Recognizer Tests (E7) ---");
@@ -976,6 +1082,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E7.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidMemberName(). </p>
 	 */
 	@Test
 	@Order(46)
@@ -990,6 +1098,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E7.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Team member name must be 100 characters or fewer." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidMemberName(). </p>
 	 */
 	@Test
 	@Order(47)
@@ -1005,6 +1115,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E7.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Team member name is required." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidMemberName(). </p>
 	 */
 	@Test
 	@Order(48)
@@ -1019,6 +1131,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E7.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Team member name contains an invalid character at position 4." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidMemberName(). </p>
 	 */
 	@Test
 	@Order(49)
@@ -1046,6 +1160,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 50 to 54 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runCoachedTextTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Root Cause and Recommendation Recognizer Tests (E6) ---");
@@ -1061,6 +1177,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidRootCause(). </p>
 	 */
 	@Test
 	@Order(50)
@@ -1076,6 +1194,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidRootCause(). </p>
 	 */
 	@Test
 	@Order(51)
@@ -1090,6 +1210,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Root cause must be 2000 characters or fewer." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidRootCause(). </p>
 	 */
 	@Test
 	@Order(52)
@@ -1105,6 +1227,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidRecommendation(). </p>
 	 */
 	@Test
 	@Order(53)
@@ -1121,6 +1245,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Recommendation must be 2000 characters or fewer." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidRecommendation(). </p>
 	 */
 	@Test
 	@Order(54)
@@ -1146,6 +1272,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> Runs Tests 55 to 58 in order for the console program.  Under JUnit each test
 	 * below is its own test method. </p>
+	 *
+	 * @param tests the test object whose test methods are run, in number order
 	 */
 	private static void runSearchTermsTests(LessonRecognizerTest tests) {
 		System.out.println("\n--- Curator Search Terms Recognizer Tests (E6) ---");
@@ -1160,6 +1288,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is accepted, so the recognizer
 	 * returns an empty String. </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchTerms(). </p>
 	 */
 	@Test
 	@Order(55)
@@ -1174,6 +1304,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Search terms are too long." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchTerms(). </p>
 	 */
 	@Test
 	@Order(56)
@@ -1188,6 +1320,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Search terms are too long." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchTerms(). </p>
 	 */
 	@Test
 	@Order(57)
@@ -1203,6 +1337,8 @@ public class LessonRecognizerTest {
 	 *
 	 * <p> <b>Requirements:</b> E6.  <b>Expected:</b> the input is rejected with exactly the
 	 * message "Search terms contain an invalid character." </p>
+	 *
+	 * <p> Validates: LessonRecognizer.checkForValidSearchTerms(). </p>
 	 */
 	@Test
 	@Order(58)

@@ -42,7 +42,9 @@ public class ViewFirstAdmin {
 
 	// These are the application values required by the user interface
 	
+	/** The width of the window, from FoundationsMain. */
 	private static double width = applicationMain.FoundationsMain.WINDOW_WIDTH;
+	/** The height of the window, from FoundationsMain. */
 	private static double height = applicationMain.FoundationsMain.WINDOW_HEIGHT;
 
 	// These are the widget attributes for the GUI
@@ -51,40 +53,59 @@ public class ViewFirstAdmin {
 	// for the user to specify a username for this account and two copies of the password to be
 	// used (they must match), a button to request that the account be established, and a quit
 	// but to abort the action and stop the application.
+	/** The page title. */
 	private static Label label_ApplicationTitle = new Label("Foundation Application Startup Page");
+	/** The first line of the instructions: the first user must be an administrator. */
 	private static Label label_TitleLine1 = 
 			new Label(" You are the first user.  You must be an administrator.");
 	
+	/** The second line of the instructions: what to enter and which button to press. */
 	private static Label label_TitleLine2 = 
 			new Label("Enter the Admin's Username, the Password twice, and then click on " + 
 					"Setup Admin Account.");
 	
+	/** Shows a message when the two passwords do not match. */
 	protected static Label label_PasswordsDoNotMatch = new Label();
+	/** The Admin's user name. */
 	protected static TextField text_AdminUsername = new TextField();
+	/** The Admin's password. */
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
+	/** The Admin's password again, which must match the first. */
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
+	/** Creates the Admin account. */
 	private static Button button_AdminSetup = new Button("Setup Admin Account");
 
-	// This alert is used should the user enter two passwords that do not match
+	/** The alert shown when the user name or password is not valid. */
 	protected static Alert alertUsernamePasswordError = new Alert(AlertType.INFORMATION);
 
-	// This button allow the user to abort creating the first admin account and terminate
+	/** Stops the application without creating the first Admin account. */
 	private static Button button_Quit = new Button("Quit");
 
 	// These attributes are used to configure the page and populate it with this user's information
+	/** The window this page is shown in. */
 	protected static Stage theStage;	
+	/** The pane that holds every widget of the page. */
 	private static Pane theRootPane;
+	/** The page's scene, created on the first visit. */
 	private static Scene theFirstAdminScene = null;
-	private static final int theRole = 1;		// Admin: 1; Contributor: 2; Curator: 3
+	/** The role this page sets up (Admin: 1; Contributor: 2; Curator: 3). */
+	private static final int theRole = 1;
 	
 	// Password checklist
-	static protected Label validPassword = new Label();		// This only appears with a valid password
+	/** Appears only when the password meets every requirement. */
+	static protected Label validPassword = new Label();
+	/** The heading of the password checklist. */
 	static protected Label label_Requirements = 
     		new Label("Password requirements:");
-	static protected Label label_UpperCase = new Label();		// These empty labels change based on the
-	static protected Label label_LowerCase = new Label();		// user's input
+	/** Checklist line: an upper-case letter (updated as the user types). */
+	static protected Label label_UpperCase = new Label();
+	/** Checklist line: a lower-case letter. */
+	static protected Label label_LowerCase = new Label();
+	/** Checklist line: a numeric digit. */
 	static protected Label label_NumericDigit = new Label();	
+	/** Checklist line: a special character. */
 	static protected Label label_SpecialChar = new Label();
+	/** Checklist line: long enough. */
 	static protected Label label_LongEnough = new Label();
 		
 	

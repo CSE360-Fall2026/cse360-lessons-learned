@@ -140,6 +140,8 @@ public class UpdateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means "Lesson updated" was returned and the
 	 * database now holds the new title with the other fields unchanged. </p>
+	 *
+	 * <p> Validates: ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -169,6 +171,8 @@ public class UpdateLessonTests {
 	 * <p> <b>Steps:</b> change every core field to a new valid value. </p>
 	 *
 	 * <p> <b>How to read the output:</b> PASS means every new value is stored. </p>
+	 *
+	 * <p> Validates: ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -201,6 +205,8 @@ public class UpdateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the update succeeded, the description
 	 * changed, and the locked title is the same as before. </p>
+	 *
+	 * <p> Validates: ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -235,6 +241,8 @@ public class UpdateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the locked-field message is returned for
 	 * the title and the stored lesson is exactly as it was. </p>
+	 *
+	 * <p> Validates: ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -266,6 +274,8 @@ public class UpdateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the description-length message is returned
 	 * for the description and the stored description is still the original one. </p>
+	 *
+	 * <p> Validates: ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -297,6 +307,8 @@ public class UpdateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the locked-field message names the category
 	 * and the stored category is still General. </p>
+	 *
+	 * <p> Validates: ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@Order(6)

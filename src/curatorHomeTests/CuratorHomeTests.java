@@ -359,6 +359,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-01, positive.  The stored name "Role2" becomes the label "Curator",
 	 * which is what every screen shows (US-CR1; CR-1). </p>
+	 *
+	 * <p> Validates: RoleLabels.toLabel(). </p>
 	 */
 	@Test
 	@DisplayName("CH-01 Stored Role2 is shown as Curator (P)")
@@ -371,6 +373,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-02, positive.  The label "Curator" chosen on a screen becomes the
 	 * stored name "Role2", which is what the database and the invitation code expect (CR-1). </p>
+	 *
+	 * <p> Validates: RoleLabels.toStoredName(). </p>
 	 */
 	@Test
 	@DisplayName("CH-02 Chosen Curator is stored as Role2 (P)")
@@ -384,6 +388,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-03, positive.  Adding the Curator names did not change the TP2
 	 * Contributor names (design decision D12; CR-1). </p>
+	 *
+	 * <p> Validates: RoleLabels.toLabel(), RoleLabels.toStoredName(). </p>
 	 */
 	@Test
 	@DisplayName("CH-03 Contributor names still translate both ways (P)")
@@ -399,6 +405,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-04, negative.  Names that are not a role label are returned
 	 * unchanged: "Admin", the "&lt;Select a role&gt;" prompt, a lower-case "curator", and null
 	 * (CR-1). </p>
+	 *
+	 * <p> Validates: RoleLabels.toLabel(), RoleLabels.toStoredName(). </p>
 	 */
 	@Test
 	@DisplayName("CH-04 Other names are not translated (N)")
@@ -425,6 +433,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-05, positive.  A user with the Curator role is a Curator, whether or
 	 * not the user also has the Contributor role (US-CH-V; CR-4). </p>
+	 *
+	 * <p> Validates: CuratorAccess.isCurator(). </p>
 	 */
 	@Test
 	@DisplayName("CH-05 A user with the Curator role is a Curator (P)")
@@ -439,6 +449,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-06, negative.  A Contributor and an Admin are not Curators; being an
 	 * Admin does not include the Curator role (CR-4). </p>
+	 *
+	 * <p> Validates: CuratorAccess.isCurator(). </p>
 	 */
 	@Test
 	@DisplayName("CH-06 A Contributor or an Admin is not a Curator (N)")
@@ -452,6 +464,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-07, negative.  No user at all (null) and a user with no role are not
 	 * Curators, and the check does not crash on null (CWE-476; CR-4). </p>
+	 *
+	 * <p> Validates: CuratorAccess.isCurator(). </p>
 	 */
 	@Test
 	@DisplayName("CH-07 Null and a user with no role are not Curators (N)")
@@ -472,6 +486,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-08, positive.  Giving the Curator role to a Contributor sets the
 	 * Curator flag and leaves the Contributor flag alone (US-CR1; CR-2). </p>
+	 *
+	 * <p> Validates: Database.updateUserRole(). </p>
 	 */
 	@Test
 	@DisplayName("CH-08 An Admin gives the Curator role (P)")
@@ -488,6 +504,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-09, positive.  Removing the Curator role clears the Curator flag and
 	 * leaves the Contributor flag alone (US-CR1; CR-2). </p>
+	 *
+	 * <p> Validates: Database.updateUserRole(). </p>
 	 */
 	@Test
 	@DisplayName("CH-09 An Admin removes the Curator role (P)")
@@ -506,6 +524,8 @@ public class CuratorHomeTests {
 	 * the chosen label through RoleLabels.toStoredName(); that path gives the role to a user who
 	 * had no role, and the Admin and Contributor flags stay false.  The database also accepts
 	 * the word "Curator" itself, as it accepts "Contributor" for Role1 (CR-1 and CR-2). </p>
+	 *
+	 * <p> Validates: RoleLabels.toStoredName(), Database.updateUserRole(). </p>
 	 */
 	@Test
 	@DisplayName("CH-10 The role chosen as Curator on the screen is saved (P)")
@@ -526,6 +546,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-11, negative.  A role name the system does not have is refused and no
 	 * flag changes (CR-2). </p>
+	 *
+	 * <p> Validates: Database.updateUserRole(). </p>
 	 */
 	@Test
 	@DisplayName("CH-11 An unknown role name changes nothing (N)")
@@ -550,6 +572,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-12, positive.  A user whose only role is Curator is accepted by the
 	 * Curator login check and has exactly one role, so the login page sends the user straight
 	 * to the Curator Home Page (US-CR2; CR-3). </p>
+	 *
+	 * <p> Validates: Database.loginRole2(). </p>
 	 */
 	@Test
 	@DisplayName("CH-12 A Curator logs in and has one role (P)")
@@ -567,6 +591,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-13, negative.  The Curator login check refuses a Contributor who is
 	 * not a Curator, and refuses a Curator with the wrong password (CR-3). </p>
+	 *
+	 * <p> Validates: Database.loginRole2(). </p>
 	 */
 	@Test
 	@DisplayName("CH-13 A non-Curator or a wrong password is refused (N)")
@@ -589,6 +615,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-14, positive.  A user who is both a Contributor and a Curator has two
 	 * roles, so the login page shows the role chooser, and both login checks accept the user
 	 * (US-CR2; CR-3). </p>
+	 *
+	 * <p> Validates: Database.loginRole2(). </p>
 	 */
 	@Test
 	@DisplayName("CH-14 A Contributor who is also a Curator has two roles (P)")
@@ -607,6 +635,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-15, negative.  After an Admin removes the Curator role, the Curator
 	 * login check refuses that user, even though the user was accepted before (US-CR1;
 	 * CR-2 and CR-3). </p>
+	 *
+	 * <p> Validates: Database.loginRole2(), Database.updateUserRole(). </p>
 	 */
 	@Test
 	@DisplayName("CH-15 After the role is removed the Curator login is refused (N)")
@@ -632,6 +662,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-16, positive.  A Curator's list holds lessons from two different
 	 * Contributors and is as long as the number of lessons in the database (US-CH1; CR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-16 A Curator sees every Contributor's lessons (P)")
@@ -652,6 +684,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-17, positive.  The list is newest first, so a lesson just added is
 	 * the first row and the one added before it is the second (US-CH1; CR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-17 The list is newest first (P)")
@@ -670,6 +704,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-18, negative.  A Contributor who asks for the full list is refused
 	 * and receives no list, which protects the privacy story US-R4 (US-CH-V; CR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-18 A Contributor is refused the full list (N)")
@@ -686,6 +722,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-19, negative.  An Admin without the Curator role, a user with no
 	 * role, and no user at all are each refused and receive no list (US-CH-V; CR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-19 An Admin, a user with no role, and null are refused (N)")
@@ -705,6 +743,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-20, positive.  A user who is a Contributor and a Curator may use the
 	 * Curator's list, and it includes another Contributor's lesson (US-CH1; CR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-20 A user with both roles sees the full list (P)")
@@ -729,6 +769,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-21, positive.  A keyword that only one lesson contains finds exactly
 	 * that lesson, although another Contributor owns it (US-CH2; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-21 A search finds a single matching lesson (P)")
@@ -747,6 +789,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-22, positive.  A keyword two Contributors both used finds both
 	 * lessons (US-CH2; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-22 A search finds lessons from several Contributors (P)")
@@ -765,6 +809,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-23, positive.  The search ignores case and also matches a keyword
 	 * that appears only in the tags, not in the title (US-CH2; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-23 A search matches tags and ignores case (P)")
@@ -781,6 +827,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-24, negative.  A keyword no lesson contains is not an error; it finds
 	 * nothing (US-CH2-V; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-24 A search that matches nothing finds no lessons (N)")
@@ -798,6 +846,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-25, negative.  Empty search text, or only spaces, is valid but finds
 	 * nothing, the same rule as the Contributor search (design decision D6; US-CH2-V;
 	 * CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-25 An empty search finds no lessons (N)")
@@ -817,6 +867,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-26, boundary.  Search text of 254 characters, the maximum, is
 	 * accepted; 255 characters is refused with a specific message and no search is run
 	 * (US-CH2-V; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-26 Search text of 254 characters is accepted and 255 is refused (N)")
@@ -839,6 +891,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-27, negative.  Search text containing a control character (a tab) is
 	 * refused with a specific message (US-CH2-V; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-27 Search text with a control character is refused (N)")
@@ -855,6 +909,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-28, negative.  A Contributor who searches is refused, and the role is
 	 * checked before the text: with invalid text the Contributor still receives the role
 	 * message, not the text message (US-CH-V; CR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.searchAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-28 A Contributor's search is refused before the text is checked (N)")
@@ -881,6 +937,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-29, positive.  A Curator opens a lesson another user owns and
 	 * receives the lesson, its owner, and its experience entries (US-CH3; CR-7). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewLesson(). </p>
 	 */
 	@Test
 	@DisplayName("CH-29 A Curator reads a Contributor's lesson with its experience (P)")
@@ -903,6 +961,8 @@ public class CuratorHomeTests {
 	 *
 	 * <p> Description: CH-30, negative.  A lesson that has been deleted gives "Lesson not
 	 * found." and no lesson (US-CH-V; CR-7). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewLesson(). </p>
 	 */
 	@Test
 	@DisplayName("CH-30 A Curator opening a deleted lesson gets Lesson not found (N)")
@@ -920,6 +980,8 @@ public class CuratorHomeTests {
 	 * for the Contributor's own lesson, and receives the same message for a lesson that does
 	 * not exist, so the refusal reveals nothing about which lessons exist (CWE-200; US-CH-V;
 	 * CR-7). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewLesson(). </p>
 	 */
 	@Test
 	@DisplayName("CH-31 A Contributor is refused before the lesson is looked up (N)")
@@ -942,6 +1004,8 @@ public class CuratorHomeTests {
 	 * with those fields, and, on a second lesson, the whole lesson alone.  The last case proves
 	 * the summary does not list every field just because the whole lesson is locked (US-CH3;
 	 * CR-7). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.lockSummary(). </p>
 	 */
 	@Test
 	@DisplayName("CH-32 The lock summary names what is locked (P)")
@@ -967,6 +1031,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-33, positive.  The details shown for a selected lesson are its title,
 	 * owner, category, tags, locks, description, and experience entries, one fact per line
 	 * (US-CH3; CR-7). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.detailsText(), ModelCuratorHome.viewLesson(). </p>
 	 */
 	@Test
 	@DisplayName("CH-33 The details text shows every part of the lesson (P)")
@@ -1006,6 +1072,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-34, regression.  With the Curator's list in place, a Contributor's
 	 * own list still never includes another Contributor's lesson (US-R4), while the Curator's
 	 * list includes both (CR-8). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-34 A Contributor's own list still shows only that Contributor's lessons (P)")
@@ -1028,6 +1096,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-35, integration.  The lock action (Epic E6) still refuses a
 	 * Contributor and accepts a Curator, and a lesson the Curator locked is shown as locked in
 	 * the Curator's list (CR-8). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.viewAllLessons(). </p>
 	 */
 	@Test
 	@DisplayName("CH-35 The lock action uses the same Curator rule and its lock shows (P)")
@@ -1049,6 +1119,8 @@ public class CuratorHomeTests {
 	 * <p> Description: CH-36, positive.  A row of the Curator's list shows the title, the
 	 * category, and the owner, and adds "(locked)" once any part of the lesson is locked
 	 * (US-CH1; CR-5). </p>
+	 *
+	 * <p> Validates: ModelCuratorHome.rowText(). </p>
 	 */
 	@Test
 	@DisplayName("CH-36 A list row shows the title, category, owner, and locked state (P)")

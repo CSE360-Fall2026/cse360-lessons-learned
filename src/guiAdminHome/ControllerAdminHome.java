@@ -26,6 +26,9 @@ import javafx.scene.control.ChoiceDialog;
  * can invoke these methods.  This is why each has been declared at "protected".  Do not change any
  * of these methods to public.</p>
  *
+ * <p> Tested by M-CH6 (an invitation for the Curator role creates a Curator) and M-CH5
+ * (Add/Remove Roles) in Manual Tests.pdf. </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

@@ -7,6 +7,10 @@ package entityClasses;
  * <p> Description: This User class represents a user entity in the system.  It contains the user's
  *  details such as userName, password, and roles being played. </p>
  *
+ * <p> Tested by curatorHomeTests.CuratorHomeTests (the Curator role),
+ * viewerTests.ViewerAccessTests (the Viewer role), and database.DatabaseAuthenticationTest
+ * (JUnit), and by M-CH5 and M-V1 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

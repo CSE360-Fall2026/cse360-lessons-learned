@@ -18,6 +18,9 @@ import entityClasses.User;
  * <p> The Viewer role uses the Role3 flag stored in the User
  * object. This flag is loaded from the database during login. </p>
  *
+ * <p> Tested by viewerTests.ViewerAccessTests (JUnit, all 5 tests) and by the refusal tests in
+ * viewerTests.ViewerHomeTests, and by M-V2 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author David Nevarez

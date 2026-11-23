@@ -9,6 +9,11 @@ import java.util.Set;
  * Entity model representing aggregated time and effort statistics merged
  * across multiple lessons-learned instances (Aspects 3 and 4 / Epics E4 and E5).
  *
+ * <p> Tested by curatorSummaryTests.CuratorSummaryTests SU-01 to SU-05 (the statistics and
+ * their formatting) and CuratorSummaryPageTests SP-05, SP-12, and SP-15 (the table and panel
+ * lines, with a decimal point on every computer) (JUnit), and by M-CS3 and M-CS8 (Manual
+ * Tests.pdf). </p>
+ *
  * @author Alex Meyers
  * @author Emilia Davey
  * @version 3.0  2026-11-16 Alex Meyers: summary entity for Aspects 3 and 4
@@ -16,16 +21,27 @@ import java.util.Set;
  *               computer (a Polish or German locale would otherwise show "2,00")
  */
 public class LessonSummary {
+    /** The id of this summary's row in lessonSummaryDB, set when it is saved. */
     private int summaryId;
+    /** The id of the lesson this summary is saved on (the Curator's target lesson). */
     private int targetLessonId;
+    /** The distinct ids of the lessons whose experience records were merged. */
     private Set<Integer> sourceLessonIds;
+    /** The number of experience records (observations) that were merged. */
     private int entryCount;
+    /** The sum of the merged effort hours. */
     private double totalHours;
+    /** The mean of the merged effort hours. */
     private double meanHours;
+    /** The median of the merged effort hours. */
     private double medianHours;
+    /** The smallest merged effort value, in hours. */
     private double minHours;
+    /** The largest merged effort value, in hours. */
     private double maxHours;
+    /** The sample standard deviation of the merged hours; NaN when there is only one observation. */
     private double standardDeviationHours;
+    /** Whether the Curator has made this summary visible to Contributors (and Viewers). */
     private boolean visibleToContributor;
 
     /**

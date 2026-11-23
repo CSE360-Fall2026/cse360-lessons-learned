@@ -1,3 +1,7 @@
+/**
+ * The Lessons Learned System (CSE 360, Fall 2026): the Foundations application with the TP2
+ * Contributor pages and the TP3 Curator, Viewer, and AI features, and their JUnit tests.
+ */
 module FoundationsF26 {
 	requires javafx.controls;
 	requires java.sql;

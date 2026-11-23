@@ -54,6 +54,11 @@ import java.util.List;
  * Copyright: Lynn Robert Carter © 2026
  * </p>
  *
+ * <p> Tested by lessonTests.LessonsLearnedListEntityTests and
+ * entityClasses.LessonsLearnedSearchTest (JUnit); the TP3 search over the Curator's saved
+ * search terms by viewerTests.ViewerHomeTests and ViewerDatabaseIntegrationTests (JUnit) and
+ * by M-ST6 and M-V4 (Manual Tests.pdf). </p>
+ *
  * @author David Nevarez and Emilia Davey
  *
  * @version 1.00 2026-09-29 Initial version for HW2 (as LessonCollection)

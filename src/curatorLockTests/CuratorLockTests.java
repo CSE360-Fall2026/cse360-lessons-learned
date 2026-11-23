@@ -341,6 +341,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-01, positive.  A Curator locks the title of a lesson the Curator does
 	 * not own (scenario S1; TR-1 and TR-2). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-01 A Curator locks the title (P)")
@@ -356,6 +358,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk02_adminRefused() </p>
 	 *
 	 * <p> Description: LK-02, negative.  An Admin who is not a Curator is refused. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-02 An Admin who is not a Curator is refused (N)")
@@ -371,6 +375,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk03_ownerRefused() </p>
 	 *
 	 * <p> Description: LK-03, negative.  The lesson's own Contributor is refused. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-03 The lesson's own Contributor is refused (N)")
@@ -388,6 +394,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-04, negative, boundary value.  No user at all (null) is refused without
 	 * an exception. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-04 No user (null) is refused without an exception (N)")
@@ -404,6 +412,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-05, positive.  A user who is both a Contributor and a Curator may
 	 * lock. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-05 A user with the Contributor and Curator roles may lock (P)")
@@ -420,6 +430,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-06, negative.  A non-Curator asking about a missing lesson gets the
 	 * not-a-Curator message, not "Lesson not found.", which proves the role is checked first. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-06 The role is checked before the lesson (N)")
@@ -442,6 +454,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-07, negative.  A lesson deleted after the Curator's list was shown
 	 * (scenario S5). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-07 A deleted lesson gives Lesson not found. (N)")
@@ -457,6 +471,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-08, negative, boundary value.  Id 0, just below the first database
 	 * id. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-08 Lesson id 0 gives Lesson not found. (N)")
@@ -471,6 +487,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk09_idMinusOne() </p>
 	 *
 	 * <p> Description: LK-09, negative, boundary value.  Id -1, the TP2 "no lesson" id. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-09 Lesson id -1 gives Lesson not found. (N)")
@@ -493,6 +511,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-10, negative, boundary value.  An empty list (scenario S4: Lock
 	 * pressed with nothing ticked). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-10 An empty field list is refused (N)")
@@ -508,6 +528,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk11_nullList() </p>
 	 *
 	 * <p> Description: LK-11, negative.  A missing (null) list is treated like an empty one. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-11 A null field list is refused without an exception (N)")
@@ -523,6 +545,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk12_unknownName() </p>
 	 *
 	 * <p> Description: LK-12, negative.  A name that is not one of the five field names. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-12 An unknown field name is refused (N)")
@@ -539,6 +563,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-13, negative, boundary value.  "Title" differs from a valid name only
 	 * by letter case. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-13 A name with the wrong letter case is refused (N)")
@@ -555,6 +581,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-14, negative.  A valid name with an unknown one: nothing is saved, not
 	 * even the valid name. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-14 A valid name mixed with an unknown one saves nothing (N)")
@@ -570,6 +598,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk15_repeatedName() </p>
 	 *
 	 * <p> Description: LK-15, positive.  A repeated name is counted once. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-15 A repeated name is counted once (P)")
@@ -586,6 +616,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-16, positive, boundary value.  The largest valid list: all five
 	 * names. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-16 All five names together are accepted (P)")
@@ -612,6 +644,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-17, negative.  A valid request that is not confirmed returns a refused
 	 * result with an EMPTY message and saves nothing (scenario S4). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-17 Without confirmation nothing is saved (N)")
@@ -629,6 +663,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-18, positive.  The two-step flow the Curator page will use: ask first,
 	 * then save after Yes. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-18 Ask first, then save after Yes (P)")
@@ -653,6 +689,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-19, positive.  Scenario S1: lock title and tags, given in reverse
 	 * order. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-19 Two fields lock exactly those flags; message in fixed order (P)")
@@ -672,6 +710,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-20, positive.  Scenario S2: a whole-lesson lock makes every field count
 	 * as locked through the TP2 methods. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-20 A whole-lesson lock covers every field (P)")
@@ -696,6 +736,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-21, positive.  Scenario S3: unlocking one mistake leaves the other
 	 * locks in place (TR-6). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-21 Unlocking one field leaves the other locks (P)")
@@ -713,6 +755,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk22_unlockWhatIsNotLocked() </p>
 	 *
 	 * <p> Description: LK-22, positive.  Unlocking a field that is not locked is harmless. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-22 Unlocking a field that is not locked is harmless (P)")
@@ -729,6 +773,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-23, negative.  The empty-list message uses the word for the action
 	 * actually requested. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-23 An empty list when unlocking uses the unlock wording (N)")
@@ -751,6 +797,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-24, positive.  Three flags set by one call to setLessonLocks(), with
 	 * one name repeated. </p>
+	 *
+	 * <p> Validates: Database.setLessonLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-24 setLessonLocks sets three flags in one call, repeats ignored (P)")
@@ -770,6 +818,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-25, negative.  A write that changes no row is reported as a
 	 * failure. </p>
+	 *
+	 * <p> Validates: Database.setLessonLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-25 setLessonLocks on a missing lesson returns false (N)")
@@ -786,6 +836,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-26, negative, boundary value.  An empty or missing (null) list must
 	 * not run an empty or broken UPDATE. </p>
+	 *
+	 * <p> Validates: Database.setLessonLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-26 setLessonLocks with an empty or null list returns false (N)")
@@ -804,6 +856,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-27, negative.  An unknown or null name is refused before the statement
 	 * is built, so nothing is written. </p>
+	 *
+	 * <p> Validates: Database.setLessonLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-27 setLessonLocks with an unknown or null name writes nothing (N)")
@@ -833,6 +887,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-28, negative.  After a Curator locks the title, the owner's change is
 	 * refused by the unchanged TP2 ModelUpdateLesson (US-U1-V). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(), ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@DisplayName("LK-28 The owner cannot edit a title the Curator locked (N)")
@@ -851,6 +907,8 @@ public class CuratorLockTests {
 	 * <p> Method: void lk29_ownerCanEditUnlockedField() </p>
 	 *
 	 * <p> Description: LK-29, positive.  Locking the title does not freeze the description. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(), ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@DisplayName("LK-29 The owner can still edit a field that is not locked (P)")
@@ -873,6 +931,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-30, negative.  Any locked field blocks deletion, even with an explicit
 	 * Yes (US-D1-V). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(), ModelLessonDetails.deleteLesson(). </p>
 	 */
 	@Test
 	@DisplayName("LK-30 The owner cannot delete a lesson with a locked field (N)")
@@ -890,6 +950,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-31, positive.  A fully locked lesson still accepts experience (ConOps
 	 * assumption A4). </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(). </p>
 	 */
 	@Test
 	@DisplayName("LK-31 Experience can still be added to a fully locked lesson (P)")
@@ -909,6 +971,8 @@ public class CuratorLockTests {
 	 *
 	 * <p> Description: LK-32, positive.  After the Curator unlocks the title, the owner can
 	 * change it again. </p>
+	 *
+	 * <p> Validates: ModelCuratorLock.changeLocks(), ModelUpdateLesson.updateLesson(). </p>
 	 */
 	@Test
 	@DisplayName("LK-32 After unlocking, the owner can edit the title again (P)")
@@ -937,6 +1001,9 @@ public class CuratorLockTests {
 	 * this test checks. </p>
 	 *
 	 * @throws SQLException if the database cannot be reopened afterward
+	 *
+	 * <p> Validates: every TP2 requirement test (lessonTests) and every LessonRecognizerTest
+	 * test, run again as a regression check after the Curator lock was added. </p>
 	 */
 	@Test
 	@DisplayName("LK-33 The TP2 test suites still pass (P, regression)")

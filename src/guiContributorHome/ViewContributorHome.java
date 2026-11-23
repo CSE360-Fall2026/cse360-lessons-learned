@@ -43,6 +43,9 @@ import entityClasses.User;
  * "rule of 7"), one clearly emphasized primary action (New Lesson), and messages shown in place
  * rather than in pop-ups.</p>
  *
+ * <p> Tested by the TP2 semi-automated tests M2 and M3 in lessonTests.ManualGuiTests, and by
+ * M-CL5, M-CS6, and M-RF7 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Lynn Robert Carter (Contributor home page by Emilia Davey)

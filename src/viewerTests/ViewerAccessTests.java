@@ -23,10 +23,18 @@ import guiTools.ViewerAccess;
 public class ViewerAccessTests {
 
     /**********
+     * Default constructor.  JUnit creates an instance for each test.
+     */
+    public ViewerAccessTests() {
+    }
+
+    /**********
      * <p> Method: testViewerIsAuthorized() </p>
      *
      * <p> Description: Verifies that a user with the Viewer
      * role is authorized. </p>
+     *
+     * <p> Validates: ViewerAccess.isViewer(). </p>
      */
     @Test
     public void testViewerIsAuthorized() {
@@ -43,6 +51,8 @@ public class ViewerAccessTests {
      *
      * <p> Description: Verifies that the Contributor role
      * does not automatically provide Viewer access. </p>
+     *
+     * <p> Validates: ViewerAccess.isViewer(). </p>
      */
     @Test
     public void testContributorIsNotViewer() {
@@ -59,6 +69,8 @@ public class ViewerAccessTests {
      *
      * <p> Description: Verifies that the Curator role
      * does not automatically provide Viewer access. </p>
+     *
+     * <p> Validates: ViewerAccess.isViewer(). </p>
      */
     @Test
     public void testCuratorIsNotViewer() {
@@ -75,6 +87,8 @@ public class ViewerAccessTests {
      *
      * <p> Description: Verifies that a null user cannot
      * obtain Viewer access. </p>
+     *
+     * <p> Validates: ViewerAccess.isViewer(). </p>
      */
     @Test
     public void testNullUserIsDenied() {
@@ -87,6 +101,8 @@ public class ViewerAccessTests {
      *
      * <p> Description: Verifies that removing the Viewer
      * flag from a user denies Viewer authorization. </p>
+     *
+     * <p> Validates: ViewerAccess.isViewer(). </p>
      */
     @Test
     public void testViewerRoleCanBeRemoved() {

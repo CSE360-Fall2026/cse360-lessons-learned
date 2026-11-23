@@ -25,6 +25,12 @@ import inputValidation.LessonRecognizer;
  * The Model uses an injectable provider so tests can supply
  * deterministic responses without making external API calls. </p>
  *
+ * <p> Tested by curatorTests.CuratorSearchTermsTests (JUnit, all 10 tests: authorization,
+ * review, suggestions, approval, saving, and outdated drafts), by lessonTests.WritingHelpTests
+ * WH-12 (the connection to the shared AI service), and by
+ * viewerTests.ViewerDatabaseIntegrationTests (saved terms are searched); on screen by M-ST1 to
+ * M-ST6 (Manual Tests.pdf). </p>
+ *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 5
@@ -50,6 +56,15 @@ public class ModelCuratorSearchTerms {
     @FunctionalInterface
     public interface SuggestionProvider {
 
+        /**
+         * Asks the AI provider for search terms for one lesson.
+         *
+         * @param title the lesson's title
+         * @param description the lesson's description
+         * @param tags the lesson's tags
+         * @return the provider's raw, comma-separated suggestion, which the Model cleans
+         * @throws Exception if the provider cannot answer; the Model reports AI_UNAVAILABLE
+         */
         String suggest(String title, String description, String tags)
                 throws Exception;
     }
@@ -57,6 +72,13 @@ public class ModelCuratorSearchTerms {
     /**
      * <p> Description: Immutable lesson snapshot used during
      * the Curator's review of search terms. </p>
+     *
+     * @param lessonId the id of the lesson being reviewed
+     * @param title the lesson's title when it was opened
+     * @param description the lesson's description when it was opened
+     * @param tags the lesson's tags when it was opened
+     * @param savedTerms the search terms stored when it was opened, which a save compares
+     *        with the stored terms to detect a change made meanwhile (STALE)
      */
     public record Draft(
             int lessonId,
@@ -69,6 +91,11 @@ public class ModelCuratorSearchTerms {
     /**
      * <p> Description: Result of opening a lesson or requesting
      * suggestions. Suggestions are not automatically approved. </p>
+     *
+     * @param success true if the lesson was opened or suggestions were produced
+     * @param message the message the page shows
+     * @param draft the lesson snapshot, or null when the request was refused
+     * @param suggestion the cleaned suggested terms, or "" when there are none
      */
     public record Review(
             boolean success,
@@ -77,8 +104,12 @@ public class ModelCuratorSearchTerms {
             String suggestion) {
     }
 
+    /** The database the lesson is read from and the approved terms are saved to. */
     private final Database database;
+    /** The shared AI service, used here only to clean each suggestion before it is shown. */
     private final SharedAiService cleaner;
+    /** Where suggestions come from: the shared AI service in the application, a simulated
+     *  provider in the tests; null means AI suggestions are unavailable. */
     private final SuggestionProvider provider;
 
     /**********

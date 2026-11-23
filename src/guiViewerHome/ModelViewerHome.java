@@ -29,6 +29,10 @@ import inputValidation.LessonRecognizer;
  * search functionality. Database overloads allow isolated
  * integration testing without modifying the shared database. </p>
  *
+ * <p> Tested by viewerTests.ViewerHomeTests and ViewerDatabaseIntegrationTests (JUnit) and by
+ * curatorSummaryTests.CuratorSummaryPageTests SP-14 (a summary only when visible); on screen
+ * by M-V3 to M-V5 (Manual Tests.pdf). </p>
+ *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9

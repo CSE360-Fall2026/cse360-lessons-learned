@@ -27,6 +27,9 @@ import guiTools.LessonAccess;
  * <p> The Model works on the Database it is given.  The page gives it FoundationsMain.database;
  * the JUnit tests give it an in-memory database (curatorSummaryTests.CuratorSummaryPageTests).</p>
  *
+ * <p> Tested by curatorSummaryTests.CuratorSummaryPageTests SP-01 to SP-11 (JUnit), and on
+ * screen by M-CS1 to M-CS8 (Manual Tests.pdf). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

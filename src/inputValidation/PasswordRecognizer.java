@@ -11,6 +11,8 @@ package inputValidation;
  * This is a purely static component of the MVC implementation.  There is no need to instantiate
  * the class.
  *
+ * <p> Tested by hw3Tests.PasswordRecognizerTest PW-01 to PW-26 (JUnit). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2025 </p>
  *
  * @author Lynn Robert Carter

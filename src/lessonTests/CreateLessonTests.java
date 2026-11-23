@@ -129,6 +129,8 @@ public class CreateLessonTests {
 	 * <p> <b>How to read the output:</b> the Actual line shows the Model's message, how many
 	 * lessons the Contributor now has, and the title, category, and tags read back from the
 	 * database.  PASS means the lesson was really stored with exactly the values entered. </p>
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	@Order(1)
@@ -164,6 +166,8 @@ public class CreateLessonTests {
 	 * <p> <b>How to read the output:</b> the stored title must be "Padded title" with no spaces
 	 * around it, and the tags must be "(none)".  PASS means an optional field may be left empty
 	 * and the stored text is clean. </p>
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	@Order(2)
@@ -195,6 +199,8 @@ public class CreateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> the Actual line shows the lengths read back from the
 	 * database.  PASS means both limits are accepted and stored in full. </p>
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	@Order(3)
@@ -231,6 +237,8 @@ public class CreateLessonTests {
 	 * <p> <b>How to read the output:</b> the Actual line must show the category message, the
 	 * field "category", and 0 lessons.  PASS means the invalid input was refused and nothing
 	 * was stored. </p>
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	@Order(4)
@@ -263,6 +271,8 @@ public class CreateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the message names the missing title, the
 	 * field is "title", and 0 lessons were stored. </p>
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	@Order(5)
@@ -295,6 +305,8 @@ public class CreateLessonTests {
 	 *
 	 * <p> <b>How to read the output:</b> PASS means the length message is shown for the
 	 * description and 0 lessons were stored. </p>
+	 *
+	 * <p> Validates: ModelCreateLesson.createLesson(). </p>
 	 */
 	@Test
 	@Order(6)

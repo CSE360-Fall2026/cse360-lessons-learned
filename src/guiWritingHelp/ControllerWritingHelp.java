@@ -26,6 +26,9 @@ import javafx.scene.paint.Color;
  * <p> The class has been written assuming that the View is the only class that invokes these
  * methods.  This is why each has been declared "protected".</p>
  *
+ * <p> Tested by M-WH1 to M-WH5 (Manual Tests.pdf). The Model methods these actions call are
+ * tested by lessonTests.WritingHelpTests WH-01 to WH-11 (JUnit). </p>
+ *
  * <p> Copyright: Lynn Robert Carter © 2026 </p>
  *
  * @author Emilia Davey

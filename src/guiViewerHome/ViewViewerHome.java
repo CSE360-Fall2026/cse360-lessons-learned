@@ -38,6 +38,8 @@ import javafx.stage.Stage;
  * while removing Curator-specific actions. </p>
  *
  *
+ * <p> Tested by M-V1 to M-V6, M-CS7, and M-ST6 (Manual Tests.pdf). </p>
+ *
  * @author David Nevarez
  *
  * @version 1.00 2026-11-15 Initial version for TP3 Aspect 9
